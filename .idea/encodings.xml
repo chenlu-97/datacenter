@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/datacenter-air-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-air-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-auth2-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-auth2-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-cwic-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-cwic-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-gee-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-gee-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-hikvision-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-hikvision-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-himawari-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-himawari-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-indicator-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-indicator-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-laads-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-laads-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-littleSensor-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-littleSensor-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-mobile-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-mobile-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-offline-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-offline-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-product-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-product-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-util/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-weather-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-weather-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server01/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server01/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server02/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server02/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server03/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server03/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-sos/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-sos/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-swe/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ogc-services-swe/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sensorml-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sensorml-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sos-obs-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sos-obs-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sos-sensor-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sos-sensor-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/swe-common-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/swe-common-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/swe-common-om/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/swe-common-om/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

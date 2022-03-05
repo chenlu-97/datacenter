@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterlaadsservice.dao.GLDASMapper">
+    <sql id="insertFields">
+        gldas_id, title,  link, file_path, time,  bbox, geom , product_type, get_date
+    </sql>
+
+    <sql id="selectFields">
+        id, gldas_id, title, link, file_path, time,  bbox , product_type, get_date
+    </sql>
+
+    <insert id="insertData" parameterType="GLDAS" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gldas (<include refid="insertFields"></include>)
+        VALUES (#{gldasId}, #{title}, #{link}, #{filePath}, #{time},  #{bbox}, ST_GeomFromText(#{wkt}, 4326), #{productType}, #{getDate})
+    </insert>
+
+    <insert id="insertDataBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gldas (<include refid="insertFields"></include>)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.gldasId}, #{item.title},  #{item.link}, #{item.filePath}, #{item.time},  #{item.bbox}, ST_GeomFromText(#{item.wkt}, 4326),  #{item.productType}, #{item.getDate})
+        </foreach>
+    </insert>
+
+    <select id="selectById" resultMap="gldas">
+        SELECT <include refid="selectFields"></include>
+        FROM gldas
+        WHERE id = #{id}
+    </select>
+
+
+    <select id="selectNew" resultMap="gldas">
+        SELECT <include refid="selectFields"></include>
+        FROM gldas
+        WHERE time = (select max(time) from gldas)
+    </select>
+
+    <resultMap id="gldas" type="GLDAS">
+        <id column="id" property="id"/>
+        <result column="gldas_id" property="gldasId"/>
+        <result column="title" property="title"/>
+        <result column="link" property="link"/>
+        <result column="filePath" property="file_path"/>
+        <result column="time" property="time"/>
+        <result column="bbox" property="bbox"/>
+        <result column="product_type" property="productType"/>
+        <result column="get_date" property="getDate"/>
+    </resultMap>
+
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM gldas
+    </select>
+
+    <select id="selectByIds" resultMap="gldas" >
+        SELECT <include refid="selectFields"></include>
+        FROM gldas ORDER BY time DESC
+        WHERE satellite in
+        <foreach collection="satellite" item="satellite" open="(" close=")" separator=",">
+            #{satellite}
+        </foreach>
+        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+    <select id="selectByPage" resultMap="gldas">
+        SELECT <include refid="selectFields"></include>
+        FROM gldas ORDER BY time DESC
+        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+
+    <select id="getFilePath" resultMap="gldas">
+        SELECT <include refid="selectFields"></include>
+        FROM gldas
+        WHERE  start_time <![CDATA[>=]]> #{startTime} AND start_time <![CDATA[<=]]> #{endTime}
+
+    </select>
+
+</mapper>

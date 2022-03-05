@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterweatherservice.dao.HBWeatherStationMapper">
+    <sql id="insertFields">
+        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time
+    </sql>
+
+    <sql id="selectFields">
+        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time
+    </sql>
+
+    <insert id="insertData" parameterType="HBWeatherStation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO hb_weather_station_hourly (<include refid="insertFields"></include>)
+        VALUES (#{stationId},#{lat}, #{lon},#{prs},#{tem},#{rhu},#{pre_1h},#{gst},#{queryTime})
+    </insert>
+
+    <resultMap id="hbWeatherStation" type="HBWeatherStation">
+        <result column="station_name" property="stationId"/>
+        <result column="lat" property="lat"/>
+        <result column="lon" property="lon"/>
+        <result column="pressure" property="prs"/>
+        <result column="temperature" property="tem"/>
+        <result column="relative_humidity" property="rhu"/>
+        <result column="pre_1h" property="pre_1h"/>
+        <result column="ground_temperature" property="gst"/>
+        <result column="response_time" property="queryTime"/>
+    </resultMap>
+
+    <select id="selectByPage" resultMap="hbWeatherStation">
+        SELECT <include refid="selectFields"></include>
+        FROM hb_weather_station_hourly order by response_time desc
+        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM hb_weather_station_hourly
+    </select>
+
+</mapper>
