@@ -94,7 +94,7 @@ public class InsertGLDASService {
     public boolean insertDataByCookie(String loadfile) throws Exception {
         boolean res = false;
         int j = 0;
-        File file = new File(loadfile);
+        File file = new File(filePath+loadfile);
         try{
             BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
             String downloadPath = null;
@@ -283,7 +283,7 @@ public class InsertGLDASService {
 
 
     public String getCookie(String downloadurl) {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\chenlu\\Desktop\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", filePath+"chromedriver.exe");
         WebDriver driver = new ChromeDriver();
         driver.get("https://urs.earthdata.nasa.gov/");
         WebElement username = driver.findElement(By.id("username"));
