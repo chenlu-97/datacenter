@@ -15,6 +15,7 @@ public interface GLDASMapper {
     List<GLDAS> getFilePath(@Param("startTime") Instant startTime, @Param("endTime") Instant endTime);
 
     int insertData(GLDAS gldas);
+
     int insertDataBatch(List<GLDAS> gldaslist);
 
     GLDAS selectById(int id);

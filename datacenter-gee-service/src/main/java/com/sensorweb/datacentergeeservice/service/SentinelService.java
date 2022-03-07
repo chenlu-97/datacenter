@@ -54,11 +54,6 @@ public class SentinelService {
             @Override
             public void run() {
                 try {
-//                        MODIS/006/MCD12Q1
-//                        MODIS/006/MOD13A2
-//                        MODIS/006/MOD11A2
-//                        MODIS/006/MOD11A1
-//                        COPERNICUS/S2_SR
                     String Landsat8 = "COPERNICUS/S2_SR";
                     String url = "http://172.16.100.2:8009/getSentinel/";
                     String param = "image=" + Landsat8 + "&startDate=" + begin + "&endDate=" + end;

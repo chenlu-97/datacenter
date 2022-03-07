@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DatacenterLaadsServiceApplicationTests {
+class test1 {
 
     @Autowired
     private InsertLAADSService insertLAADSService;
@@ -63,7 +63,7 @@ class DatacenterLaadsServiceApplicationTests {
 //        System.out.println("stop = " + stop);
 //        System.out.println("start = " + start);
 //        insertGLDASService.insertData("2022-02-01T00:00:00Z");
-        insertGLDASService.insertDataByCookie("5358371643-download.txt");
+        insertGLDASService.insertDataByCookie("002_5736543331-download.txt");
 //        insertGLDASService.getCookie("https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.0000.021.nc4");
     }
 }
