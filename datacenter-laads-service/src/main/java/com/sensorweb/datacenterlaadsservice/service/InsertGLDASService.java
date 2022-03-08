@@ -11,7 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -277,8 +277,8 @@ public class InsertGLDASService {
 
 
     public String getCookie(String downloadurl) {
-        System.setProperty("webdriver.chrome.driver", filePath+"chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
+        System.setProperty("webdriver.firefox.bin", filePath+"geckodriver");
+        WebDriver driver = new FirefoxDriver();
         driver.get("https://urs.earthdata.nasa.gov/");
         WebElement username = driver.findElement(By.id("username"));
         WebElement password = driver.findElement(By.id("password"));
