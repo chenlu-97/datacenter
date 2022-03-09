@@ -104,7 +104,7 @@ public class GetLandsatController {
                 Map map = new LinkedHashMap();
                 String id = landsat.getImageID();
                 String str = landsat.getCoordinates();
-                String time = landsat.getDate();
+                String time = landsat.getDate().toString();
                 String coordinate = str.replace("POLYGON", "").replace("((","").replace("))","").replace(" ",",");
                 String[] tmp = coordinate.split(",");
                 List<Float> point = new ArrayList<>();

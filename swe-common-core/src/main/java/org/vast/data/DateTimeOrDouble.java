@@ -9,13 +9,14 @@
 
 package org.vast.data;
 
+import com.google.common.base.Objects;
+import org.vast.util.Asserts;
+import org.vast.util.NumberUtils;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import org.vast.util.Asserts;
-import org.vast.util.NumberUtils;
-import com.google.common.base.Objects;
 
 
 /**
