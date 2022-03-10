@@ -1,4 +1,4 @@
-package com.sensorweb.datacentergeeservice.config;
+package com.sensorweb.datacenterlaadsservice.config;
 
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -39,7 +39,7 @@ public class OkHttpConfig {
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder()
-//                .sslSocketFactory(sslSocketFactory(), x509TrustManager())
+                .sslSocketFactory(sslSocketFactory(), x509TrustManager())
                 // 是否开启缓存
                 .retryOnConnectionFailure(false)
                 //连接池
@@ -51,7 +51,7 @@ public class OkHttpConfig {
                 // 设置代理
 //                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8888)))
                 // 拦截器
-                .addInterceptor(new BasicAuthInterceptor("tyrr", "mao151014"))
+                .addInterceptor(new BasicAuthInterceptor("CUG_chenlu", "Chenlu1997"))
                 .build();
     }
 

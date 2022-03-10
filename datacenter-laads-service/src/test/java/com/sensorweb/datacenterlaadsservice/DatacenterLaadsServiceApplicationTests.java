@@ -1,6 +1,7 @@
 package com.sensorweb.datacenterlaadsservice;
 
 import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
+import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
 import com.sensorweb.datacenterlaadsservice.service.InsertGLDASService;
 import com.sensorweb.datacenterlaadsservice.service.InsertLAADSService;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ class DatacenterLaadsServiceApplicationTests {
     private EntryMapper entryMapper;
     @Autowired
     private InsertGLDASService insertGLDASService;
+    @Autowired
+    private GLDASMapper gldasMapper;
     @Test
     void contextLoads() throws Exception {
         //测试
@@ -62,8 +65,34 @@ class DatacenterLaadsServiceApplicationTests {
 //        String start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
 //        System.out.println("stop = " + stop);
 //        System.out.println("start = " + start);
-//        insertGLDASService.insertData("2022-02-01T00:00:00Z");
-        insertGLDASService.insertDataByCookie("007_5736543331-download.txt");
+//        insertGLDASService.insertDataByCookie("5358371643-download.txt");
 //        insertGLDASService.getCookie("https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.0000.021.nc4");
+//          insertGLDASService.getGLDASByBasic("2022-02-01T00:00:00Z");
+
+
+
+//        try {
+//            String time = null;
+//            if (gldasMapper.selectNew() != null) {
+//                time = gldasMapper.selectNew().getTime().plusSeconds(12*60*60).toString();
+//                System.out.println("time = " + time);
+//            }
+//            boolean flag = insertGLDASService.insertData(time);
+//            if (flag) {
+////                log.info("GLDAS接入时间: " + time + "Status: Success");
+//                System.out.println("GLDAS接入时间: " + time + "Status: Success");
+//            }else{
+////                log.error("GLDAS还未更新数据  "+time);
+//                System.out.println("GLDAS还未更新数据  "+time );
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+////            log.error(e.getMessage());
+////            log.error("GLDAS接入时间: " + calendar.getTime().toString() + "Status: Fail");
+////            System.out.println("GLDAS接入时间: " + calendar.getTime().toString() + "Status: Fail");
+//        }
+
+//        insertGLDASService.update();
+
     }
 }

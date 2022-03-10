@@ -24,6 +24,16 @@
         </foreach>
     </insert>
 
+
+    <update id="updateFileName" parameterType="java.lang.String">
+        UPDATE gldas SET file_path = #{newPath}
+        WHERE  gldas_id= #{id}
+    </update>
+
+
+
+
+
     <select id="selectById" resultMap="gldas">
         SELECT <include refid="selectFields"></include>
         FROM gldas
@@ -75,7 +85,12 @@
         SELECT <include refid="selectFields"></include>
         FROM gldas
         WHERE  start_time <![CDATA[>=]]> #{startTime} AND start_time <![CDATA[<=]]> #{endTime}
+    </select>
 
+
+    <select id="getall" resultMap="gldas">
+        SELECT <include refid="selectFields"></include>
+        FROM gldas
     </select>
 
 </mapper>

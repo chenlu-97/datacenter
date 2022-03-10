@@ -27,4 +27,8 @@ public interface GLDASMapper {
     List<GLDAS> selectByIds(@Param("satellite") List<String> satellite,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
     GLDAS selectNew();
+
+    List<GLDAS> getall();
+
+    void updateFileName(@Param("id") String id, @Param("newPath")String newPath);
 }

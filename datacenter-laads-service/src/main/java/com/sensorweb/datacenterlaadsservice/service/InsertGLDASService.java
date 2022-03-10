@@ -1,5 +1,8 @@
 package com.sensorweb.datacenterlaadsservice.service;
 
+
+import com.sensorweb.datacenterlaadsservice.config.DownloadUtil;
+import com.sensorweb.datacenterlaadsservice.config.OkHttpUtil;
 import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
 import com.sensorweb.datacenterlaadsservice.entity.GLDAS;
 import com.sensorweb.datacenterlaadsservice.entity.HttpsUrlValidator;
@@ -32,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +56,12 @@ public class InsertGLDASService {
     @Autowired
     private SensorFeignClient sensorFeignClient;
 
+    @Autowired
+    private OkHttpUtil okHttpUtil;
+
+    @Autowired
+    private DownloadUtil downloadUtil;
+
     @Value("${datacenter.path.gldas}")
     private String savePath;
 
@@ -69,7 +79,7 @@ public class InsertGLDASService {
                 try {
                     String time = null;
                     if (gldasMapper.selectNew() != null) {
-                        time = gldasMapper.selectNew().getTime().plusSeconds(24*60*60).toString();
+                        time = gldasMapper.selectNew().getTime().plusSeconds(3*60*60).toString();
                         System.out.println("time = " + time);
                     }
                         boolean flag = insertData(time);
@@ -106,6 +116,7 @@ public class InsertGLDASService {
                 int tmp = downloadurl.lastIndexOf("/");
                 String fileName = downloadurl.substring(tmp+1);
                 String localPath = downloadFromUrl(downloadurl, fileName, savePath,2);
+//                String localPath = getGLDASByBasic(downloadurl, fileName, savePath);
                 System.out.println("下载状态： " + localPath);
                 String date = downloadurl.substring(downloadurl.indexOf(".A")+2,downloadurl.indexOf(".021")).replace(".","");
                 if (localPath != "fail" && localPath != "none") {
@@ -121,6 +132,28 @@ public class InsertGLDASService {
         }
         return j > 0;
     }
+
+
+
+    public void update(){
+        List<GLDAS> all = gldasMapper.getall();
+        for(GLDAS one :all){
+         String id =  one.getGldasId();
+//            System.out.println("id = " + id);
+           String year = id.substring(id.indexOf(".A")+2).substring(0,4);
+//            System.out.println("year = " + year);
+            String newPath = one.getFilePath();
+            newPath = newPath.substring(0,newPath.lastIndexOf("gldas"))+"GLADS_data"+"/"+year+"/"+id;
+            System.out.println("newPath = " + newPath);
+            gldasMapper.updateFileName(id,newPath);
+        }
+
+
+
+    }
+
+
+
 
 
     /**
@@ -147,14 +180,14 @@ public class InsertGLDASService {
                     downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/" + year  + "/" +day+ "/" + fileName;
                 }
 
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath,1);
+                String localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year,2);
                 int i = 0; //防止失败，重试2次
                 while (localPath.equals("fail")) {
                     i++;
                     if (i > 1) {
                         break;
                     }
-                    localPath = downloadFromUrl(downloadurl, fileName, filePath, 1);
+                    localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year, 2);
                 }
                 GLDAS gldas = new GLDAS();
                 if (localPath != "fail" && localPath != "none") {
@@ -305,6 +338,7 @@ public class InsertGLDASService {
         return cookieStr;
     }
 
+
     public int insertDB(String fileName, String downloadurl, String date){
         int j ;
         GLDAS gldas = new GLDAS();
@@ -318,4 +352,49 @@ public class InsertGLDASService {
         j = gldasMapper.insertData(gldas);
         return j;
     }
+
+
+//    public String getGLDASByBasic(String time) throws Exception {
+//
+//        String date = time.replace("T", " ").replace("Z", "").substring(0, time.indexOf("T")).replace("-", "");
+//        String[] moments = {"0000", "0300", "0600", "0900", "1200", "1500", "1800", "2100"};
+//        for (String moment : moments) {
+//            String year = time.substring(0, 4);
+//            String day = YearMouthToday(date);
+//            String downloadurl;
+//            String fileName;
+//            if (Integer.valueOf(date) < 20201101) {
+//                fileName = "GLDAS_NOAH025_3H.A" + date + "." + moment + ".021.nc4";
+//                downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H/" + year + "/" + day + "/" + fileName;
+//            } else {
+//                fileName = "GLDAS_NOAH025_3H_EP.A" + date + "." + moment + ".021.nc4";
+//                downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/" + year + "/" + day + "/" + fileName;
+//            }
+//            downloadUtil.downloadBySysc(downloadurl, null, savePath, fileName);
+//
+////
+////
+////        InputStream inputStream = response.body().byteStream();
+////        byte[] getData = readInputStream(inputStream);
+////        if(getData.length<1000){ //如果网页返回值小于1mb ,则返回空
+////            return "no_data";
+////        }else{
+////            // 文件保存位置
+////            File saveDir = new File(savePath);
+////            if (!saveDir.exists()) {
+////                boolean flag = saveDir.mkdir();
+////            }
+////            File file = new File(saveDir + File.separator + fileName);
+////            FileOutputStream fos = new FileOutputStream(file);
+////            fos.write(getData);
+////            fos.close();
+////            inputStream.close();
+////            return savePath+fileName;
+////        }
+//        }
+//        return null;
+//    }
+
+
+
 }

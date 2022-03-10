@@ -222,35 +222,33 @@ public class LandsatService implements GoogleServiceConstant{
      * 00 ：产品级别
     */
     public String downloadLandsat(String time) {
-        String res = null;
-        for(int path = 117;path<=135;path++){
-            for(int row = 35;row<=46;row++){
+//        String res = null;
+//        for(int path = 117;path<=135;path++){
+//            for(int row = 35;row<=46;row++){
 //                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 //                Calendar calendarNow = Calendar.getInstance();
 //                String time = format.format(calendarNow.getTime());
-                String day_num = YearMouthToday(time);
-                String year = time.substring(0,4);
-                Format f1=new DecimalFormat("000");
-                String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
-                String url = "https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/"+filename;
-                res = downloadFromUrl(url, filename+".tar", savePath,2);
-                if(res == "error" || res =="no_data") {
-
-                }else if (res == "cookie过期"){
-                    res = downloadFromUrl(url, filename+".tar", savePath,1);
-                    if(res == "error"){
-                        return "cookie error";
-                    }
-                }else{
-
-
-                }
-
-//                System.out.println("url = " + url);
-//                String res = downloadFromUrl("https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC81300372022062LGN00", "LC81300372022062LGN00.tar", savePath);
-            }
-        }
-//        String res = downloadFromUrl("https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC81300372022062LGN00", "LC81300372022062LGN00.tar", savePath,2);
+//                String day_num = YearMouthToday(time);
+//                String year = time.substring(0,4);
+//                Format f1=new DecimalFormat("000");
+//                String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
+//                String url = "https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/"+filename;
+//                res = downloadFromUrl(url, filename+".tar", savePath,2);
+//                if(res == "error" || res =="no_data") {
+//
+//                }else if (res == "cookie过期"){
+//                    res = downloadFromUrl(url, filename+".tar", savePath,1);
+//                    if(res == "error"){
+//                        return "cookie error";
+//                    }
+//                }else{
+//
+//
+//                }
+//
+//            }
+//        }
+        String res = downloadFromUrl("https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC81300372022062LGN00", "LC81300372022062LGN00.tar", savePath,2);
         return  res;
     }
 
@@ -414,8 +412,6 @@ public class LandsatService implements GoogleServiceConstant{
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
         return localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
     }
-
-
 
 //
 //    public boolean getLandsatByUSGS() throws IOException {
