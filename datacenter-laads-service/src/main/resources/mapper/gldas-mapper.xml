@@ -8,15 +8,15 @@
     </sql>
 
     <sql id="selectFields">
-        id, gldas_id, title, link, file_path, time,  bbox , product_type, get_date
+        gldas_id, title, link, file_path, time,  bbox , product_type, get_date
     </sql>
 
-    <insert id="insertData" parameterType="GLDAS" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertData" parameterType="GLDAS">
         INSERT INTO gldas (<include refid="insertFields"></include>)
         VALUES (#{gldasId}, #{title}, #{link}, #{filePath}, #{time},  #{bbox}, ST_GeomFromText(#{wkt}, 4326), #{productType}, #{getDate})
     </insert>
 
-    <insert id="insertDataBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDataBatch" parameterType="java.util.List">
         INSERT INTO gldas (<include refid="insertFields"></include>)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -32,15 +32,6 @@
 
 
 
-
-
-    <select id="selectById" resultMap="gldas">
-        SELECT <include refid="selectFields"></include>
-        FROM gldas
-        WHERE id = #{id}
-    </select>
-
-
     <select id="selectNew" resultMap="gldas">
         SELECT <include refid="selectFields"></include>
         FROM gldas
@@ -48,7 +39,6 @@
     </select>
 
     <resultMap id="gldas" type="GLDAS">
-        <id column="id" property="id"/>
         <result column="gldas_id" property="gldasId"/>
         <result column="title" property="title"/>
         <result column="link" property="link"/>

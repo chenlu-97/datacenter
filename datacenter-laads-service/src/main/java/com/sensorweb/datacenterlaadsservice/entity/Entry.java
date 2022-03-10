@@ -6,7 +6,6 @@ import java.time.Instant;
 
 @Data
 public class Entry {
-    private int id;
     private String entryId;
     private String title;
     private String updated;

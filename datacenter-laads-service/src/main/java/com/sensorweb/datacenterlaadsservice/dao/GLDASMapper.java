@@ -18,8 +18,6 @@ public interface GLDASMapper {
 
     int insertDataBatch(List<GLDAS> gldaslist);
 
-    GLDAS selectById(int id);
-
     int selectNum();
 
     List<GLDAS> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
