@@ -65,7 +65,7 @@ class DatacenterLaadsServiceApplicationTests {
 //        String start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
 //        System.out.println("stop = " + stop);
 //        System.out.println("start = " + start);
-//        insertGLDASService.insertDataByCookie("5358371643-download.txt");
+        insertGLDASService.insertDataByCookie("5358371643-download.txt");
 //        insertGLDASService.getCookie("https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.0000.021.nc4");
 //          insertGLDASService.getGLDASByBasic("2022-02-01T00:00:00Z");
 

@@ -116,7 +116,6 @@ public class InsertGLDASService {
                 int tmp = downloadurl.lastIndexOf("/");
                 String fileName = downloadurl.substring(tmp+1);
                 String localPath = downloadFromUrl(downloadurl, fileName, savePath,2);
-//                String localPath = getGLDASByBasic(downloadurl, fileName, savePath);
                 System.out.println("下载状态： " + localPath);
                 String date = downloadurl.substring(downloadurl.indexOf(".A")+2,downloadurl.indexOf(".021")).replace(".","");
                 if (localPath != "fail" && localPath != "none") {

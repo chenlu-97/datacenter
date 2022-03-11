@@ -22,4 +22,5 @@ public interface LandsatMapper {
 
     List<Landsat> selectByIds(@Param("imageid") List<String> imageid,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
+    int insertLandsat(Landsat landsat);
 }

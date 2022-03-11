@@ -19,7 +19,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -27,10 +26,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -89,47 +90,86 @@ public class LandsatService implements GoogleServiceConstant{
         return landsatMapper.selectNum();
     }
 
-    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
+//    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
+//    public void getLandsat() {
+//        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
+//        String time = formatter.format(dateTime);
+//        LocalDateTime begin_date = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+//        LocalDateTime end_date = begin_date.plusSeconds(24*60*60);
+//        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("Asia/Shanghai"));
+//        String begin = formatter1.format(begin_date);
+//        String end = formatter1.format(end_date);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                    try {
+////                        MODIS/006/MCD12Q1
+////                        MODIS/006/MOD13A2
+////                        MODIS/006/MOD11A2
+////                        MODIS/006/MOD11A1
+////                        COPERNICUS/S2_SR
+//                        String Landsat8 = "LANDSAT/LC08/C01/T1";
+//                        String url = "http://172.16.100.2:8009/getLandsat/";
+//                        String param = "image="+Landsat8+"&startDate="+begin+"&endDate="+end;
+//                        String statue = DataCenterUtils.doGet(url,param);
+//                        if (statue=="0") {
+//                            log.info("------ 目前暂无影像！！！！！-----");
+//                            System.out.println("------ 目前暂无影像！！！！！-----");
+//                        } else if(statue=="fail"){
+//                            log.info("------ 连接GEE失败-----");
+//                            System.out.println("------ 连接GEE失败-----");
+//                        }else if(statue=="success"){
+//                            log.info("------获取影像成功！！！！！！！-----");
+//                            System.out.println("------ 获取影像成功！！！！！！！-----");
+//                            DataCenterUtils.sendMessage("Landsat-8"+ time, "Landsat-8","GEE获取的Landsat-8影像成功");
+//                        }
+//                    } catch (Exception e) {
+//                        log.error(e.getMessage());
+//                        log.info("GEE获取Landsat-8影像 " + time + "Status: Fail");
+//                        System.out.println(e.getMessage());
+//                    }
+//            }
+//        }).start();
+//    }
+
+//    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
     public void getLandsat() {
-        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
-        String time = formatter.format(dateTime);
-        LocalDateTime begin_date = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-        LocalDateTime end_date = begin_date.plusSeconds(24*60*60);
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("Asia/Shanghai"));
-        String begin = formatter1.format(begin_date);
-        String end = formatter1.format(end_date);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+                System.out.println("-----------------------------");
+                try {
+                    //起始时间
+                    String str="20200101";
+                    //结束时间
+                    String str1="20220311";
+                    SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
+                    Calendar start = Calendar.getInstance();
+                    Calendar end = Calendar.getInstance();
                     try {
-//                        MODIS/006/MCD12Q1
-//                        MODIS/006/MOD13A2
-//                        MODIS/006/MOD11A2
-//                        MODIS/006/MOD11A1
-//                        COPERNICUS/S2_SR
-                        String Landsat8 = "LANDSAT/LC08/C01/T1";
-                        String url = "http://172.16.100.2:8009/getLandsat/";
-                        String param = "image="+Landsat8+"&startDate="+begin+"&endDate="+end;
-                        String statue = DataCenterUtils.doGet(url,param);
-                        if (statue=="0") {
-                            log.info("------ 目前暂无影像！！！！！-----");
-                            System.out.println("------ 目前暂无影像！！！！！-----");
-                        } else if(statue=="fail"){
-                            log.info("------ 连接GEE失败-----");
-                            System.out.println("------ 连接GEE失败-----");
-                        }else if(statue=="success"){
-                            log.info("------获取影像成功！！！！！！！-----");
-                            System.out.println("------ 获取影像成功！！！！！！！-----");
-                            DataCenterUtils.sendMessage("Landsat-8"+ time, "Landsat-8","GEE获取的Landsat-8影像成功");
-                        }
-                    } catch (Exception e) {
-                        log.error(e.getMessage());
-                        log.info("GEE获取Landsat-8影像 " + time + "Status: Fail");
-                        System.out.println(e.getMessage());
+                        start.setTime(format.parse(str));
+                        end.setTime(format.parse(str1));
+                    } catch (java.text.ParseException e) {
+                        e.printStackTrace();
                     }
-            }
-        }).start();
+                    while(start.before(end))
+                    {
+                        log.info("------ 开始下载" + format.format(start.getTime()) +"的影像-----");
+                        String statue =  downloadLandsat(format.format(start.getTime()));
+                        if (statue.equals("cookie error")){
+                            log.info("------ cookie error 过期了，要更换cookie-----");
+                        } else if(statue.equals("fail")){
+                            log.info("------ landsat8下载失败-----");
+                        }else if(statue.equals("success")){
+                            log.info(format.format(start.getTime())+"-----获取影像成功！！！！！！！----");
+                            DataCenterUtils.sendMessage("Landsat-8"+ format.format(start.getTime()), "Landsat-8","USGS获取的Landsat-8影像成功");
+                        }
+                        start.add(Calendar.DAY_OF_MONTH,1);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    log.info("GEE获取Landsat-8影像 " + "Status: Fail");
+                    System.out.println(e.getMessage());
+                }
     }
 
 
@@ -203,7 +243,7 @@ public class LandsatService implements GoogleServiceConstant{
 
 
     /**
-    * 5e83d14fec7cae84  Landsat 8-9 OLI/TIRS C2 L2的下载编号
+    * 5e83d14fec7cae84  Landsat 8-9 OLI/TIRS C2 L2的下载编号   5e81f14f92acf9ef Landsat 8-9 OLI/TIRS C2 L1的下载编号
     *   下载连接示例：
     *       https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC91270372022065LGN00
     *        https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC91270382022065LGN00
@@ -222,34 +262,65 @@ public class LandsatService implements GoogleServiceConstant{
      * 00 ：产品级别
     */
     public String downloadLandsat(String time) {
-//        String res = null;
-//        for(int path = 117;path<=135;path++){
-//            for(int row = 35;row<=46;row++){
+        String res = null;
+        boolean finalres = false;
+        for(int row = 35;row<=46;row++){
+            for(int path = 117;path<=135;path++){
 //                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 //                Calendar calendarNow = Calendar.getInstance();
 //                String time = format.format(calendarNow.getTime());
-//                String day_num = YearMouthToday(time);
-//                String year = time.substring(0,4);
-//                Format f1=new DecimalFormat("000");
-//                String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
-//                String url = "https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/"+filename;
-//                res = downloadFromUrl(url, filename+".tar", savePath,2);
-//                if(res == "error" || res =="no_data") {
-//
-//                }else if (res == "cookie过期"){
-//                    res = downloadFromUrl(url, filename+".tar", savePath,1);
-//                    if(res == "error"){
-//                        return "cookie error";
-//                    }
-//                }else{
-//
-//
-//                }
-//
-//            }
-//        }
-        String res = downloadFromUrl("https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/LC81300372022062LGN00", "LC81300372022062LGN00.tar", savePath,2);
-        return  res;
+                String day_num = YearMouthToday(time);
+                String year = time.substring(0,4);
+                Format f1=new DecimalFormat("000");
+                String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
+                String url = "https://earthexplorer.usgs.gov/download/5e81f14f92acf9ef/"+filename;
+                res = downloadFromUrl(url, filename+".tar", savePath,2);
+                 if (res == "cookie过期"){
+                     res = downloadFromUrl(url, filename+".tar", savePath,1);
+                    if(res == "error"){
+                        return "cookie error";
+                    }else if(res.equals("no_data")){
+                        System.out.println(url+ " "+res);
+                    }else{
+                        finalres =  saveToDB(res);
+                    }
+                }else if(res.equals("no_data") || res.equals("error")){
+                     System.out.println(url+ " "+res);
+                 }else{
+                     System.out.println("下载成功 : " +url+ " "+res);
+                     finalres = saveToDB(res);
+                 }
+            }
+        }
+        if(finalres){
+            return "success";
+        }else{
+            return "fail";
+        }
+    }
+
+    public boolean saveToDB(String filepath){
+        String unzippath = filepath.substring(0,filepath.indexOf(".tar"));
+        Landsat landsat = new Landsat();
+        int flag = 0 ;
+        //解压
+        try {
+            TarArchiveInputStream tais = new TarArchiveInputStream(new FileInputStream(new File(filepath)));
+            deTarFile(unzippath, tais);
+            tais.close();
+            String newfilepath =  renamefile(unzippath);
+            String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
+            String doc = readJsonFile(newfilepath+File.separator+newfilename.replace("T1","RT")+"_stac.json");
+            landsat =  getLandsatInfo(doc,newfilepath);
+            flag =  landsatMapper.insertLandsat(landsat);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if(flag>0){
+            return  true;
+        }else{
+            return  false;
+        }
     }
 
 
@@ -302,9 +373,6 @@ public class LandsatService implements GoogleServiceConstant{
         return count;
     }
 
-
-
-
     public static void deTarFile(String destPath, TarArchiveInputStream tais) throws Exception {
         TarArchiveEntry tae = null;
         File saveFile = new File(destPath);
@@ -322,8 +390,6 @@ public class LandsatService implements GoogleServiceConstant{
             }
             bos.close();
         }
-//        File deleteFile = new File(destPath+".tar");
-//        deleteFile.delete();
     }
 
 
@@ -335,19 +401,19 @@ public class LandsatService implements GoogleServiceConstant{
         for (int i = 0; i < list.length; i++) {
             if (list[i].isFile()) {
                 String temp = list[i].getName();
-                if(temp.substring(temp.lastIndexOf("_")-2).equals("ST_stac.json")){
-                  filename = temp.substring(0,temp.lastIndexOf("_")-3);
+                if(temp.substring(temp.lastIndexOf("_")).equals("_stac.json")){
+                  filename = temp.replace("RT","T1");
                     //想命名的原文件夹的路径
                     File file1 = new File(destPath);
                     //将原文件夹更改为A，其中路径是必要的
-                    file1.renameTo(new File(destPath.substring(0,destPath.lastIndexOf("LC"))+filename));
-                    return temp;
+                   String newFilePath = destPath.substring(0,destPath.lastIndexOf("LC"))+filename;
+                    file1.renameTo(new File(newFilePath));
+                    return newFilePath;
                 }
             }
         }
         return null;
     }
-
 
 
     public String readJsonFile(String jsonPath) {
@@ -372,7 +438,6 @@ public class LandsatService implements GoogleServiceConstant{
         }
     }
 
-
     /**
      * 解析JSON字符串信息
      */
@@ -382,20 +447,19 @@ public class LandsatService implements GoogleServiceConstant{
             JSONObject jsonObject = JSON.parseObject(document);
             JSONObject properties = jsonObject.getJSONObject("properties");
 
-            res.setImageID(jsonObject.getString("id"));
+            res.setImageID(jsonObject.getString("id").replace("RT","T1"));
             res.setSensorID("OLI_TIRS");
             res.setSpacecraftID(properties.getString("platform"));
-            res.setDate(str2Instant(properties.getString("datetime")));
+            res.setDate(str2Instant(properties.getString("datetime")).plusSeconds(8*60*60));
             res.setCloudcover(properties.getString("eo:cloud_cover"));
             res.setImageSize("30");
             res.setEllipsoid("WGS84");
             res.setImageType("ALL");
-
             JSONArray geoms = jsonObject.getJSONArray("bbox");
-            String min_lon = geoms.getJSONObject(0).toString();
-            String min_lat = geoms.getJSONObject(1).toString();
-            String max_lon = geoms.getJSONObject(2).toString();
-            String max_lat = geoms.getJSONObject(3).toString();
+            String min_lon = geoms.getBigDecimal(0).toString();
+            String min_lat = geoms.getBigDecimal(1).toString();
+            String max_lon = geoms.getBigDecimal(2).toString();
+            String max_lat = geoms.getBigDecimal(3).toString();
             String bbox_tmp = max_lon + ' ' + max_lat + ',' + min_lon + ' ' + max_lat + ','
                     + min_lon + ' ' + min_lat + ',' + max_lon+ ' ' + min_lat + ',' + max_lon + ' ' + max_lat;
             String wkt = "POLYGON((" + bbox_tmp  + "))";
@@ -406,7 +470,8 @@ public class LandsatService implements GoogleServiceConstant{
     }
 
     public Instant str2Instant(String time) {
-        String pattern = "yyyy-MM-ddTHH:mm:ssZ";
+        time = time.substring(0, time.indexOf(".")).replace("T"," ");
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);

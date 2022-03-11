@@ -91,6 +91,12 @@
             <version>1.20</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sensorweb</groupId>
+            <artifactId>datacenter-mobile-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

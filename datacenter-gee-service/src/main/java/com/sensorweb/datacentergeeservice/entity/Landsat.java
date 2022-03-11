@@ -11,6 +11,7 @@ public class Landsat {
     private String sensorID;
     private String spacecraftID;
     private String Coordinates;
+    private String geom;
     private Instant Date;
     private String Time;
     private String imageSize;
