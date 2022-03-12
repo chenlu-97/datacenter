@@ -82,5 +82,10 @@
     FROM landsat ORDER BY date DESC
     LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
   </select>
+    <select id="selectNew" resultType="com.sensorweb.datacentergeeservice.entity.Landsat">
+      SELECT <include refid="selectFields"></include>
+      FROM landsat
+      WHERE  date= (select max(date) from landsat)
+    </select>
 
 </mapper>

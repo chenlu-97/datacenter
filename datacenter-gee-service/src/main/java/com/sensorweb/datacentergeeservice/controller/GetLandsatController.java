@@ -57,7 +57,7 @@ public class GetLandsatController {
     @GetMapping(path = "getLandsat8")
     @ResponseBody
     public void getLandsat() {
-        landsatService.getLandsat();
+//        landsatService.getLandsat();
     }
 
     @ApiOperation("发送获取到的信息给前端")

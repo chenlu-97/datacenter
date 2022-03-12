@@ -19,6 +19,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -26,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -37,6 +40,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
+@EnableScheduling
 public class LandsatService implements GoogleServiceConstant{
     @Autowired
     LandsatMapper landsatMapper;
@@ -133,36 +137,43 @@ public class LandsatService implements GoogleServiceConstant{
 //        }).start();
 //    }
 
-//    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
-    public void getLandsat() {
+
+
+    @Scheduled(cron = "0 00 12 * * ?")
+    public void insertData() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 System.out.println("-----------------------------");
                 try {
-                    //起始时间
-                    String str="20200101";
-                    //结束时间
-                    String str1="20220311";
-                    SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
+                    //获取数据库中最新的数据时间
+                    List<Landsat> landsats = landsatMapper.selectNew();
+                    String timeNew = landsats.get(0).getDate().toString();
+                    timeNew = timeNew.replace("T", " ").replace("Z", "").substring(0, timeNew.indexOf("T")).replace("-", "");
+                    //获取当天的时间
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                    Calendar calendarNow = Calendar.getInstance();
+                    String timeNow = format.format(calendarNow.getTime());
                     Calendar start = Calendar.getInstance();
                     Calendar end = Calendar.getInstance();
                     try {
-                        start.setTime(format.parse(str));
-                        end.setTime(format.parse(str1));
-                    } catch (java.text.ParseException e) {
+                        start.setTime(format.parse(timeNew));
+                        end.setTime(format.parse(timeNow));
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    while(start.before(end))
-                    {
-                        log.info("------ 开始下载" + format.format(start.getTime()) +"的影像-----");
-                        String statue =  downloadLandsat(format.format(start.getTime()));
-                        if (statue.equals("cookie error")){
+                    while (start.before(end)) {
+                        log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");
+                        String statue = downloadLandsat(format.format(start.getTime()));
+                        if (statue.equals("cookie error")) {
                             log.info("------ cookie error 过期了，要更换cookie-----");
-                        } else if(statue.equals("fail")){
+                        } else if (statue.equals("fail")) {
                             log.info("------ landsat8下载失败-----");
-                        }else if(statue.equals("success")){
-                            log.info(format.format(start.getTime())+"-----获取影像成功！！！！！！！----");
-                            DataCenterUtils.sendMessage("Landsat-8"+ format.format(start.getTime()), "Landsat-8","USGS获取的Landsat-8影像成功");
+                        } else if (statue.equals("success")) {
+                            log.info(format.format(start.getTime()) + "-----获取影像成功！！！！！！！----");
+                            DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功");
                         }
-                        start.add(Calendar.DAY_OF_MONTH,1);
+                        start.add(Calendar.DAY_OF_MONTH, 1);
                     }
 
                 } catch (Exception e) {
@@ -170,7 +181,10 @@ public class LandsatService implements GoogleServiceConstant{
                     log.info("GEE获取Landsat-8影像 " + "Status: Fail");
                     System.out.println(e.getMessage());
                 }
+            }
+        }).start();
     }
+
 
 
 
@@ -266,9 +280,6 @@ public class LandsatService implements GoogleServiceConstant{
         boolean finalres = false;
         for(int row = 35;row<=46;row++){
             for(int path = 117;path<=135;path++){
-//                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-//                Calendar calendarNow = Calendar.getInstance();
-//                String time = format.format(calendarNow.getTime());
                 String day_num = YearMouthToday(time);
                 String year = time.substring(0,4);
                 Format f1=new DecimalFormat("000");

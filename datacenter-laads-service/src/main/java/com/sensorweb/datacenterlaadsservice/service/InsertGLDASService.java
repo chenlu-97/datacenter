@@ -79,7 +79,7 @@ public class InsertGLDASService {
                 try {
                     String time = null;
                     if (gldasMapper.selectNew() != null) {
-                        time = gldasMapper.selectNew().getTime().plusSeconds(3*60*60).toString();
+                        time = gldasMapper.selectNew().getTime().plusSeconds(12*60*60).toString();
                         System.out.println("time = " + time);
                     }
                         boolean flag = insertData(time);
@@ -99,6 +99,7 @@ public class InsertGLDASService {
             }
         }).start();
     }
+
 
 
     /**
@@ -133,7 +134,6 @@ public class InsertGLDASService {
     }
 
 
-
     public void update(){
         List<GLDAS> all = gldasMapper.getall();
         for(GLDAS one :all){
@@ -150,9 +150,6 @@ public class InsertGLDASService {
 
 
     }
-
-
-
 
 
     /**
