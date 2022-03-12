@@ -310,7 +310,7 @@ public class LandsatService implements GoogleServiceConstant{
             tais.close();
             String newfilepath =  renamefile(unzippath);
             String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
-            String doc = readJsonFile(newfilepath+File.separator+newfilename.replace("T1","RT")+"_stac.json");
+            String doc = readJsonFile(newfilepath+File.separator+newfilename+"_stac.json");
             landsat =  getLandsatInfo(doc,newfilepath);
             flag =  landsatMapper.insertLandsat(landsat);
         } catch (Exception ex) {
@@ -402,19 +402,23 @@ public class LandsatService implements GoogleServiceConstant{
             if (list[i].isFile()) {
                 String temp = list[i].getName();
                 if(temp.substring(temp.lastIndexOf("_")).equals("_stac.json")){
-                  filename = temp.replace("RT","T1");
+                  filename = temp.substring(0,temp.indexOf("_stac.json"));
                     //想命名的原文件夹的路径
                     File file1 = new File(destPath);
                     //将原文件夹更改为A，其中路径是必要的
-                   String newFilePath = destPath.substring(0,destPath.lastIndexOf("LC"))+filename;
+                    String newFilePath = destPath.substring(0,destPath.lastIndexOf("LC"))+filename;
                     file1.renameTo(new File(newFilePath));
+
+                    //想命名的原文件夹的路径
+                    File file2 = new File(destPath+".tar");
+                    //将原文件夹更改为A，其中路径是必要的
+                    file2.renameTo(new File(newFilePath+".tar"));
                     return newFilePath;
                 }
             }
         }
         return null;
     }
-
 
     public String readJsonFile(String jsonPath) {
         File jsonFile = new File(jsonPath);
@@ -447,7 +451,7 @@ public class LandsatService implements GoogleServiceConstant{
             JSONObject jsonObject = JSON.parseObject(document);
             JSONObject properties = jsonObject.getJSONObject("properties");
 
-            res.setImageID(jsonObject.getString("id").replace("RT","T1"));
+            res.setImageID(jsonObject.getString("id"));
             res.setSensorID("OLI_TIRS");
             res.setSpacecraftID(properties.getString("platform"));
             res.setDate(str2Instant(properties.getString("datetime")).plusSeconds(8*60*60));
@@ -455,6 +459,7 @@ public class LandsatService implements GoogleServiceConstant{
             res.setImageSize("30");
             res.setEllipsoid("WGS84");
             res.setImageType("ALL");
+            res.setThumburl(jsonObject.getJSONObject("assets").getJSONObject("reduced_resolution_browse").getString("href"));
             JSONArray geoms = jsonObject.getJSONArray("bbox");
             String min_lon = geoms.getBigDecimal(0).toString();
             String min_lat = geoms.getBigDecimal(1).toString();

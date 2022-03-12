@@ -18,20 +18,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jna</groupId>
-            <artifactId>test</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/jna.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jna.examples</groupId>
-            <artifactId>test</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/examples.jar</systemPath>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.sun.jna</groupId>-->
+<!--            <artifactId>test</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${basedir}/src/main/resources/jna.jar</systemPath>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.sun.jna.examples</groupId>-->
+<!--            <artifactId>test</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${basedir}/src/main/resources/examples.jar</systemPath>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>
