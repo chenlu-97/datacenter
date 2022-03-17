@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -53,12 +55,12 @@ public class GetLandsatController {
     }
 
 
-    @ApiOperation("获取landsat数据")
-    @GetMapping(path = "getLandsat8")
-    @ResponseBody
-    public void getLandsat() {
-        landsatService.getLandsat();
-    }
+//    @ApiOperation("获取landsat数据")
+//    @GetMapping(path = "getLandsat8")
+//    @ResponseBody
+//    public void getLandsat() {
+//        landsatService.getLandsat();
+//    }
 
     @ApiOperation("发送获取到的信息给前端")
     @GetMapping(path = "sendLandsat")
@@ -128,6 +130,58 @@ public class GetLandsatController {
         int count = landsatService.getLandsatNum();
         return count;
     }
+
+
+    @GetMapping(value = "getLandsatData")
+    @ResponseBody
+    public Map<String, Object> getLandsatData( @RequestParam(value="cloudcover", required=false) String cloudcover,@RequestParam(value="wkt", required=false) String wkt,@Param("startTime")String startTime, @Param("endTime")String endTime) {
+
+        Map<String, Object> res = new HashMap<>();
+        Map<String, List<String>> path = new HashMap<>();
+        try {
+
+            SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            Calendar startloop = Calendar.getInstance();
+            Calendar endloop = Calendar.getInstance();
+            try {
+                startloop.setTime(format.parse(startTime));
+                endloop.setTime(format.parse(endTime));
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+            while(startloop.before(endloop))
+            {
+                Instant start = DataCenterUtils.string2Instant(format.format(startloop.getTime()));
+                Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
+                List<Landsat> Landsats = new ArrayList<>();
+                if(cloudcover != null){
+                     Landsats = landsatMapper.getFilePath(Float.valueOf(cloudcover),wkt,start,end);
+                }else{
+                     Landsats = landsatMapper.getFilePath(0,wkt,start,end);
+                }
+                List<String> paths = new ArrayList<>();
+                if(Landsats.size()>0){
+                    for(int i=0;i<Landsats.size();i++) {
+                        String filepath = Landsats.get(i).getFilePath();
+                        String time = Landsats.get(0).getDate().plusSeconds(8*60*60).toString();
+                        paths.add(filepath);
+                        path.put(time,paths);
+                    }
+                    res.put("filePath",path);
+                    res.put("status","success");
+                }else{
+                        res.put("filePath","");
+                        res.put("status","success");
+                }
+                startloop.add(Calendar.DAY_OF_MONTH,1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.put("status", "failed");
+        }
+        return res;
+    }
+
 
 
 }

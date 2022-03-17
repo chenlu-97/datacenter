@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -23,4 +24,6 @@ public interface LandsatMapper {
     List<Landsat> selectByIds(@Param("imageid") List<String> imageid,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
     int insertLandsat(Landsat landsat);
+
+    List<Landsat> getFilePath(@Param("cloudcover") float cloudcover, @Param("wkt")String wkt, @Param("start")Instant start, @Param("end")Instant end);
 }

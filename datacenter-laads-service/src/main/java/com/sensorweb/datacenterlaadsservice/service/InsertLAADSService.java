@@ -64,7 +64,7 @@ public class InsertLAADSService implements LAADSConstant {
                 Calendar calendarNow = Calendar.getInstance();
                 String stop = null;
                 String start = null;
-                String bbox = "90.55,24.5,112.417,34.75";//长江流域经纬度范围
+                String bbox = "95,24,123,35";//长江流域经纬度范围
                 boolean flag = false;
                 String code = null;
                 try {
@@ -87,7 +87,7 @@ public class InsertLAADSService implements LAADSConstant {
                             start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
                             code = insertData2(start, stop, bbox, product);
 
-                        }else if(product.equals("MOD11A1")){
+                        }else if(product.equals("MOD11A2")){
                             Calendar calendar = Calendar.getInstance();
                             calendar.add(Calendar.DATE, -9);
                             stop = format.format(calendar.getTime());
@@ -127,36 +127,36 @@ public class InsertLAADSService implements LAADSConstant {
         }).start();
     }
 
-    @Scheduled(cron = "00 40 23 * * ?")//每天的23：40分执行一次
-    public void insertMerra2Data() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-        Calendar calendar = Calendar.getInstance();
-//        String time = format.format(calendar.getTime());
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String time = null;
-                    if (entryMapper.selectNew() != null) {
-                        time = entryMapper.selectNew().getStart().plusSeconds(24 * 60 * 60).toString();
-                    }
-//                        boolean flag = insertData3(time);
-                    boolean flag = insertData3("2021-09-01T00:00:00Z");
-                    if (flag) {
-                        log.info("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Success");
-                        System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Success");
-                    }else{
-                        log.error("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
-                        System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    log.error("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
-                    System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
-                }
-            }
-        }).start();
-    }
+//    @Scheduled(cron = "00 40 23 * * ?")//每天的23：40分执行一次
+//    public void insertMerra2Data() {
+//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+//        Calendar calendar = Calendar.getInstance();
+////        String time = format.format(calendar.getTime());
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    String time = null;
+//                    if (entryMapper.selectNew() != null) {
+//                        time = entryMapper.selectNew().getStart().plusSeconds(24 * 60 * 60).toString();
+//                    }
+////                        boolean flag = insertData3(time);
+//                    boolean flag = insertData3("2021-09-01T00:00:00Z");
+//                    if (flag) {
+//                        log.info("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Success");
+//                        System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Success");
+//                    }else{
+//                        log.error("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
+//                        System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
+//                    }
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    log.error("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
+//                    System.out.println("MERRA2接入时间: " + calendar.getTime().toString() + "Status: Fail");
+//                }
+//            }
+//        }).start();
+//    }
 
     /**
      * 通过API接口获取Modis数据信息
@@ -289,13 +289,12 @@ public class InsertLAADSService implements LAADSConstant {
     public String downloadFromUrl(String url, String fileName, String savePath) {
         String res = null;
         try {
-//          HttpsUrlValidator.retrieveResponseFromServer(url);
+//            HttpsUrlValidator.retrieveResponseFromServer(url);
             URL httpUrl = new URL(url);
 //            SSLUtil.ignoreSsl();
             HttpURLConnection connection = (HttpURLConnection) httpUrl.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36");
             connection.setRequestProperty("Authorization", LAADSConstant.LAADS_DOWNLOAD_TOKEN);
-
             //设置https协议访问
             System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2,SSLv3");
             InputStream inputStream = connection.getInputStream();
@@ -481,7 +480,7 @@ public class InsertLAADSService implements LAADSConstant {
      * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
      *
      * @param startTime "2020-11-08 00:00:00"
-     * @param bbox      "90.55,24.5,112.417,34.75"-->长江经济带
+     * @param bbox      "95,24,123,35"-->长江经济带
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean insertData(String satellite, String startTime, String endTime, String bbox, String productName) throws Exception {
@@ -636,7 +635,7 @@ public class InsertLAADSService implements LAADSConstant {
      * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地，（由于有些卫星和产品的页面访问会卡住，这个方法直接从产品的数据集页面下载数据）
      *
      * @param startTime "2020-11-08 00:00:00"
-     * @param bbox      "90.55,24.5,112.417,34.75"-->长江经济带
+     * @param bbox      "95,24,123,35"-->长江经济带
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public String insertData2( String startTime, String endTime, String bbox, String productName) throws Exception {
@@ -684,7 +683,7 @@ public class InsertLAADSService implements LAADSConstant {
                 }
             }
         }
-        return "无次数据集";
+        return "无该数据集";
     }
 
 
@@ -731,7 +730,6 @@ public class InsertLAADSService implements LAADSConstant {
         }
         return false;
     }
-
 
 
     public Instant str2Instant(String time) {

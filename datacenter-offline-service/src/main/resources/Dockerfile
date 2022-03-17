@@ -3,5 +3,9 @@ VOLUME /tmp
 ADD datacenter-offline-service.jar app.jar
 RUN bash -c 'touch /app.jar'
 
+
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 EXPOSE 9011
+
+RUN chmod +x /data/Ai-Sensing/DeployCenter/offline-service/clientStart.sh
+CMD ["sh","/data/Ai-Sensing/DeployCenter/offline-service/clientStart.sh"]

@@ -1,5 +1,7 @@
 package com.sensorweb.datacentergeeservice.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.Instant;
@@ -16,7 +18,7 @@ public class Landsat {
     private String Time;
     private String imageSize;
     private String Ellipsoid;
-    private String Cloudcover;
+    private Float Cloudcover;
     private String Thumburl;
     private String imageType;
     private String filePath;

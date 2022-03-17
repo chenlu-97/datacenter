@@ -159,6 +159,7 @@ public class InsertGLDASService {
      * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
      * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.2100.021.nc4
      * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H/2022/039/GLDAS_NOAH025_3H.A20220208.2100.021.nc4
+     * @param time 2022-03-01T00:00:00
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean insertData(String time) throws Exception {

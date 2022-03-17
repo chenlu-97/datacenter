@@ -90,87 +90,47 @@ public class LandsatService implements GoogleServiceConstant{
         return landsatMapper.selectNum();
     }
 
+
+
+
 //    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
 //    public void getLandsat() {
-//        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
-//        String time = formatter.format(dateTime);
-//        LocalDateTime begin_date = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-//        LocalDateTime end_date = begin_date.plusSeconds(24*60*60);
-//        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("Asia/Shanghai"));
-//        String begin = formatter1.format(begin_date);
-//        String end = formatter1.format(end_date);
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
+//                System.out.println("-----------------------------");
+//                try {
+//                    //起始时间
+//                    String str="20200101";
+//                    //结束时间
+//                    String str1="20220311";
+//                    SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
+//                    Calendar start = Calendar.getInstance();
+//                    Calendar end = Calendar.getInstance();
 //                    try {
-////                        MODIS/006/MCD12Q1
-////                        MODIS/006/MOD13A2
-////                        MODIS/006/MOD11A2
-////                        MODIS/006/MOD11A1
-////                        COPERNICUS/S2_SR
-//                        String Landsat8 = "LANDSAT/LC08/C01/T1";
-//                        String url = "http://172.16.100.2:8009/getLandsat/";
-//                        String param = "image="+Landsat8+"&startDate="+begin+"&endDate="+end;
-//                        String statue = DataCenterUtils.doGet(url,param);
-//                        if (statue=="0") {
-//                            log.info("------ 目前暂无影像！！！！！-----");
-//                            System.out.println("------ 目前暂无影像！！！！！-----");
-//                        } else if(statue=="fail"){
-//                            log.info("------ 连接GEE失败-----");
-//                            System.out.println("------ 连接GEE失败-----");
-//                        }else if(statue=="success"){
-//                            log.info("------获取影像成功！！！！！！！-----");
-//                            System.out.println("------ 获取影像成功！！！！！！！-----");
-//                            DataCenterUtils.sendMessage("Landsat-8"+ time, "Landsat-8","GEE获取的Landsat-8影像成功");
-//                        }
-//                    } catch (Exception e) {
-//                        log.error(e.getMessage());
-//                        log.info("GEE获取Landsat-8影像 " + time + "Status: Fail");
-//                        System.out.println(e.getMessage());
+//                        start.setTime(format.parse(str));
+//                        end.setTime(format.parse(str1));
+//                    } catch (java.text.ParseException e) {
+//                        e.printStackTrace();
 //                    }
-//            }
-//        }).start();
+//                    while(start.before(end))
+//                    {
+//                        log.info("------ 开始下载" + format.format(start.getTime()) +"的影像-----");
+//                        String statue =  downloadLandsat(format.format(start.getTime()));
+//                        if (statue.equals("cookie error")){
+//                            log.info("------ cookie error 过期了，要更换cookie-----");
+//                        } else if(statue.equals("fail")){
+//                            log.info("------ landsat8下载失败-----");
+//                        }else if(statue.equals("success")){
+//                            log.info(format.format(start.getTime())+"-----获取影像成功！！！！！！！----");
+//                            DataCenterUtils.sendMessage("Landsat-8"+ format.format(start.getTime()), "Landsat-8","USGS获取的Landsat-8影像成功");
+//                        }
+//                        start.add(Calendar.DAY_OF_MONTH,1);
+//                    }
+//
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    log.info("GEE获取Landsat-8影像 " + "Status: Fail");
+//                    System.out.println(e.getMessage());
+//                }
 //    }
-
-//    @Scheduled(cron = "0 00 11 * * ?") //每天上午11点接入
-    public void getLandsat() {
-                System.out.println("-----------------------------");
-                try {
-                    //起始时间
-                    String str="20200101";
-                    //结束时间
-                    String str1="20220311";
-                    SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
-                    Calendar start = Calendar.getInstance();
-                    Calendar end = Calendar.getInstance();
-                    try {
-                        start.setTime(format.parse(str));
-                        end.setTime(format.parse(str1));
-                    } catch (java.text.ParseException e) {
-                        e.printStackTrace();
-                    }
-                    while(start.before(end))
-                    {
-                        log.info("------ 开始下载" + format.format(start.getTime()) +"的影像-----");
-                        String statue =  downloadLandsat(format.format(start.getTime()));
-                        if (statue.equals("cookie error")){
-                            log.info("------ cookie error 过期了，要更换cookie-----");
-                        } else if(statue.equals("fail")){
-                            log.info("------ landsat8下载失败-----");
-                        }else if(statue.equals("success")){
-                            log.info(format.format(start.getTime())+"-----获取影像成功！！！！！！！----");
-                            DataCenterUtils.sendMessage("Landsat-8"+ format.format(start.getTime()), "Landsat-8","USGS获取的Landsat-8影像成功");
-                        }
-                        start.add(Calendar.DAY_OF_MONTH,1);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    log.info("GEE获取Landsat-8影像 " + "Status: Fail");
-                    System.out.println(e.getMessage());
-                }
-    }
 
 
 
@@ -266,9 +226,6 @@ public class LandsatService implements GoogleServiceConstant{
         boolean finalres = false;
         for(int row = 35;row<=46;row++){
             for(int path = 117;path<=135;path++){
-//                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-//                Calendar calendarNow = Calendar.getInstance();
-//                String time = format.format(calendarNow.getTime());
                 String day_num = YearMouthToday(time);
                 String year = time.substring(0,4);
                 Format f1=new DecimalFormat("000");
@@ -455,7 +412,7 @@ public class LandsatService implements GoogleServiceConstant{
             res.setSensorID("OLI_TIRS");
             res.setSpacecraftID(properties.getString("platform"));
             res.setDate(str2Instant(properties.getString("datetime")).plusSeconds(8*60*60));
-            res.setCloudcover(properties.getString("eo:cloud_cover"));
+            res.setCloudcover(Float.valueOf(properties.getString("eo:cloud_cover")));
             res.setImageSize("30");
             res.setEllipsoid("WGS84");
             res.setImageType("ALL");
@@ -482,6 +439,11 @@ public class LandsatService implements GoogleServiceConstant{
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
         return localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
     }
+
+    public List<Landsat> getFilePath(Instant startTime, Instant endTime) {
+        return landsatMapper.getFilePath(0,null,startTime,endTime);
+    }
+
 
 //
 //    public boolean getLandsatByUSGS() throws IOException {

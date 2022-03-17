@@ -83,4 +83,17 @@
     LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
   </select>
 
+
+  <select id="getFilePath" resultMap="BaseResultMap">
+    SELECT <include refid="selectFields"></include>
+    FROM landsat
+    WHERE imagetype = 'ALL' AND date <![CDATA[>=]]> #{start} AND  date <![CDATA[<]]> #{end}
+    <if test="cloudcover != 0 ">
+      AND cloudcover <![CDATA[<]]> #{cloudcover}
+    </if>
+    <if test="wkt != null">
+      AND ST_Intersects(geom, ST_GeomFromText(#{wkt}, 4326)) = true
+    </if>
+  </select>
+
 </mapper>

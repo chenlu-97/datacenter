@@ -85,7 +85,7 @@ public class GLDASController {
 
     @GetMapping(value = "downloadGLDASByFile")
     @ResponseBody
-    public Map<String, Object> downloadGLDAS( @Param("filepath")String filepath) {
+    public Map<String, Object> downloadGLDASByFile( @Param("filepath")String filepath) {
         Map<String, Object> res = new HashMap<>();
         boolean flag = false;
         try {

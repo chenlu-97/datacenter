@@ -8,15 +8,15 @@
     </sql>
 
     <sql id="selectFields">
-        id, entry_id, title, updated, link, file_path, start_time, stop_time, bbox ,satellite,product_type
+        entry_id, title, updated, link, file_path, start_time, stop_time, bbox ,satellite,product_type
     </sql>
 
-    <insert id="insertData" parameterType="Entry" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertData" parameterType="Entry" >
         INSERT INTO entry (<include refid="insertFields"></include>)
         VALUES (#{entryId}, #{title}, #{updated}, #{link}, #{filePath}, #{start}, #{stop}, #{bbox}, ST_GeomFromText(#{wkt}, 4326),#{satellite},#{productType})
     </insert>
 
-    <insert id="insertDataBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDataBatch" parameterType="java.util.List">
         INSERT INTO entry (<include refid="insertFields"></include>)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -76,7 +76,7 @@
     <select id="getFilePath" resultMap="entry">
         SELECT <include refid="selectFields"></include>
         FROM entry
-        WHERE product_type = #{product} AND start_time <![CDATA[>=]]> #{startTime} AND start_time <![CDATA[<=]]> #{endTime}
+        WHERE product_type = #{product} AND start_time <![CDATA[>=]]> #{startTime} AND start_time <![CDATA[<]]> #{endTime}
 
     </select>
 

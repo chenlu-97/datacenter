@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 @SpringBootTest
 class DatacenterLaadsServiceApplicationTests {
 
@@ -65,7 +68,7 @@ class DatacenterLaadsServiceApplicationTests {
 //        String start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
 //        System.out.println("stop = " + stop);
 //        System.out.println("start = " + start);
-        insertGLDASService.insertDataByCookie("5358371643-download.txt");
+//        insertGLDASService.insertDataByCookie("5358371643-download.txt");
 //        insertGLDASService.getCookie("https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.0000.021.nc4");
 //          insertGLDASService.getGLDASByBasic("2022-02-01T00:00:00Z");
 
@@ -93,6 +96,25 @@ class DatacenterLaadsServiceApplicationTests {
 //        }
 
 //        insertGLDASService.update();
+
+
+        String startTime = "2022-03-01 00:00:00";
+        String endTime = "2022-03-13 00:00:00";
+
+        SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        try {
+            start.setTime(format.parse(startTime));
+            end.setTime(format.parse(endTime));
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        while(start.before(end))
+        {
+            System.out.println("start = " + format.format(start.getTime()));
+            start.add(Calendar.DAY_OF_MONTH,1);
+        }
 
     }
 }

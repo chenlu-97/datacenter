@@ -12,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -116,39 +114,52 @@ public class LAADSController {
     public Map<String, Object> getModisData(@Param("product")String product,@Param("startTime")String startTime, @Param("endTime")String endTime, @Param("bbox")String bbox) {
 
         Map<String, Object> res = new HashMap<>();
-        Map<String, String> path = new HashMap<>();
+        Map<String, List<String>> path = new HashMap<>();
         try {
-            Instant start = DataCenterUtils.string2Instant(startTime);
-            Instant end = DataCenterUtils.string2Instant(endTime);
-            List<Entry> entrys = entryMapper.getFilePath(product,start,end);
 
-
-
-
-            if(entrys.size()>0){
-                for(int i=0;i<entrys.size();i++) {
-                    String filepath = entrys.get(i).getFilePath();
-                    String time = entrys.get(i).getStart().toString().replace("T"," ").replace("Z","");
-                    path.put(time+"."+i,filepath);
-                }
-                res.put("status", "success");
-                res.put("filePath",path);
-            }else{
-                String flag = insertLaadsService.insertData2(startTime, endTime, bbox, product);
-                if (flag.equals("下载成功")) {
-                    entrys = entryMapper.getFilePath(product,start,end);
-                    if(entrys.size()>0) {
-                        for (int i = 0; i < entrys.size(); i++) {
-                            String filepath = entrys.get(i).getFilePath();
-                            String time = entrys.get(i).getStart().toString().replace("T"," ").replace("Z","");
-                            path.put(time+"."+i, filepath);
-                        }
+            SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            Calendar startloop = Calendar.getInstance();
+            Calendar endloop = Calendar.getInstance();
+            try {
+                startloop.setTime(format.parse(startTime));
+                endloop.setTime(format.parse(endTime));
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+            while(startloop.before(endloop))
+            {
+                Instant start = DataCenterUtils.string2Instant(format.format(startloop.getTime()));
+                Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
+                List<Entry> entrys = entryMapper.getFilePath(product,start,end);
+                List<String> paths = new ArrayList<>();
+                if(entrys.size()>0){
+                    for(int i=0;i<entrys.size();i++) {
+                        String filepath = entrys.get(i).getFilePath();
+                        String time = entrys.get(0).getStart().toString().replace("T"," ").replace("Z","");
+                        paths.add(filepath);
+                        path.put(time,paths);
                     }
-                    res.put("status", "success");
                     res.put("filePath",path);
-                } else {
-                    res.put("status：failed", flag);
+                    res.put("status","success");
+                }else{
+                    String flag = insertLaadsService.insertData2(start.toString().replace("T"," ").replace("Z",""), end.toString().replace("T"," ").replace("Z",""), bbox, product);
+                    if (flag.equals("下载成功")) {
+                        entrys = entryMapper.getFilePath(product,start,end);
+                        if(entrys.size()>0) {
+                            for (int i = 0; i < entrys.size(); i++) {
+                                String filepath = entrys.get(i).getFilePath();
+                                String time = entrys.get(i).getStart().toString().replace("T"," ").replace("Z","");
+                                paths.add(filepath);
+                                path.put(time,paths);
+                            }
+                        }
+                        res.put("filePath",path);
+                        res.put("status","success");
+                    } else {
+                        res.put("status：failed", flag + startTime +"--"+endTime+"获取失败");
+                    }
                 }
+                startloop.add(Calendar.DAY_OF_MONTH,1);
             }
         } catch (Exception e) {
             e.printStackTrace();

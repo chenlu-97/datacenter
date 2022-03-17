@@ -96,7 +96,6 @@
     <update id="updateGeom" parameterType="AirStationModel">
         update station
         <set>
-
             geom = (ST_GeomFromText(#{wkt}, 4326))
         </set>
         where lon=#{lon} and lat = #{lat}
