@@ -116,7 +116,6 @@ public class LAADSController {
         Map<String, Object> res = new HashMap<>();
         Map<String, List<String>> path = new HashMap<>();
         try {
-
             SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Calendar startloop = Calendar.getInstance();
             Calendar endloop = Calendar.getInstance();

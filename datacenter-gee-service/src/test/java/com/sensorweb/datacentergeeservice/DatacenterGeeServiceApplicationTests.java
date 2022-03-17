@@ -1,17 +1,24 @@
 package com.sensorweb.datacentergeeservice;
 
+import com.sensorweb.datacentergeeservice.dao.LandsatMapper;
+import com.sensorweb.datacentergeeservice.entity.Landsat;
 import com.sensorweb.datacentergeeservice.service.LandsatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootTest
 class DatacenterGeeServiceApplicationTests {
 
     @Autowired
     private LandsatService googleService;
+
+    @Autowired
+    LandsatMapper landsatMapper;
+
     @Test
     void contextLoads() throws IOException {
 ////        String path = "D:\\OneDrive\\GoogleEarthEngine\\GetGeoInfo-d670c0a18233.json";
@@ -28,7 +35,11 @@ class DatacenterGeeServiceApplicationTests {
 
 //        System.out.println( googleService.readJsonFile("E:\\landsat\\LC08_L2SP_130037_20220303_20220309_02_T1\\LC08_L2SP_130037_20220303_20220309_02_T1_ST_stac.json"));
 
-        googleService.downloadLandsat("20220306");
+//        googleService.downloadLandsat("20220306");
+
+        List<Landsat> landsats =  landsatMapper.selectNew();
+        String time = landsats.get(0).getDate().toString();
+        time = time.replace("T", " ").replace("Z", "").substring(0, time.indexOf("T")).replace("-", "");
 
 
     }

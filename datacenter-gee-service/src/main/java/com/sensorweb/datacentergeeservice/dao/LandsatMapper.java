@@ -25,5 +25,9 @@ public interface LandsatMapper {
 
     int insertLandsat(Landsat landsat);
 
+
     List<Landsat> getFilePath(@Param("cloudcover") float cloudcover, @Param("wkt")String wkt, @Param("start")Instant start, @Param("end")Instant end);
+
+    List<Landsat> selectNew();
+
 }
