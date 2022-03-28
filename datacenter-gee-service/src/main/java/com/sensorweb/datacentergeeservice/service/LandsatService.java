@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -139,56 +140,55 @@ public class LandsatService implements GoogleServiceConstant{
 
 
 
-    @Scheduled(cron = "0 00 12 * * ?")
-    public void insertData() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("-----------------------------");
-                try {
-                    //获取数据库中最新的数据时间
-                    List<Landsat> landsats = landsatMapper.selectNew();
-                    String timeNew = landsats.get(0).getDate().toString();
-                    timeNew = timeNew.replace("T", " ").replace("Z", "").substring(0, timeNew.indexOf("T")).replace("-", "");
-                    //获取当天的时间
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                    Calendar calendarNow = Calendar.getInstance();
-                    String timeNow = format.format(calendarNow.getTime());
-                    Calendar start = Calendar.getInstance();
-                    Calendar end = Calendar.getInstance();
-                    try {
-                        start.setTime(format.parse(timeNew));
-                        end.setTime(format.parse(timeNow));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    while (start.before(end)) {
-                        log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");
-                        String statue = downloadLandsat(format.format(start.getTime()));
-                        if (statue.equals("cookie error")) {
-                            log.info("------ cookie error 过期了，要更换cookie-----");
-                        } else if (statue.equals("fail")) {
-                            log.info("------ landsat8下载失败-----");
-                        } else if (statue.equals("success")) {
-                            log.info(format.format(start.getTime()) + "-----获取影像成功！！！！！！！----");
-                            DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功");
-                        }
-                        start.add(Calendar.DAY_OF_MONTH, 1);
-                    }
-
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    log.info("GEE获取Landsat-8影像 " + "Status: Fail");
-                    System.out.println(e.getMessage());
-                }
-            }
-        }).start();
-    }
-
+//    @Scheduled(cron = "0 00 12 * * ?") //每天12点接入
+//    public void insertData() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                System.out.println("-----------------------------");
+//                try {
+//                    //获取数据库中最新的数据时间
+//                    List<Landsat> landsats = landsatMapper.selectNew();
+//                    String timeNew = landsats.get(0).getDate().toString();
+//                    timeNew = timeNew.replace("T", " ").replace("Z", "").substring(0, timeNew.indexOf("T")).replace("-", "");
+//                    //获取当天的时间
+//                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+//                    Calendar calendarNow = Calendar.getInstance();
+//                    String timeNow = format.format(calendarNow.getTime());
+//                    Calendar start = Calendar.getInstance();
+//                    Calendar end = Calendar.getInstance();
+//                    try {
+//                        start.setTime(format.parse(timeNew));
+//                        end.setTime(format.parse(timeNow));
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                    while (start.before(end)) {
+//                        log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");
+//                        String statue = downloadLandsat(format.format(start.getTime()));
+//                        if (statue.equals("cookie error")) {
+//                            log.info("------ cookie error 过期了，要更换cookie-----");
+//                        } else if (statue.equals("fail")) {
+//                            log.info("------ landsat8下载失败-----");
+//                        } else if (statue.equals("success")) {
+//                            log.info(format.format(start.getTime()) + "-----获取影像成功！！！！！！！----");
+//                            DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功");
+//                        }
+//                        start.add(Calendar.DAY_OF_MONTH, 1);
+//                    }
+//
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    log.info("GEE获取Landsat-8影像 " + "Status: Fail");
+//                    System.out.println(e.getMessage());
+//                }
+//            }
+//        }).start();
+//    }
 
 
     /**
-     * 通过url下载landsat文件，需要cookie的情况下
+     * 通过url下载landsat文件
      *
      * @param url
      * @param fileName
@@ -296,7 +296,7 @@ public class LandsatService implements GoogleServiceConstant{
                 }else if(res.equals("no_data") || res.equals("error")){
                      System.out.println(url+ " "+res);
                  }else{
-                     System.out.println("下载成功 : " +url+ " "+res);
+//                     System.out.println("下载成功 : " +url+ " "+res);
                      finalres = saveToDB(res);
                  }
             }
@@ -311,13 +311,14 @@ public class LandsatService implements GoogleServiceConstant{
     public boolean saveToDB(String filepath){
         String unzippath = filepath.substring(0,filepath.indexOf(".tar"));
         Landsat landsat = new Landsat();
+        String newfilepath = null;
         int flag = 0 ;
         //解压
         try {
             TarArchiveInputStream tais = new TarArchiveInputStream(new FileInputStream(new File(filepath)));
             deTarFile(unzippath, tais);
             tais.close();
-            String newfilepath =  renamefile(unzippath);
+            newfilepath =  renamefile(unzippath);
             String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
             String doc = readJsonFile(newfilepath+File.separator+newfilename+"_stac.json");
             landsat =  getLandsatInfo(doc,newfilepath);
@@ -326,6 +327,10 @@ public class LandsatService implements GoogleServiceConstant{
             ex.printStackTrace();
         }
         if(flag>0){
+            if(newfilepath !=null){
+                generateThumb(newfilepath);//生成缩略图
+                changeAuthority(newfilepath);//更改文件权限
+            }
             return  true;
         }else{
             return  false;
@@ -360,6 +365,8 @@ public class LandsatService implements GoogleServiceConstant{
         }
         return cookieStr;
     }
+
+
 
     public String YearMouthToday(String time){
         Integer num = 0;
@@ -403,7 +410,6 @@ public class LandsatService implements GoogleServiceConstant{
 
 
     public static String renamefile(String destPath) {
-
         File f = new File(destPath);
         File list[] = f.listFiles();
         String filename = null;
@@ -550,5 +556,53 @@ public class LandsatService implements GoogleServiceConstant{
 //        return "";
 //    }
 
+
+
+//    @Scheduled(cron = "0 * * * * *")
+//    public void autoThumb(){
+//        generateThumb("/data/Ai-Sensing/ProcessCenter/TestData/landsat/LC08_L1TP_123039_20200108_20200824_02_T1");
+//    }
+
+    public static void generateThumb(String filePath) {
+        String[] params = new String[3];
+        params[0] = "/bin/sh";
+        params[1] = "-c";
+        String thumb432 = "/home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_432.tif *T1_B{4,3,2}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_432.tif merged_432_translate.jpg";
+        String thumb753 = "/home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_753.tif *T1_B{7,5,3}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_753.tif merged_753_translate.jpg";
+        params[2] = "cd " + filePath + " && " + thumb432 + " && " + thumb753;
+        String result = exe(params);
+        System.out.println(result);
+    }
+
+    public static void changeAuthority(String filePath) {
+        String[] params = new String[1];
+        params[0] = "chown -R 1030:1030 " + filePath;
+        String result = exe(params);
+        System.out.println(result);
+    }
+
+    private static String exe(String[] params) {
+        StringBuilder sb = new StringBuilder();
+        Process proc;
+        try {
+            proc = Runtime.getRuntime().exec(params);
+            proc.waitFor();
+            //用输入输出流来截取结果
+            SequenceInputStream sis = new SequenceInputStream(proc.getInputStream(), proc.getErrorStream());
+            InputStreamReader isr = new InputStreamReader(sis, Charset.forName("GBK"));
+            BufferedReader in = new BufferedReader(isr);
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+            }
+            proc.destroy();
+            in.close();
+            isr.close();
+            proc.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return  sb.toString();
+    }
 
 }

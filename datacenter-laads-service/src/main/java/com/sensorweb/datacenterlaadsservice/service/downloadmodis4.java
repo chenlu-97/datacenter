@@ -40,12 +40,12 @@ public class downloadmodis4 implements Runnable{
                 Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
                 List<Entry> entrys = entryMapper.getFilePath(product,start,end);
                 if(entrys.size()>0){
-                        System.out.println(startTime+"已存在该数据，无需下载！！！");
-                        log.info(startTime+"已存在该数据，无需下载！！！");
+                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
+                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
                 }else{
                     String flag = insertLAADSService.insertData2(start.toString().replace("T"," ").replace("Z",""), end.toString().replace("T"," ").replace("Z",""), bbox, product);
-                    System.out.println( startTime+ flag);
-                    log.info(startTime+flag);
+                    System.out.println( product+start.toString()+ flag);
+                    log.info(product+start.toString()+flag);
                 }
                 startloop.add(Calendar.DAY_OF_MONTH,1);
             }

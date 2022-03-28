@@ -26,4 +26,6 @@ public interface EntryMapper {
     List<Entry> selectByIds(@Param("satellite") List<String> satellite,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
     Entry selectNew();
+
+    List<Entry> selectMaxTimeData(String product);
 }

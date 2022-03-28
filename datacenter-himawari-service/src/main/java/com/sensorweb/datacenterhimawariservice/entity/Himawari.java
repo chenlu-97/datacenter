@@ -7,7 +7,6 @@ import java.time.Instant;
 
 @Data
 public class Himawari {
-    private int id;
     private String sName = "Himawari-8";
     private String name;
     private Instant time;

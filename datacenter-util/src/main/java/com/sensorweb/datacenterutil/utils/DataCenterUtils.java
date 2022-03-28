@@ -542,11 +542,11 @@ public class DataCenterUtils {
         return format.format(date);
     }
 
-
-    /**
-    * 获取系统当前时间，并转为string
-     */
-
+//
+//    /**
+//    * 获取系统当前时间，并转为string
+//     */
+//
 //    public static String getTimeNow(){
 //        SimpleDateFormat sd = new SimpleDateFormat();// 格式化时间
 //        sd.applyPattern("yyyy-MM-dd HH:mm:ss");

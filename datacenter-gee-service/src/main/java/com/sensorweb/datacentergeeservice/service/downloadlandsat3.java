@@ -42,7 +42,6 @@ public class downloadlandsat3 implements Runnable{
                 Instant endTime = DataCenterUtils.string2Instant(format1.format(start.getTime())).plusSeconds(24*60*60);
                 List<Landsat> landsats = landsatService.getFilePath(startTime,endTime);
                 if(landsats.size()>0){
-                    System.out.println(startTime.plusSeconds(8*60*60)+"已存在该数据，无需下载！！！");
                     log.info(startTime.plusSeconds(8*60*60)+"已存在该数据，无需下载！！！");
                 }else {
                     log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");

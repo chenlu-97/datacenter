@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.net.*;
-import java.text.SimpleDateFormat;
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -54,78 +54,107 @@ public class InsertLAADSService implements LAADSConstant {
     @Value("${datacenter.path.laads}")
     private String filePath;
 
-    @Scheduled(cron = "00 30 23 * * ?")//每天的23点30分执行一次，获取的是前一天的modis拍摄的数据，这时候应该已经出了产品
-    public void insertModisData() {
 
+
+    /**
+     * 每隔一个小时执行一次，为了以小时为单位接入数据
+     */
+    @Scheduled(cron = "0 35 0/1 * * ?")
+    public void insertModisData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-                Calendar calendarNow = Calendar.getInstance();
-                String stop = null;
-                String start = null;
-                String bbox = "95,24,123,35";//长江流域经纬度范围
-                boolean flag = false;
-                String code = null;
-                try {
-
-//                    List<SatelliteInstrument> satelliteInstruments = getSatelliteInstruments();
-//                    if (satelliteInstruments!=null && satelliteInstruments.size()>0) {
-//                        for (SatelliteInstrument satelliteInstrument:satelliteInstruments) {
-                    //通过接口内容可知AM1M卫星生产Terra MODIS, PM1M卫星生产Aqua MODIS, AMPM卫星生产Combined Aqua和Terra MODIS
-                    //对于AMPM卫星,由于目前无法确定那些产品事Terra MODIS,所以暂时只接入AM1M和PM1M卫星的数据
-//                            if (satelliteInstrument.getName().equals("AM1M") || satelliteInstrument.getName().equals("PM1M")) {
-
-//                    MOD11A1 隔一天更新一次， MOD11A2隔9天更新一次  MYD11A1隔一天更新一次   MOD13A2 17天更新一次  MCD12Q1没有数据  MCD19A2两天更新一次
-                    String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
-                    for (String product : products) {
-                        if(product.equals("MOD11A1") || product.equals("MYD11A1")){
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.add(Calendar.DATE, -1);
-                            stop = format.format(calendar.getTime());
-                            calendar.add(Calendar.DATE, -1);
-                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
-                            code = insertData2(start, stop, bbox, product);
-
-                        }else if(product.equals("MOD11A2")){
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.add(Calendar.DATE, -9);
-                            stop = format.format(calendar.getTime());
-                            calendar.add(Calendar.DATE, -1);
-                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
-                             code = insertData2(start, stop, bbox, product);
-                        }else if(product.equals("MOD13A2")){
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.add(Calendar.DATE, -17);
-                            stop = format.format(calendar.getTime());
-                            calendar.add(Calendar.DATE, -1);
-                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
-                            code = insertData2(start, stop, bbox, product);
+                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
+                boolean flag;
+                LocalDateTime dateTime = LocalDateTime.now();
+                DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+                String strDate3 = dtf3.format(dateTime);
+                dateTime = LocalDateTime.parse(strDate3, dtf3);
+                for (String product : products) {
+                    try {
+                        Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
+                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().minusSeconds(24*60*60);
+                        while (timeNew.isBefore(timeNow)) {
+                            String bbox = "95,24,123,35";//长江流域经纬度范围
+                            String code = null;
+                            try {
+                                String start = timeNew.plusSeconds(24 * 60 * 60).toString();
+                                start = start.substring(0, start.indexOf("T")) + " 00:00:00";
+                                String stop = timeNew.plusSeconds(48 * 60 * 60).toString();
+                                stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
+                                code = insertData2(start, stop, bbox, product);
+                                log.info(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                                log.info(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
+                            }
+                            timeNew = timeNew.plusSeconds(48 * 60 * 60);
                         }
-                        else if(product.equals("MCD19A2")){
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.add(Calendar.DATE, -2);
-                            stop = format.format(calendar.getTime());
-                            calendar.add(Calendar.DATE, -1);
-                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
-                            code = insertData2(start, stop, bbox, product);
-                        }
-                            log.info("LAADS接入时间: " + calendarNow.getTime() + "Status: "+code);
-                            System.out.println("LAADS接入时间: " + calendarNow.getTime() + "Status: "+code);
-//                                    }
-//                                }
-
-//                            }
-
+                    }catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    log.error("LAADS接入时间: " + calendarNow.getTime() + "Status: Fail" +code);
-                    System.out.println("LAADS接入时间: " + calendarNow.getTime() + "Status: Fail"+code);
                 }
             }
         }).start();
     }
+
+
+//    @Scheduled(cron = "00 30 23 * * ?")//每天的23点30分执行一次，获取的是前一天的modis拍摄的数据，这时候应该已经出了产品
+//    public void insertModisData() {
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+//                Calendar calendarNow = Calendar.getInstance();
+//                String stop = null;
+//                String start = null;
+//                String bbox = "95,24,123,35";//长江流域经纬度范围
+//                boolean flag = false;
+//                String code = null;
+//                try {
+//                    String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
+//                    for (String product : products) {
+//                        if(product.equals("MOD11A1") || product.equals("MYD11A1")){
+//                            Calendar calendar = Calendar.getInstance();
+//                            calendar.add(Calendar.DATE, -1);
+//                            stop = format.format(calendar.getTime());
+//                            calendar.add(Calendar.DATE, -1);
+//                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
+//                            code = insertData2(start, stop, bbox, product);
+//
+//                        }else if(product.equals("MOD11A2")){
+//                            Calendar calendar = Calendar.getInstance();
+//                            calendar.add(Calendar.DATE, -9);
+//                            stop = format.format(calendar.getTime());
+//                            calendar.add(Calendar.DATE, -1);
+//                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
+//                             code = insertData2(start, stop, bbox, product);
+//                        }else if(product.equals("MOD13A2")){
+//                            Calendar calendar = Calendar.getInstance();
+//                            calendar.add(Calendar.DATE, -17);
+//                            stop = format.format(calendar.getTime());
+//                            calendar.add(Calendar.DATE, -1);
+//                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
+//                            code = insertData2(start, stop, bbox, product);
+//                        }
+//                        else if(product.equals("MCD19A2")){
+//                            Calendar calendar = Calendar.getInstance();
+//                            calendar.add(Calendar.DATE, -2);
+//                            stop = format.format(calendar.getTime());
+//                            calendar.add(Calendar.DATE, -1);
+//                            start = format.format(calendar.getTime()).replace("00:00:00", "23:59:59");
+//                            code = insertData2(start, stop, bbox, product);
+//                        }
+//                            log.info("LAADS接入时间: " + calendarNow.getTime() + "Status: "+code);
+//                    }
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    log.error("LAADS接入时间: " + calendarNow.getTime() + "Status: Fail" +code);
+//                }
+//            }
+//        }).start();
+//    }
 
 //    @Scheduled(cron = "00 40 23 * * ?")//每天的23：40分执行一次
 //    public void insertMerra2Data() {
@@ -668,6 +697,7 @@ public class InsertLAADSService implements LAADSConstant {
                                 entry.setSatellite("Modis");
                                 entry.setProductType(productName);
                                 j = entryMapper.insertData(entry);
+//                                changeAuthority(localPath);
                             }
                         }
                     }
@@ -678,7 +708,6 @@ public class InsertLAADSService implements LAADSConstant {
                     }
                 }else{
                     log.info("MODIS暂无数据！！！");
-                    System.out.println("MODIS暂无数据！！！");
                     return "暂无数据";
                 }
             }
@@ -819,6 +848,39 @@ public class InsertLAADSService implements LAADSConstant {
             System.out.println("cookieStr = " + cookieStr);
         }
         return cookieStr;
+    }
+
+
+
+    public static void changeAuthority(String filePath) {
+        String[] params = new String[1];
+        params[0] = "sh /data/Ai-Sensing/DeployCenter/laads-service/quanxian.sh " + "/data/Ai-Sensing/DataCenter/laads/MOD11A1.A2020128.h29v06.006.2020129085455.hdf";
+        String result = exe(params);
+        System.out.println(result);
+    }
+
+    private static String exe(String[] params) {
+        StringBuilder sb = new StringBuilder();
+        Process proc;
+        try {
+            proc = Runtime.getRuntime().exec(params);
+            proc.waitFor();
+            //用输入输出流来截取结果
+            SequenceInputStream sis = new SequenceInputStream(proc.getInputStream(), proc.getErrorStream());
+            InputStreamReader isr = new InputStreamReader(sis, Charset.forName("GBK"));
+            BufferedReader in = new BufferedReader(isr);
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+            }
+            proc.destroy();
+            in.close();
+            isr.close();
+            proc.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return  sb.toString();
     }
 
 }

@@ -74,7 +74,7 @@ public class FTPUtils {
      * @param downPath
      * @return
      */
-    public static boolean downloadFTP(FTPClient ftpClient, String filePath, String fileName, String downPath) {
+    public static boolean  downloadFTP(FTPClient ftpClient, String filePath, String fileName, String downPath) {
         boolean flag = false;
         try {
             //common-net的ftpclient默认是使用ASCII_FILE_TYPE，文件会经过ASCII编码转换，所以可能会造成文件损坏。所以我们需要手动指定其文件类型为二进制文件，屏蔽ASCII转换的操作，避免文件在转换的过程中受损。
@@ -87,13 +87,17 @@ public class FTPUtils {
             for (FTPFile file : files) {
                 //取得指定文件并下载
                 if (file.getName().equals(fileName)) {
-//                    File downFile = new File(downPath + File.separator + file.getName());
-                    File downFile = new File(downPath);
-                    OutputStream out = new FileOutputStream(downFile);
-                    //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
-                    flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
-                    out.flush();
-                    out.close();
+//                    File downFile123 = new File(downPath + File.separator + file.getName());
+//                    if (!downFile123.exists()){
+                        File downFile = new File(downPath);
+                        OutputStream out = new FileOutputStream(downFile);
+                        //绑定输出流下载文件,需要设置编码集,不然可能出现文件为空的情况
+                        flag = ftpClient.retrieveFile(new String(file.getName().getBytes(StandardCharsets.UTF_8),StandardCharsets.ISO_8859_1), new FileOutputStream(downFile));
+                        out.flush();
+                        out.close();
+//                    }else{
+//                        log.info("文件已存在，无需下载");
+//                    }
                     if (flag) {
                         log.info("下载成功");
                     } else {

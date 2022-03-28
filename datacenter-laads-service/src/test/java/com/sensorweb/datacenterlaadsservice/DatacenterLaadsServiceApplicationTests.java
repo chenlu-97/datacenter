@@ -7,8 +7,13 @@ import com.sensorweb.datacenterlaadsservice.service.InsertLAADSService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 @SpringBootTest
@@ -98,23 +103,55 @@ class DatacenterLaadsServiceApplicationTests {
 //        insertGLDASService.update();
 
 
-        String startTime = "2022-03-01 00:00:00";
-        String endTime = "2022-03-13 00:00:00";
-
-        SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Calendar start = Calendar.getInstance();
-        Calendar end = Calendar.getInstance();
-        try {
-            start.setTime(format.parse(startTime));
-            end.setTime(format.parse(endTime));
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        }
-        while(start.before(end))
-        {
-            System.out.println("start = " + format.format(start.getTime()));
-            start.add(Calendar.DAY_OF_MONTH,1);
-        }
-
+//        String startTime = "2022-03-01 00:00:00";
+//        String endTime = "2022-03-13 00:00:00";
+//
+//        SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        Calendar start = Calendar.getInstance();
+//        Calendar end = Calendar.getInstance();
+//        try {
+//            start.setTime(format.parse(startTime));
+//            end.setTime(format.parse(endTime));
+//        } catch (java.text.ParseException e) {
+//            e.printStackTrace();
+//        }
+//        while(start.before(end))
+//        {
+//            System.out.println("start = " + format.format(start.getTime()));
+//            start.add(Calendar.DAY_OF_MONTH,1);
+//        }
+//            String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
+            String[] products = new String[]{"MOD11A1"};
+            boolean flag;
+            LocalDateTime dateTime = LocalDateTime.now();
+            DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+            String strDate3 = dtf3.format(dateTime);
+            dateTime = LocalDateTime.parse(strDate3, dtf3);
+            for (String product : products) {
+                try {
+                        Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
+                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().minusSeconds(24*60*60);
+                        while (timeNew.isBefore(timeNow)) {
+                            String bbox = "95,24,123,35";//长江流域经纬度范围
+                            String code = null;
+                            try {
+                                String start = timeNew.plusSeconds(24 * 60 * 60).toString();
+                                start = start.substring(0, start.indexOf("T")) + " 00:00:00";
+                                String stop = timeNew.plusSeconds(48 * 60 * 60).toString();
+                                stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
+                                System.out.println("start = " + start);
+                                System.out.println("stop = " + stop);
+//                                code = insertLAADSService.insertData2(start, stop, bbox, product);
+//                                System.out.println(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                                System.out.println(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
+                            }
+                            timeNew = timeNew.plusSeconds(48 * 60 * 60);
+                        }
+                    }catch (Exception e) {
+                     System.out.println(e.getMessage());
+                }
+            }
     }
 }

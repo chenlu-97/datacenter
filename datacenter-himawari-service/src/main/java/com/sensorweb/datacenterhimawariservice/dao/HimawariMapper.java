@@ -27,5 +27,6 @@ public interface HimawariMapper {
 
     List<Himawari> selectByIds(@Param("uniquecode") List<String> uniquecode,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
+
 //    Himawari selectBySpatialAndTemporal(@Param("region") String region, @Param("begin") Instant begin, @Param("end") Instant end);
 }
