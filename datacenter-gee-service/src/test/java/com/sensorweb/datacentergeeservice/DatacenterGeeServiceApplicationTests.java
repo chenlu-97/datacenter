@@ -20,7 +20,7 @@ class DatacenterGeeServiceApplicationTests {
     LandsatMapper landsatMapper;
 
     @Test
-    void contextLoads() throws IOException {
+    void contextLoads() throws Exception {
 ////        String path = "D:\\OneDrive\\GoogleEarthEngine\\GetGeoInfo-d670c0a18233.json";
 //        GoogleCredentials credentials = ServiceAccountCredentials.fromStream(new FileInputStream("src/main/resources/GetGeoInfo-d670c0a18233.json"));
 ////        GoogleCredentials googleCredentials = googleService.getCredentials();
@@ -37,11 +37,11 @@ class DatacenterGeeServiceApplicationTests {
 
 //        googleService.downloadLandsat("20220306");
 
-        List<Landsat> landsats =  landsatMapper.selectNew();
-        String time = landsats.get(0).getDate().toString();
-        time = time.replace("T", " ").replace("Z", "").substring(0, time.indexOf("T")).replace("-", "");
+//        List<Landsat> landsats =  landsatMapper.selectNew();
+//        String time = landsats.get(0).getDate().toString();
+//        time = time.replace("T", " ").replace("Z", "").substring(0, time.indexOf("T")).replace("-", "");
 
-
+//        googleService.saveToDB("/Users/chenlu/Desktop/landsat/LC08_L2SP_025032_20220404_20220412_02_T1.tar");
     }
 
 }

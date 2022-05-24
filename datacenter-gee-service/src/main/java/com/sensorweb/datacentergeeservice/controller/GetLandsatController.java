@@ -134,7 +134,7 @@ public class GetLandsatController {
 
     @GetMapping(value = "getLandsatData")
     @ResponseBody
-    public Map<String, Object> getLandsatData( @RequestParam(value="cloudcover", required=false) String cloudcover,@RequestParam(value="wkt", required=false) String wkt,@Param("startTime")String startTime, @Param("endTime")String endTime) {
+    public Map<String, Object> getLandsatData(@RequestParam(value="type", required=false) String type,@RequestParam(value="cloudcover", required=false) String cloudcover,@RequestParam(value="wkt", required=false) String wkt,@Param("startTime")String startTime, @Param("endTime")String endTime) {
 
         Map<String, Object> res = new HashMap<>();
         Map<String, List<String>> path = new HashMap<>();
@@ -155,9 +155,9 @@ public class GetLandsatController {
                 Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
                 List<Landsat> Landsats = new ArrayList<>();
                 if(cloudcover != null){
-                     Landsats = landsatMapper.getFilePath(Float.valueOf(cloudcover),wkt,start,end);
+                     Landsats = landsatMapper.getFilePath(Float.valueOf(cloudcover),wkt,start,end,type);
                 }else{
-                     Landsats = landsatMapper.getFilePath(0,wkt,start,end);
+                     Landsats = landsatMapper.getFilePath(0,wkt,start,end,type);
                 }
                 List<String> paths = new ArrayList<>();
                 if(Landsats.size()>0){

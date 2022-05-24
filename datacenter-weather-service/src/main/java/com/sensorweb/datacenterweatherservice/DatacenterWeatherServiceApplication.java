@@ -15,6 +15,7 @@ public class DatacenterWeatherServiceApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(DatacenterWeatherServiceApplication.class, args);
+
     }
 
 }

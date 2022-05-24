@@ -11,11 +11,14 @@ import com.sensorweb.datacenterairservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterairservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterairservice.util.AirConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import com.sensorweb.datacenterutil.utils.SendMail;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,6 +64,7 @@ public class InsertAirService extends Thread implements AirConstant {
         String time = formatter.format(dateTime);
 
         new Thread(new Runnable() {
+            @SneakyThrows
             @Override
             public void run() {
                 boolean flag = true;
@@ -71,6 +75,13 @@ public class InsertAirService extends Thread implements AirConstant {
                             log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Success");
                             DataCenterUtils.sendMessage("HB_AIR"+ time, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据");
                             System.out.println("湖北省监测站接入时间: " + dateTime.toString() + "Status: Success");
+                            int num = airQualityHourMapper.selectMaxTimeData().size();
+                            if(num!=273){
+                                int gap = 273-num;
+                                String mes = "湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                                // 发送邮件
+                                SendMail.sendemail(mes);
+                            }
                         } else {
                             System.out.println("等待中...");
                         }
@@ -78,7 +89,9 @@ public class InsertAirService extends Thread implements AirConstant {
                     } catch (Exception e) {
                         log.error(e.getMessage());
                         log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Fail");
-                        System.out.println(e.getMessage());
+                        String mes = "湖北省监测站接入失败！！----失败时间 ："+ dateTime;
+                        // 发送邮件
+                        SendMail.sendemail(mes);
                         break;
                     }
                 }

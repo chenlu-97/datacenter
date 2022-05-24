@@ -5,10 +5,12 @@
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/controller/MeasuringVehicleController.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/util/MeasuringVehicleUtil.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/service/ServerThread.java
+/Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/util/OkHttpConfig.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/entity/MeasuringVehicle.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/config/Swagger3Configuration.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/service/MeasuringVehicleService.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/util/ApplicationContextUtil.java
+/Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/util/OkHttpUtil.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/DatacenterMobileServiceApplication.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/dao/SurveyingVesselMapper.java
 /Users/chenlu/Desktop/code/datacenter/datacenter-mobile-service/src/main/java/com/sensorweb/datacentermobileservice/service/TCPService.java

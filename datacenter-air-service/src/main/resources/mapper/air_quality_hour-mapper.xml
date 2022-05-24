@@ -136,4 +136,9 @@
         WHERE station_name = #{name} AND querytime = #{time}
     </select>
 
+    <select id="selectMaxTimeData" resultMap="airQualityHour">
+        select <include refid="selectFields"></include>
+        from "wuhanCC_air_hourly" where querytime = (select max(querytime) from "wuhanCC_air_hourly");
+    </select>
+
 </mapper>

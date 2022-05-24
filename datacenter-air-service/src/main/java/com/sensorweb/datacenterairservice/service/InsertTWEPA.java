@@ -12,6 +12,8 @@ import com.sensorweb.datacenterairservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterairservice.util.AirConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sensorweb.datacenterutil.utils.DownloadFile;
+import com.sensorweb.datacenterutil.utils.SendMail;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +68,7 @@ public class InsertTWEPA implements AirConstant {
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         new Thread(new Runnable() {
+            @SneakyThrows
             @Override
             public void run() {
                 boolean flag = false;
@@ -77,10 +80,20 @@ public class InsertTWEPA implements AirConstant {
                         log.info("台湾EPA接入时间: " + dateTime.toString() + "Status: Success");
                         DataCenterUtils.sendMessage("TW_AIR"+ dateTime.toString(), "站网-台湾空气质量","这是一条获取的台湾省空气质量数据");
                         System.out.println("台湾EPA接入时间: " + dateTime.toString() + "Status: Success");
+                        int num = twepaMapper.selectMaxTimeData().size();
+                        if(num!=85){
+                            int gap = 85-num;
+                            String mes = "台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                            // 发送邮件
+                            SendMail.sendemail(mes);
+                        }
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     log.info("台湾EPA接入时间: " + dateTime.toString() + "Status: Fail");
+                    String mes = "台湾EPA接入失败！！----失败时间 ："+ dateTime;
+                    // 发送邮件
+                    SendMail.sendemail(mes);
                     System.out.println(e.getMessage());
                 }
             }

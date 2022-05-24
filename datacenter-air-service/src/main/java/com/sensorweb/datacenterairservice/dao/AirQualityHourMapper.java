@@ -38,4 +38,7 @@ public interface AirQualityHourMapper {
     List<AirQualityHour> selectByIdAndTimeNew(@Param("type") String type , @Param("spa") String spa, @Param("time")Instant time);
 
     List<AirQualityHour> getDataByNameAndTime(@Param("name")String name,@Param("time")Instant time);
+
+    List<AirQualityHour> selectMaxTimeData();
+
 }

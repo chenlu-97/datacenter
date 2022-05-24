@@ -93,4 +93,87 @@
         FROM surveying_vessel
     </select>
 
+
+    <select id="getTime" resultMap="surveyingVessel">
+        SELECT <include refid="selectFields"></include>
+        FROM surveying_vessel
+        WHERE datatime = #{dataTime}
+    </select>
+
+
+
+    <select id="selectByPage2" resultType="com.sensorweb.datacentermobileservice.entity.SurveyingVessel">
+        SELECT <include refid="selectFields"></include>
+        FROM surveying_vessel  where id != 0
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
+        <if test="pageSize != null and pageNum != null">
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+    </select>
+
+
+
+    <update id="UpdateSpaByTime" parameterType="SurveyingVessel">
+        UPDATE surveying_vessel
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lon != null"> lon=#{lon},</if>
+            <if test="lat != null"> lat=#{lat},</if>
+        </trim>
+        WHERE datatime = #{dataTime}
+    </update>
+
+    <update id="updateDataByTime" parameterType="SurveyingVessel">
+        UPDATE surveying_vessel
+        <trim prefix="set" suffixOverrides=",">
+            <if test="w20138 != null and w20138 != 0.0000" > w20138=#{w20138},</if>
+            <if test="w20139 != null and w20139 != 0.0000"> w20139=#{w20139},</if>
+            <if test="w20140 != null and w20140 != 0.0000"> w20140=#{w20140},</if>
+            <if test="w20142 != null and w20142 != 0.0000"> w20142=#{w20142},</if>
+            <if test="w20143 != null and w20143 != 0.0000"> w20143=#{w20143},</if>
+            <if test="w20144 != null and w20144 != 0.0000"> w20144=#{w20144},</if>
+            <if test="w24003 != null and w24003 != 0.0000"> w24003=#{w24003},</if>
+            <if test="w24071 != null and w24071 != 0.0000"> w24071=#{w24071},</if>
+            <if test="w20170 != null and w20170 != 0.0000"> w20170=#{w20170},</if>
+            <if test="w24004 != null and w24004 != 0.0000"> w24004=#{w24004},</if>
+            <if test="w24017 != null and w24017 != 0.0000"> w24017=#{w24017},</if>
+            <if test="w25002 != null and w25002 != 0.0000"> w25002=#{w25002},</if>
+            <if test="w24049 != null and w24049 != 0.0000"> w24049=#{w24049},</if>
+            <if test="w25003 != null and w25003 != 0.0000"> w25003=#{w25003},</if>
+            <if test="w24050 != null and w24050 != 0.0000"> w24050=#{w24050},</if>
+            <if test="w25010 != null and w25010 != 0.0000"> w25010=#{w25010},</if>
+            <if test="w25004 != null and w25004 != 0.0000"> w25004=#{w25004},</if>
+            <if test="w25073 != null and w25073 != 0.0000"> w25073=#{w25073},</if>
+            <if test="w25038 != null and w25038 != 0.0000"> w25038=#{w25038},</if>
+            <if test="w25006 != null and w25006 != 0.0000"> w25006=#{w25006},</if>
+            <if test="w25034 != null and w25034 != 0.0000"> w25034=#{w25034},</if>
+            <if test="w25013 != null and w25013 != 0.0000"> w25013=#{w25013},</if>
+            <if test="w25011 != null and w25011 != 0.0000"> w25011=#{w25011},</if>
+            <if test="w21016 != null and w21016 != 0.0000"> w21016=#{w21016},</if>
+            <if test="w23002 != null and w23002 != 0.0000"> w23002=#{w23002},</if>
+            <if test="w21003 != null and w21003 != 0.0000"> w21003=#{w21003},</if>
+            <if test="w19002 != null and w19002 != 0.0000"> w19002=#{w19002},</if>
+            <if test="w20117 != null and w20117 != 0.0000">w20117=#{w20117},</if>
+            <if test="w01019 != null and w01019 != 0.0000"> w01019=#{w01019},</if>
+            <if test="w21011 != null and w21011 != 0.0000"> w21011=#{w21011},</if>
+            <if test="w21001 != null and w21001 != 0.0000"> w21001=#{w21001},</if>
+            <if test="w20125 != null and w20125 != 0.0000"> w20125=#{w20125},</if>
+            <if test="w20141 != null and w20141 != 0.0000"> w20141=#{w20141},</if>
+            <if test="w22001 != null and w22001 != 0.0000"> w22001=#{w22001},</if>
+            <if test="w01001 != null and w01001 != 0.0000"> w01001=#{w01001},</if>
+            <if test="w01014 != null and w01014 != 0.0000"> w01014=#{w01014},</if>
+            <if test="w01010 != null and w01010 != 0.0000"> w01010=#{w01010},</if>
+            <if test="w01009 != null and w01009 != 0.0000"> w01009=#{w01009},</if>
+            <if test="w01003 != null and w01003 != 0.0000"> w01003=#{w01003},</if>
+            <if test="w01022 != null and w01022 != 0.0000"> w01022=#{w01022},</if>
+            <if test="w01016 != null and w01016 != 0.0000"> w01016=#{w01016},</if>
+            <if test="w19011 != null and w19011 != 0.0000"> w19011=#{w19011},</if>
+        </trim>
+        WHERE datatime = #{dataTime}
+    </update>
+
 </mapper>

@@ -17,9 +17,19 @@ public interface SurveyingVesselMapper {
 
     List<SurveyingVessel> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
+
+    List<SurveyingVessel> selectByPage2(@Param("pageNum") Integer pageNum, @Param("pageSize") Integer pageSize,  @Param("start")Instant start,  @Param("end")Instant end);
+
+
     int selectNum();
 
     int insertPosition(SurveyingVessel surveyingVessel);
 
     int UpdateDataByTime(SurveyingVessel surveyingVessel);
+
+    int UpdateSpaByTime(SurveyingVessel surveyingVessel);
+
+    List<SurveyingVessel> getTime(SurveyingVessel surveyingVessel);
+
+    int updateDataByTime(SurveyingVessel surveyingVessel);
 }

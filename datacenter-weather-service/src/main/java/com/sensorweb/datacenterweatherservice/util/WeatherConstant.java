@@ -12,8 +12,6 @@ public interface WeatherConstant {
     String TianXingZhou_URL = "http://iot.ainongye.cn/json";
 
 
-
-
     /**
      * 湖北气象站点 数据请求URL
      */

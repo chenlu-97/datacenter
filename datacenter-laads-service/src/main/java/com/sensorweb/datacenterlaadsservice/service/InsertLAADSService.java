@@ -6,6 +6,7 @@ import com.sensorweb.datacenterlaadsservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterlaadsservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterlaadsservice.util.LAADSConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import com.sun.corba.se.spi.logging.CORBALogDomains;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -59,13 +60,12 @@ public class InsertLAADSService implements LAADSConstant {
     /**
      * 每隔一个小时执行一次，为了以小时为单位接入数据
      */
-    @Scheduled(cron = "0 35 0/1 * * ?")
+    @Scheduled(cron = "0 40 0/1 * * ?")
     public void insertModisData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
-                boolean flag;
                 LocalDateTime dateTime = LocalDateTime.now();
                 DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
                 String strDate3 = dtf3.format(dateTime);
@@ -73,22 +73,19 @@ public class InsertLAADSService implements LAADSConstant {
                 for (String product : products) {
                     try {
                         Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
-                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().minusSeconds(24*60*60);
-                        while (timeNew.isBefore(timeNow)) {
-                            String bbox = "95,24,123,35";//长江流域经纬度范围
-                            String code = null;
-                            try {
-                                String start = timeNew.plusSeconds(24 * 60 * 60).toString();
-                                start = start.substring(0, start.indexOf("T")) + " 00:00:00";
-                                String stop = timeNew.plusSeconds(48 * 60 * 60).toString();
-                                stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
-                                code = insertData2(start, stop, bbox, product);
-                                log.info(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                                log.info(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
-                            }
-                            timeNew = timeNew.plusSeconds(48 * 60 * 60);
+                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
+                        String bbox = "95,24,123,35";//长江流域经纬度范围
+                        String code = null;
+                        try {
+                            String start = timeNew.plusSeconds(24 * 60 * 60).toString();
+                            start = start.substring(0, start.indexOf("T")) + " 00:00:00";
+                            String stop = timeNow.plusSeconds(24 * 60 * 60).toString();
+                            stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
+                            code = insertData2(start, stop, bbox, product);
+                            log.info(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                            log.info(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
                         }
                     }catch (Exception e) {
                         System.out.println(e.getMessage());
@@ -670,7 +667,12 @@ public class InsertLAADSService implements LAADSConstant {
     public String insertData2( String startTime, String endTime, String bbox, String productName) throws Exception {
         List<Entry> entryList = new ArrayList<>();
         int j = 0;
-        List<LAADSCollection> collections = getCollectionsByProduct(productName);
+        List<LAADSCollection> collections = new ArrayList<>();
+        try {
+         collections = getCollectionsByProduct(productName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (collections != null && collections.size() > 0) {
             for (LAADSCollection collection : collections) {
                 String response = getInfoByOpenSearch(productName, Integer.parseInt(collection.getName()), startTime, endTime, bbox);
@@ -686,11 +688,11 @@ public class InsertLAADSService implements LAADSConstant {
                             String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
                             int i = 0;
                             while (localPath.equals("fail")) {
-                                i++;
-                                if (i > 1) {
+                                if (i > 2) {
                                     break;
                                 }
                                 localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                i++;
                             }
                             if (localPath != "fail" && localPath != null && localPath != "none") {
                                 entry.setFilePath(localPath);

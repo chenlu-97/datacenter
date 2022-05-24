@@ -50,18 +50,6 @@ public class InsertGLDASService {
     @Autowired
     private GLDASMapper gldasMapper;
 
-    @Autowired
-    private ObsFeignClient obsFeignClient;
-
-    @Autowired
-    private SensorFeignClient sensorFeignClient;
-
-    @Autowired
-    private OkHttpUtil okHttpUtil;
-
-    @Autowired
-    private DownloadUtil downloadUtil;
-
     @Value("${datacenter.path.gldas}")
     private String savePath;
 
@@ -116,7 +104,7 @@ public class InsertGLDASService {
             while((downloadurl = br.readLine())!=null){//使用readLine方法，一次读一行
                 int tmp = downloadurl.lastIndexOf("/");
                 String fileName = downloadurl.substring(tmp+1);
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath,2);
+                String localPath = downloadFromUrl(downloadurl, fileName, savePath);
                 System.out.println("下载状态： " + localPath);
                 String date = downloadurl.substring(downloadurl.indexOf(".A")+2,downloadurl.indexOf(".021")).replace(".","");
                 if (localPath != "fail" && localPath != "none") {
@@ -156,7 +144,7 @@ public class InsertGLDASService {
      * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
      * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.2100.021.nc4
      * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H/2022/039/GLDAS_NOAH025_3H.A20220208.2100.021.nc4
-     * @param time 2022-03-01T00:00:00
+     * @param time 2022-03-01T00:00:00z
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean insertData(String time) throws Exception {
@@ -177,14 +165,14 @@ public class InsertGLDASService {
                     downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/" + year  + "/" +day+ "/" + fileName;
                 }
 
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year,2);
+                String localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year);
                 int i = 0; //防止失败，重试2次
                 while (localPath.equals("fail")) {
                     i++;
                     if (i > 1) {
                         break;
                     }
-                    localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year, 2);
+                    localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year);
                 }
                 GLDAS gldas = new GLDAS();
                 if (localPath != "fail" && localPath != "none") {
@@ -248,7 +236,7 @@ public class InsertGLDASService {
      * @param fileName
      * @param savePath
      */
-    public String downloadFromUrl(String url, String fileName, String savePath,int code) {
+    public String downloadFromUrl(String url, String fileName, String savePath) {
         String res = null;
         try {
             HttpsUrlValidator.retrieveResponseFromServer(url);
@@ -258,11 +246,7 @@ public class InsertGLDASService {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36");
             connection.setRequestProperty("Connection", "keep-alive");
             connection.setRequestProperty("Host", "hydro1.gesdisc.eosdis.nasa.gov");
-            if (code == 2){
-                connection.setRequestProperty("Cookie", LAADSConstant.Cookie);
-            }else if(code == 1){
-                connection.setRequestProperty("Cookie", getCookie(url));
-            }
+            connection.setRequestProperty("Cookie", LAADSConstant.Cookie);
             //设置https协议访问
             System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2,SSLv3");
             InputStream inputStream = connection.getInputStream();

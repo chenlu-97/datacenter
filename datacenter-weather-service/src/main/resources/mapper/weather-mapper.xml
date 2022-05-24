@@ -109,5 +109,9 @@
         FROM "wuhanCC_weather_hourly"  order by "QueryTime" desc
         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
+    <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterweatherservice.entity.ChinaWeather">
+        select <include refid="selectFields"></include>
+        from "wuhanCC_weather_hourly" where "QueryTime" = (select max("QueryTime") from "wuhanCC_weather_hourly");
+    </select>
 
 </mapper>

@@ -22,7 +22,7 @@ public class downloadmodis4 implements Runnable{
         EntryMapper entryMapper = (EntryMapper) ApplicationContextUtil.getBean("entryMapper");
         try {
             String startTime = "2020-01-01 00:00:00";
-            String endTime = "2022-03-15 00:00:00";
+            String endTime = "2020-01-02 00:00:00";
             String product = "MCD19A2";
             String bbox = "95,24,123,35";
             SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd 00:00:00");
@@ -40,13 +40,15 @@ public class downloadmodis4 implements Runnable{
                 Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
                 List<Entry> entrys = entryMapper.getFilePath(product,start,end);
                 if(entrys.size()>0){
-                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
-                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
+//                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
+//                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
                 }else{
                     String flag = insertLAADSService.insertData2(start.toString().replace("T"," ").replace("Z",""), end.toString().replace("T"," ").replace("Z",""), bbox, product);
-                    System.out.println( product+start.toString()+ flag);
-                    log.info(product+start.toString()+flag);
+                    System.out.println( "获取modis产品："+product+"接入时间："+start.toString()+ "状态："+flag);
+                    log.info("获取modis产品："+product+"接入时间："+start.toString()+ "状态："+flag);
+                    Thread.sleep(60 * 1000); //下载太快会断开连接，这里休息2分钟
                 }
+
                 startloop.add(Calendar.DAY_OF_MONTH,1);
             }
         } catch (Exception e) {

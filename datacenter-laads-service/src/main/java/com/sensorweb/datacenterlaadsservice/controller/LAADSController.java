@@ -158,6 +158,7 @@ public class LAADSController {
                         res.put("status：failed", flag + startTime +"--"+endTime+"获取失败");
                     }
                 }
+                Thread.sleep(60 * 1000); //下载太快会断开连接，这里休息1分钟
                 startloop.add(Calendar.DAY_OF_MONTH,1);
             }
         } catch (Exception e) {

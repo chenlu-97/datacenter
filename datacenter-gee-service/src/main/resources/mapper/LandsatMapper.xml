@@ -18,19 +18,21 @@
     <result column="filepath" property="filePath"/>
     <result column="wave_band" property="waveBand"/>
     <result column="band_info" property="bandInfo"/>
+    <result column="row" property="row"/>
+    <result column="path" property="path"/>
   </resultMap>
 
   <sql id="insertFields" >
-        imageid,sensorid,spacecraftid,coordinates,geom,date,time,imagesize,ellipsoid,cloudcover,thumburl,imagetype,filepath,wave_band,band_info
+        imageid,sensorid,spacecraftid,coordinates,geom,date,time,imagesize,ellipsoid,cloudcover,thumburl,imagetype,filepath,wave_band,band_info,row,path
   </sql>
 
   <sql id="selectFields" >
-        imageid,sensorid,spacecraftid,coordinates,geom,date,time,imagesize,ellipsoid,cloudcover,thumburl,imagetype,filepath,wave_band,band_info
+        imageid,sensorid,spacecraftid,coordinates,geom,date,time,imagesize,ellipsoid,cloudcover,thumburl,imagetype,filepath,wave_band,band_info,row,path
   </sql>
   <insert id="insertLandsat" parameterType="com.sensorweb.datacentergeeservice.entity.Landsat">
 
     INSERT INTO landsat (<include refid="insertFields"></include>)
-    VALUES (#{imageID}, #{sensorID}, #{spacecraftID}, #{Coordinates},ST_GeomFromText(#{Coordinates}, 4326), #{Date}, #{Time}, #{imageSize}, #{Ellipsoid}, #{Cloudcover}, #{Thumburl}, #{imageType}, #{filePath}, #{waveBand}, #{bandInfo})
+    VALUES (#{imageID}, #{sensorID}, #{spacecraftID}, #{Coordinates},ST_GeomFromText(#{Coordinates}, 4326), #{Date}, #{Time}, #{imageSize}, #{Ellipsoid}, #{Cloudcover}, #{Thumburl}, #{imageType}, #{filePath}, #{waveBand}, #{bandInfo}, #{row}, #{path})
 
   </insert>
 
@@ -92,7 +94,10 @@
   <select id="getFilePath" resultMap="BaseResultMap">
     SELECT <include refid="selectFields"></include>
     FROM landsat
-    WHERE imagetype = 'ALL' AND date <![CDATA[>=]]> #{start} AND  date <![CDATA[<]]> #{end}
+    WHERE  date <![CDATA[>=]]> #{start} AND date <![CDATA[<]]> #{end}
+    <if test="type != null">
+     AND imagetype = #{type}
+    </if>
     <if test="cloudcover != 0 ">
       AND cloudcover <![CDATA[<]]> #{cloudcover}
     </if>
@@ -100,5 +105,12 @@
       AND ST_Intersects(geom, ST_GeomFromText(#{wkt}, 4326)) = true
     </if>
   </select>
+
+
+    <select id="getLandsat" resultMap="BaseResultMap">
+      SELECT <include refid="selectFields"></include>
+      FROM landsat
+      WHERE imagetype = #{type} AND date <![CDATA[>=]]> #{startTime} AND date <![CDATA[<]]> #{endTime}
+    </select>
 
 </mapper>

@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenterweatherservice.dao.WeatherStationMapper">
     <sql id="insertFields">
-        station_id, station_name, township, region, city, province, lon, lat, stype
+        station_id, station_name, township, region, city, province, lon, lat, stype,geom
     </sql>
 
     <sql id="selectFields">
@@ -13,14 +13,14 @@
 
     <insert id="insertData" parameterType="WeatherStationModel" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO station (<include refid="insertFields"></include>)
-        VALUES (#{stationId}, #{stationName}, #{township}, #{region}, #{city}, #{province}, #{lon}, #{lat}, #{stationType})
+        VALUES (#{stationId}, #{stationName}, #{township}, #{region}, #{city}, #{province}, #{lon}, #{lat}, #{stationType},ST_GeomFromText(#{geom}, 4326))
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO station (<include refid="insertFields"></include>)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.stationId}, #{item.stationName}, #{item.township}, #{item.region}, #{item.city}, #{item.province}, #{item.lon}, #{item.lat}, #{item.stationType})
+            (#{item.stationId}, #{item.stationName}, #{item.township}, #{item.region}, #{item.city}, #{item.province}, #{item.lon}, #{item.lat}, #{item.stationType},,ST_GeomFromText(#{item.geom}, 4326))
         </foreach>
     </insert>
 

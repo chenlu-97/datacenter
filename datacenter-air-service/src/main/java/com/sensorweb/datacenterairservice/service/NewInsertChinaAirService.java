@@ -377,7 +377,6 @@ public class NewInsertChinaAirService extends Thread implements AirConstant {
 
 
 
-
     /**
      * 注册站点的方法
      * @return

@@ -1,5 +1,6 @@
 package com.sensorweb.datacenterutil.utils;
 
+import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -10,6 +11,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,106 @@ import java.util.*;
 
 @Component
 public class DataCenterUtils {
+
+
+
+
+
+
+//    /**
+//     * 发送okhttp请求
+//     * @param url
+//     * @param param
+//     * @return
+//     * @throws IOException
+//     */
+//    public static String okhttp(String url, String param) throws IOException {
+//
+//
+//        OkHttpClient okHttpClient = new OkHttpClient();
+//
+//        RequestBody requestBody = new FormBody.Builder()
+//                .add("city","广州")
+//                .add("appkey","9878b9b510123e52a951fe2074d19be1")
+//                .build();
+//
+//        Request request = new Request.Builder()
+//                .addHeader("content-type", "application/json")
+//                .url("https://way.jd.com/jisuapi/weather")
+//                .post(requestBody)
+//                .build();
+//
+//        String result = okHttpClient.newCall(request).execute().body().string();
+//        return result;
+//
+//    }
+
+
+
+
+    //清空文件内容
+    public static void clearInfoForFile(String filepath) {
+        File file =new File(filepath);
+        try {
+            if(!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fileWriter =new FileWriter(file);
+            fileWriter.write("");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**传入txt路径读取txt文件
+     * @param txtPath
+     * @return 返回读取到的内容
+     */
+    public static String readTxt(String txtPath) {
+        File file = new File(txtPath);
+        if(file.isFile() && file.exists()){
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuffer sb = new StringBuffer();
+                String text = null;
+                while((text = bufferedReader.readLine()) != null){
+                    sb.append(text);
+                }
+                return sb.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
+    /**使用FileOutputStream来写入txt文件
+     * @param txtPath txt文件路径
+     * @param content 需要写入的文本
+     */
+    public static void writeTxt(String txtPath,String content){
+        FileOutputStream fileOutputStream = null;
+        File file = new File(txtPath);
+        try {
+            if(file.exists()){
+                //判断文件是否存在，如果不存在就新建一个txt
+                file.createNewFile();
+            }
+            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(content.getBytes());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -91,9 +193,32 @@ public class DataCenterUtils {
     }
 
 
+    /**
+     * 发送post请求
+     * @param url
+     * @param param
+     * @return
+     * @throws IOException
+     */
+    public static String doPost2(String url, String param) throws IOException {
+        //打开postman
+        //这一步相当于运行main方法。
+        //创建request连接 3、填写url和请求方式
+        HttpPost post = new HttpPost(url + "?" + param);
+
+        CloseableHttpClient client = HttpClients.createDefault();
+
+        //点击发送按钮，发送请求、获取响应报文
+        CloseableHttpResponse response = client.execute(post);
+        //格式化响应报文
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity);
+    }
+
+
 
     public static void sendMessage(String id, String type, String details) throws Exception {
-        String url = "http://172.16.100.2:9999/ai-sensing-back-service/AI_Sensing_Back/api/ws/dps";
+        String url = "http://172.16.100.2:9999/ai-sensing-back-service/api/ws/dps";
         String param = "id="+URLEncoder.encode(id,"utf-8")+"&type="+URLEncoder.encode(type,"utf-8")+"&details="+URLEncoder.encode(details,"utf-8")+"&progress=100";
 //       Map<String ,Object> param = new HashMap<>();
 //
@@ -105,6 +230,7 @@ public class DataCenterUtils {
         String document =  doGet(url,param);
         System.out.println("发送给前端的数据是 = " + document);
     }
+
 
 
 

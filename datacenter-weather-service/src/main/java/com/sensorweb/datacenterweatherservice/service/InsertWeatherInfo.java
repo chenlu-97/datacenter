@@ -3,6 +3,7 @@ package com.sensorweb.datacenterweatherservice.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import com.sensorweb.datacenterutil.utils.SendMail;
 import com.sensorweb.datacenterweatherservice.dao.WeatherMapper;
 import com.sensorweb.datacenterweatherservice.dao.WeatherStationMapper;
 import com.sensorweb.datacenterweatherservice.entity.ChinaWeather;
@@ -10,6 +11,7 @@ import com.sensorweb.datacenterweatherservice.entity.WeatherStationModel;
 import com.sensorweb.datacenterweatherservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterweatherservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterweatherservice.util.WeatherConstant;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -56,20 +58,32 @@ public class InsertWeatherInfo {
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         new Thread(new Runnable() {
+            @SneakyThrows
             @Override
             public void run() {
                 boolean flag = false;
                 try {
                     flag = insertWeatherInfoBatch(getWeatherInfo());
                     if (flag) {
-                        log.info("中国气象局接入时间: " + dateTime.toString() + "Status: Success");
-                        System.out.println("中国气象局接入时间: " + dateTime.toString() + "Status: Success");
+                        log.info("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Success");
+                        System.out.println("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Success");
                         DataCenterUtils.sendMessage("WH_1+8_Weather_"+dateTime.toString(), "站网-武汉城市圈气象","这是一条武汉1+8城市圈气象数据的");
+                        int num = weatherMapper.selectMaxTimeData().size();
+                        if(num!=736){
+                            int gap = 736-num;
+                            String mes = "中国气象局接入武汉1+8城市圈的接入部分缺失（站点数据应为736），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                            // 发送邮件
+                            SendMail.sendemail(mes);
+                        }
                     }
                     Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
+                    log.info("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Fail");
+                    String mes = "中国气象局接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ dateTime;
+                    // 发送邮件
+                    SendMail.sendemail(mes);
                 }
             }
         }).start();

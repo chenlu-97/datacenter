@@ -19,6 +19,7 @@ public class DatacenterLaadsServiceApplication {
 //        new Thread(new downloadmodis3()).start();
 //        new Thread(new downloadmodis4()).start();
 //        new Thread(new downloadmodis5()).start();
+          new Thread(new downloadmodis6()).start();
     }
 
 }

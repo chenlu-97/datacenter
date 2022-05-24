@@ -1,5 +1,5 @@
-serviceName=air-service
-filePath=/data/Ai-Sensing/DeployCenter/air-service
+serviceName=weather-service
+filePath=/data/Ai-Sensing/DeployCenter/weather-service
 
 container_id=$(docker ps -a | grep ${serviceName} | awk '{print $1}')
 echo "停止容器和删除容器"
@@ -15,7 +15,7 @@ cd ${filePath}
 docker build -t ${serviceName} .
 
 echo "启动容器"
-docker run -itd -p 9003:9003 -v /data/Ai-Sensing/DataCenter/air-quality/tmp/:/data/Ai-Sensing/DataCenter/air-quality/tmp/ -v /data/Ai-Sensing/DataCenter/air-quality/export/:/data/Ai-Sensing/DataCenter/air-quality/export/ --name air-service air-service
+docker run -itd -p 9010:9010 -v /data/Ai-Sensing/DataCenter/weather/tmp/:/data/Ai-Sensing/DataCenter/weather/tmp/ -v /data/Ai-Sensing/DataCenter/weather/export/:/data/Ai-Sensing/DataCenter/weather/export/ --name  weather-service weather-service
 
 docker ps
 

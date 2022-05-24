@@ -24,4 +24,6 @@ public class Landsat {
     private String filePath;
     private String waveBand = "430nm~12510nm";
     private String bandInfo = "可见光&近红外&远红外";
+    private int path;
+    private int row;
 }

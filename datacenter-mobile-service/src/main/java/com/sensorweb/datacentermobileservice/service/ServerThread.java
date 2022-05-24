@@ -50,7 +50,7 @@ public class ServerThread extends Thread {
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
                     dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
                     LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
-                    time1 = localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().toString();
+                    time1 = localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().plusSeconds(8*60*60).toString();
                 }
 
                 boolean i = false;
@@ -63,9 +63,9 @@ public class ServerThread extends Thread {
 //                        data2txt("measuring_vehicle_vocs_"+replace(time1),data);
 //                        DataCenterUtils.sendMessage("MeasuringVehicle_vocs_"+ time1, "测量车VOCs数据","这是一条测量车推送的VOCs数据");
                         if (i == true) {
-                            System.out.println("测量车VOCs数据接收成功!!!!");
+                            System.out.println(time1+"---测量车VOCs数据接收成功!!!!");
                         } else {
-                            System.out.println("测量车VOCs数据接收失败!!!!");
+                            System.out.println(time1+"---测量车VOCs数据接收失败!!!!");
                         }
                     }
 
@@ -76,9 +76,9 @@ public class ServerThread extends Thread {
 //                        data2txt("measuring_vehicle_air_"+replace(time1),data);
 //                        DataCenterUtils.sendMessage("MeasuringVehicle_air_"+ time1, "测量车空气数据","这是一条测量车推送的空气数据");
                         if (i == true) {
-                            System.out.println("测量车气态数据接收成功!!!!");
+                            System.out.println(time1+"---测量车气态数据接收成功!!!!");
                         } else {
-                            System.out.println("测量车气态数据接收失败!!!!");
+                            System.out.println(time1+"---测量车气态数据接收失败!!!!");
                         }
                     }
                     Matcher data_type3 = Pattern.compile("a34002-Avg").matcher(data);
@@ -88,9 +88,9 @@ public class ServerThread extends Thread {
 //                        data2txt("measuring_vehicle_PM_"+replace(time1),data);
 //                        DataCenterUtils.sendMessage("MeasuringVehicle_PM_"+ time1, "测量车PM数据","这是一条测量车推送的PM数据");
                         if (i == true) {
-                            System.out.println("测量车颗粒物数据接收成功!!!!");
+                            System.out.println(time1+"---测量车颗粒物数据接收成功!!!!");
                         } else {
-                            System.out.println("测量车颗粒物数据接收失败!!!!");
+                            System.out.println(time1+"---测量车颗粒物数据接收失败!!!!");
                         }
                     }
                     Matcher data_type4 = Pattern.compile("a340081-Avg").matcher(data);
@@ -100,9 +100,9 @@ public class ServerThread extends Thread {
 //                        data2txt("measuring_vehicle_HT_"+replace(time1),data);
 //                        DataCenterUtils.sendMessage("MeasuringVehicle_HT_"+ time1, "测量车黑炭数据","这是一条测量车推送的黑炭数据");
                         if (i == true) {
-                            System.out.println("测量车黑炭数据接收成功!!!!");
+                            System.out.println(time1+"---测量车黑炭数据接收成功!!!!");
                         } else {
-                            System.out.println("测量车黑炭数据接收失败!!!!");
+                            System.out.println(time1+"---测量车黑炭数据接收失败!!!!");
                         }
                     }
                     Matcher data_type5 = Pattern.compile("b60004-Avg").matcher(data);
@@ -112,23 +112,48 @@ public class ServerThread extends Thread {
 //                        DataCenterUtils.sendMessage("MeasuringVehicle_SPMS_"+ time1, "测量车单颗粒质谱仪数据","这是一条测量车推送的单颗粒质谱仪数据：");
 //                        data2txt("measuring_vehicle_SPMS_"+replace(time1),data);
                         if (i == true) {
-                            System.out.println("测量车单颗粒质谱仪数据接收成功!!!!");
+                            System.out.println(time1+"---测量车单颗粒质谱仪数据接收成功!!!!");
                         } else {
-                            System.out.println("测量车单颗粒质谱仪数据接收失败!!!!");
+                            System.out.println(time1+"---测量车单颗粒质谱仪数据接收失败!!!!");
                         }
                     }
-                    Matcher data_type6 = Pattern.compile("w01010-Rtd").matcher(data);
-                    while (data_type6.find()) {
-                        SurveyingVesselService surveyingVesselService = (SurveyingVesselService) ApplicationContextUtil.getBean("surveyingVesselService");
-                        i = surveyingVesselService.insertData(data);
-//                        data2txt("surveying_vessel_"+replace(time1),data);
-//                        DataCenterUtils.sendMessage("surveying_vessel_"+ time1, "测量船数据","这是一条测量船推送的数据：");
-                        if (i == true) {
-                            System.out.println("测量船数据接收成功!!!!");
-                        } else {
-                            System.out.println("测量船数据接收失败!!!!");
+
+
+                    Matcher data_type7 = Pattern.compile("lhsoft").matcher(data); //表明这是测量船的数据包
+                    if(data_type7.find()) {
+                        //判断是否为走航船经纬度数据包
+                        Matcher lon_match = Pattern.compile("Lng").matcher(data);
+                        Matcher lat_match = Pattern.compile("Lat").matcher(data);
+                        Matcher needdate = Pattern.compile("w01010").matcher(data);//获取需要的数据包
+                        if(lon_match.find() || lat_match.find()) {
+                            System.out.println("--------已获取到的走航船GPS数据包--------"+data );
+                            SurveyingVesselService surveyingVesselService = (SurveyingVesselService) ApplicationContextUtil.getBean("surveyingVesselService");
+                            i = surveyingVesselService.updateGPS(data);
+                            if (i == true) {
+                                System.out.println(time1 + "---测量船GPS数据接收成功!!!!");
+                            } else {
+                                System.out.println(time1 + "---测量船GPS数据接收失败!!!!");
+                            }
+                        }else if(needdate.find()){
+//                            System.out.println("--------已获取到的走航船参数数据包--------" +data);
+                            SurveyingVesselService surveyingVesselService = (SurveyingVesselService) ApplicationContextUtil.getBean("surveyingVesselService");
+                                i = surveyingVesselService.insertData(data);
+//                            data2txt("surveying_vessel_"+replace(time1),data);
+//                            DataCenterUtils.sendMessage("surveying_vessel_"+ time1, "测量船数据","这是一条测量船推送的数据：");
+                            if (i == true) {
+                                System.out.println(time1+"---测量船数据接收成功!!!!");
+                            } else {
+                                System.out.println(time1+"---测量船数据接收失败!!!!");
+                            }
                         }
+//                        else{
+//                            System.out.println("--------已获取到的走航船其他类型的数据包--------"+data+time1);
+//                        }
+                    }else{
+                        System.out.println(time1+"--------已获取到的其他类型的数据包（other）--------"+data);
                     }
+                }else{
+                    System.out.println(time1+"--------已获取到的其他类型的数据包（other）--------"+data);
                 }
             }
             socket.shutdownInput();

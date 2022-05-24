@@ -8,26 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 @SpringBootTest
 class DatacenterWeatherServiceApplicationTests {
     @Autowired
     private HBWeatherStationService hbWeatherStationService;
-    @Test
-    void testHBWeatherStation() throws IOException,ParseException{
-//        String document = hbWeatherStationService.getApiDocument("20211209100000");
-//        boolean i = hbWeatherStationService.getIOTInfo(document);
-//        System.out.println(i);
-        System.out.println("hbWeatherStationService.str2Instant(\"20211209110000\") = " + hbWeatherStationService.str2Instant("20211209110000"));
-    }
-//    @Autowired
-//    private InsertWeatherInfo insertWeatherInfo;
-
-//    @Autowired
-//    private TianXingZhouService tianXingZhouService;
-//    @Autowired
-//    private MeasuringVehicleService measuringVehicleService;
-
     @Test
     void contextLoads() throws IOException, ParseException {
 //        List<ChinaWeather> chinaWeathers = insertWeatherInfo.getWeatherInfo();

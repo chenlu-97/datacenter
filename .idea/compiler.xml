@@ -7,32 +7,37 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="datacenter-weather-service" />
         <module name="datacenter-cwic-service" />
         <module name="datacenter-util" />
+        <module name="datacenter-hikvision-service" />
         <module name="datacenter-auth2-service" />
+        <module name="datacenter-gee-service" />
+        <module name="datacenter-indicator-service" />
         <module name="sos-sensor-service" />
         <module name="datacenter-offline-service" />
+        <module name="datacenter-air-service" />
         <module name="datacenter-mobile-service" />
-        <module name="ogc-services-swe" />
+        <module name="datacenter-gateway" />
         <module name="eureka-server03" />
         <module name="datacenter-laads-service" />
         <module name="eureka-server01" />
+        <module name="datacenter-littleSensor-service" />
         <module name="eureka-server02" />
+        <module name="datacenter-himawari-service" />
         <module name="sos-obs-service" />
         <module name="datacenter-product-service" />
-        <module name="datacenter-weather-service" />
-        <module name="swe-common-core" />
-        <module name="datacenter-hikvision-service" />
-        <module name="datacenter-gee-service" />
-        <module name="datacenter-indicator-service" />
-        <module name="ogc-services-sos" />
-        <module name="datacenter-air-service" />
+      </profile>
+      <profile name="Annotation profile for springcloud-parent" enabled="true">
+        <sourceOutputDir name="../target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
         <module name="sensorml-core" />
-        <module name="datacenter-gateway" />
+        <module name="ogc-services-sos" />
+        <module name="swe-common-core" />
         <module name="swe-common-om" />
-        <module name="datacenter-littleSensor-service" />
-        <module name="datacenter-himawari-service" />
         <module name="ogc-services-common" />
+        <module name="ogc-services-swe" />
       </profile>
     </annotationProcessing>
   </component>

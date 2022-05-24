@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -30,4 +31,6 @@ public interface WeatherMapper {
     List<ChinaWeather> selectByIds(@Param("stationid") List<String> stationid,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 
     List<ChinaWeather> selectAll();
+
+    List<ChinaWeather> selectMaxTimeData();
 }

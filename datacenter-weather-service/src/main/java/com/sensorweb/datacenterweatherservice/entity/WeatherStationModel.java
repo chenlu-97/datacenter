@@ -14,4 +14,5 @@ public class WeatherStationModel {
     private double lon;
     private double lat;
     private String stationType;
+    private String geom;
 }

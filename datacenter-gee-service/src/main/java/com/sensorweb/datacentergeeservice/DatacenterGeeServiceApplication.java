@@ -1,9 +1,6 @@
 package com.sensorweb.datacentergeeservice;
 
-import com.sensorweb.datacentergeeservice.service.downloadlandsat1;
-import com.sensorweb.datacentergeeservice.service.downloadlandsat2;
-import com.sensorweb.datacentergeeservice.service.downloadlandsat3;
-import com.sensorweb.datacentergeeservice.service.downloadlandsat4;
+import com.sensorweb.datacentergeeservice.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -17,6 +14,7 @@ public class DatacenterGeeServiceApplication {
         new Thread(new downloadlandsat2() ).start();
         new Thread(new downloadlandsat3() ).start();
         new Thread(new downloadlandsat4() ).start();
+        new Thread(new downloadlandsat5() ).start();
     }
 
 }

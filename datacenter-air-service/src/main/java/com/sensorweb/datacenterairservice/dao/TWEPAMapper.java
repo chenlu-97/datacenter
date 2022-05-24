@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -30,4 +31,6 @@ public interface TWEPAMapper {
     List<TWEPA> selectByIdAndTimeNew(@Param("type") String type , @Param("spa") String spa, @Param("time")Instant time);
 
     int updateTWData(TWEPA twepa);
+
+    List<TWEPA> selectMaxTimeData();
 }

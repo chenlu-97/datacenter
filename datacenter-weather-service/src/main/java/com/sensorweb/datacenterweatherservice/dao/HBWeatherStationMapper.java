@@ -4,6 +4,7 @@ import com.sensorweb.datacenterweatherservice.entity.HBWeatherStation;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -14,4 +15,6 @@ public interface HBWeatherStationMapper {
     List<HBWeatherStation> selectByPage(int pageNum, int pageSize);
 
     int selectNum();
+
+    List<HBWeatherStation> selectMaxTimeData();
 }

@@ -50,12 +50,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.sensorweb</groupId>
-            <artifactId>datacenter-offline-service</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>5.0.0</version>

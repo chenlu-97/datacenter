@@ -10,9 +10,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -36,14 +34,21 @@ public class SurveyingVesselController {
 
     @ApiOperation("分页查询数据")
     @GetMapping(path = "getSurveyingVesselByPage")
-    public Map<String, Object> getSurveyingVesselByPage(@ApiParam(name = "pageNum", value = "当前页码") @Param("pageNum") int pageNum,
-                                                       @ApiParam(name = "pageSize", value = "每页的数据条目数") @Param("pageSize") int pageSize) {
+    @ResponseBody
+    public Map<String, Object> getSurveyingVesselByPage(@RequestParam(value="pageNum", required=false) Integer pageNum,
+                                                        @RequestParam(value="pageSize", required=false) Integer pageSize,
+                                                        @RequestParam(value="startTime" ,required=false)String startTime,
+                                                        @RequestParam(value="endTime" ,required=false)String endTime) {
         Map<String, Object> res = new HashMap<>();
-        List<SurveyingVessel> info =  surveyingVesselService.getDataByPage(pageNum, pageSize);
-        int count =surveyingVesselMapper.selectNum();
-        Object num = new Integer(count);
+        List<SurveyingVessel> info;
+        Instant start = null;
+        Instant end = null;
+        if(endTime!=null && startTime!=null ){
+            start = DataCenterUtils.string2Instant(startTime);
+            end = DataCenterUtils.string2Instant(endTime);
+        }
+        info =  surveyingVesselMapper.selectByPage2(pageNum,pageSize,start,end);
         res.put("Info", info);
-        res.put("num",num);
         return res;
     }
 

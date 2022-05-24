@@ -98,46 +98,6 @@ public class NewInsertHimawariService implements HimawariConstant {
     }
 
 
-//    public void insertDataByHour() {
-//        boolean flag ;
-//        LocalDateTime dateTime = LocalDateTime.now();
-//        DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
-//        String strDate3 = dtf3.format(dateTime);
-//        dateTime=LocalDateTime.parse(strDate3,dtf3);
-//
-//        Instant timeNew = himawariMapper.selectMaxTimeData().get(0).getTime();
-//        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
-//        while(timeNew.isBefore(timeNow)){
-//            LocalDateTime time = LocalDateTime.ofInstant(timeNew.plusSeconds(60*60),ZoneId.systemDefault());
-//            System.out.println("time = " + time);
-//            int year = time.getYear();
-//            Month month = time.getMonth();
-//            String monthValue = month.getValue()<10?"0"+month.getValue():month.getValue()+"";
-//            String day = time.getDayOfMonth()<10?"0"+time.getDayOfMonth():time.getDayOfMonth()+"";
-//            String hour = time.getHour()<10?"0"+time.getHour():time.getHour()+"";
-//            String minute = time.getMinute()<10?"0"+time.getMinute():time.getMinute()+"";
-//            String fileName = getName(year+"", monthValue, day, hour, minute);
-//            if (himawariMapper.selectByName(fileName)!=null) {
-//                log.info("数据已存在");
-//                return ;
-//            }else{
-//                try {
-//                    flag = !insertData(time);
-//                    if (!flag) {
-//                        log.info("Himawari接入时间: " + time + "Status: Success");
-//                        DataCenterUtils.sendMessage("Himawari-8"+dateTime.toString(), "卫星-葵花8号","这是一条获取的葵花8号卫星的数据");
-//                    }else{
-//                        log.info("Himawari接入时间: ----" + time + "---暂无最新的数据！！等下个小时再试");
-//                        return ;
-//                    }
-//                } catch (Exception e) {
-//                    log.error(e.getMessage());
-//                }
-//            }
-//            timeNew = timeNew.plusSeconds(60*60);
-//        }
-//    }
-
     /**
      * Registry Himawari Data, from dateTime to now
      * @param dateTime YYYY-DD-MMThh:mm:ss  is start time

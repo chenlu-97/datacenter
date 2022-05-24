@@ -5,6 +5,7 @@ import com.sensorweb.datacentergeeservice.entity.Landsat;
 import com.sensorweb.datacentergeeservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -12,15 +13,19 @@ import java.util.Calendar;
 import java.util.List;
 
 @Slf4j
-public class downloadlandsat1 implements Runnable{
+public class downloadlandsat5 implements Runnable{
+
+    @Autowired
+    LandsatService landsatService;
+
     @Override
     public void run() {
-        System.out.println("-----20200101-----------20200630------------Landsat8 L1/L2影像-");
+        System.out.println("-----20220101------------20220414------------Landsat8 L1/L2影像");
         try {
             //起始时间
-            String str="20200101";
+            String str="20220101";
             //结束时间
-            String str1="20200630";
+            String str1="20220414";
             LandsatService landsatService = (LandsatService) ApplicationContextUtil.getBean("landsatService");
             SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
             SimpleDateFormat format1= new  SimpleDateFormat("yyyy-MM-dd 00:00:00");
@@ -70,11 +75,11 @@ public class downloadlandsat1 implements Runnable{
                 }
                 start.add(Calendar.DAY_OF_MONTH,1);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
             log.info("USGS获取Landsat-8影像 " + "Status: Fail");
+            System.out.println(e.getMessage());
         }
     }
 }
