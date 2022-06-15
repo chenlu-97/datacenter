@@ -28,4 +28,6 @@ public interface EntryMapper {
     Entry selectNew();
 
     List<Entry> selectMaxTimeData(String product);
+
+    List<Entry> getByFileName(@Param("fileName") String fileName);
 }

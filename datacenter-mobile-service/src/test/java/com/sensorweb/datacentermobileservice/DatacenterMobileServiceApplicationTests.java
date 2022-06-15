@@ -57,6 +57,9 @@ class DatacenterMobileServiceApplicationTests {
 //        okHttpUtil.doPostJson(url,param.toString());  //推送经纬度到武大前端
 //        System.out.println("走航船GPS推送成功");
 
+       String token =  surveyingVesselService.gettoken();
+        System.out.println("token = " + token);
+
     }
 
     }

@@ -1,5 +1,7 @@
 package com.sensorweb.datacenterhimawariservice.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenterhimawariservice.config.OkHttpUtil;
 import com.sensorweb.datacenterhimawariservice.dao.HimawariMapper;
 import com.sensorweb.datacenterhimawariservice.entity.Himawari;
 import com.sensorweb.datacenterhimawariservice.feign.ObsFeignClient;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +49,9 @@ public class NewInsertHimawariService implements HimawariConstant {
 
     @Autowired
     private ObsFeignClient obsFeignClient;
+
+    @Autowired
+    OkHttpUtil okHttpUtil;
 
 
     /**
@@ -85,6 +91,7 @@ public class NewInsertHimawariService implements HimawariConstant {
                                 DataCenterUtils.sendMessage("Himawari-8"+dateTime.toString(), "卫星-葵花8号","这是一条获取的葵花8号卫星的数据");
                             }else{
                                 log.info("Himawari接入时间: ----" + time + "---暂无最新的数据！！等下个小时再试");
+                                SendException("Himawari",timeNew.toString(), timeNow+"当前接入Himawari的数据失败");
                                 return ;
                             }
                         } catch (Exception e) {
@@ -162,6 +169,23 @@ public class NewInsertHimawariService implements HimawariConstant {
         StringBuilder sb = new StringBuilder();
         sb.append("H08_").append(year).append(month).append(day).append("_").append(hour).append("00_1HARP031_FLDK.02401_02401.nc");
         return sb.toString();
+    }
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
     }
 
 }

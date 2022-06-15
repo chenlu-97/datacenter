@@ -2,44 +2,44 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sensorweb.datacenterlaadsservice.dao.GLDASMapper">
+<mapper namespace="com.sensorweb.datacenterlaadsservice.dao.GPM_3IMERGDEMapper">
     <sql id="insertFields">
-        gldas_id, title,  link, file_path, time,  bbox, geom , product_type, get_date
+        gpm_id, title,  link, file_path, time,  bbox, geom , product_type, get_date
     </sql>
 
     <sql id="selectFields">
-        gldas_id, title, link, file_path, time,  bbox , product_type, get_date
+        gpm_id, title, link, file_path, time,  bbox , product_type, get_date
     </sql>
 
-    <insert id="insertData" parameterType="GLDAS">
-        INSERT INTO gldas (<include refid="insertFields"></include>)
-        VALUES (#{gldasId}, #{title}, #{link}, #{filePath}, #{time},  #{bbox}, ST_GeomFromText(#{wkt}, 4326), #{productType}, #{getDate})
+    <insert id="insertData" parameterType="GPM_3IMERGDE">
+        INSERT INTO gpm_3imergde (<include refid="insertFields"></include>)
+        VALUES (#{gpmId}, #{title}, #{link}, #{filePath}, #{time},  #{bbox}, ST_GeomFromText(#{wkt}, 4326), #{productType}, #{getDate})
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">
-        INSERT INTO gldas (<include refid="insertFields"></include>)
+        INSERT INTO gpm_3imergde (<include refid="insertFields"></include>)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.gldasId}, #{item.title},  #{item.link}, #{item.filePath}, #{item.time},  #{item.bbox}, ST_GeomFromText(#{item.wkt}, 4326),  #{item.productType}, #{item.getDate})
+            (#{item.gpmId}, #{item.title},  #{item.link}, #{item.filePath}, #{item.time},  #{item.bbox}, ST_GeomFromText(#{item.wkt}, 4326),  #{item.productType}, #{item.getDate})
         </foreach>
     </insert>
 
 
     <update id="updateFileName" parameterType="java.lang.String">
-        UPDATE gldas SET file_path = #{newPath}
-        WHERE  gldas_id= #{id}
+        UPDATE gpm_3imergde SET file_path = #{newPath}
+        WHERE  gpm_id= #{id}
     </update>
 
 
 
-    <select id="selectNew" resultMap="gldas">
+    <select id="selectNew" resultMap="GPM_3IMERGDE">
         SELECT <include refid="selectFields"></include>
-        FROM gldas
-        WHERE time = (select max(time) from gldas)
+        FROM gpm_3imergde
+        WHERE time = (select max(time) from gpm_3imergde)
     </select>
 
-    <resultMap id="gldas" type="GLDAS">
-        <result column="gldas_id" property="gldasId"/>
+    <resultMap id="GPM_3IMERGDE" type="GPM_3IMERGDE">
+        <result column="gpm_id" property="gpmId"/>
         <result column="title" property="title"/>
         <result column="link" property="link"/>
         <result column="filePath" property="file_path"/>
@@ -51,12 +51,12 @@
 
     <select id="selectNum" resultType="java.lang.Integer">
         SELECT count(*)
-        FROM gldas
+        FROM gpm_3imergde
     </select>
 
-    <select id="selectByIds" resultMap="gldas" >
+    <select id="selectByIds" resultMap="GPM_3IMERGDE" >
         SELECT <include refid="selectFields"></include>
-        FROM gldas ORDER BY time DESC
+        FROM gpm_3imergde ORDER BY time DESC
         WHERE satellite in
         <foreach collection="satellite" item="satellite" open="(" close=")" separator=",">
             #{satellite}
@@ -64,23 +64,23 @@
         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
-    <select id="selectByPage" resultMap="gldas">
+    <select id="selectByPage" resultMap="GPM_3IMERGDE">
         SELECT <include refid="selectFields"></include>
-        FROM gldas ORDER BY time DESC
+        FROM gpm_3imergde ORDER BY time DESC
         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
 
-    <select id="getFilePath" resultMap="gldas">
+    <select id="getFilePath" resultMap="GPM_3IMERGDE">
         SELECT <include refid="selectFields"></include>
-        FROM gldas
+        FROM gpm_3imergde
         WHERE  time <![CDATA[>=]]> #{startTime} AND time <![CDATA[<=]]> #{endTime}
     </select>
 
 
-    <select id="getall" resultMap="gldas">
+    <select id="getall" resultMap="GPM_3IMERGDE">
         SELECT <include refid="selectFields"></include>
-        FROM gldas
+        FROM gpm_3imergde
     </select>
 
 </mapper>

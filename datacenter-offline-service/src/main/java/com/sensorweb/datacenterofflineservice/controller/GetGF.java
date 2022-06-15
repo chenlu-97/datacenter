@@ -26,19 +26,19 @@ public class GetGF {
     @Autowired
     private GFMapper gfMapper;
 
-//    @ApiOperation("启动GF的离线数据的入库")
-//    @PostMapping(value = "GFdata2DB")
-//    @ResponseBody
-//    public String GFdata2DB() throws Exception {
-//        int status = getGFService.insertGF();
-//        String res ;
-//        if (status > 0) {
-//            res = "SUCESS!!!";
-//        } else {
-//            res = "failed!!!";
-//        }
-//        return res;
-//    }
+    @ApiOperation("启动GF的离线数据的入库")
+    @PostMapping(value = "GFdata2DB")
+    @ResponseBody
+    public String GFdata2DB() throws Exception {
+        int status = getGFService.insertGF();
+        String res ;
+        if (status > 0) {
+            res = "SUCESS!!!";
+        } else {
+            res = "failed!!!";
+        }
+        return res;
+    }
 
 
 

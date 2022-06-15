@@ -2,8 +2,11 @@ package com.sensorweb.datacenterlaadsservice.controller;
 
 
 import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
+import com.sensorweb.datacenterlaadsservice.dao.GPM_3IMERGDEMapper;
 import com.sensorweb.datacenterlaadsservice.entity.GLDAS;
+import com.sensorweb.datacenterlaadsservice.entity.GPM_3IMERGDE;
 import com.sensorweb.datacenterlaadsservice.service.InsertGLDASService;
+import com.sensorweb.datacenterlaadsservice.service.InsertGPM_3IMERGDE;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
@@ -21,23 +24,23 @@ import java.util.Map;
 @Slf4j
 @RestController
 @CrossOrigin
-public class GLDASController {
+public class GPMController {
     @Autowired
-    private InsertGLDASService insertGLDASService;
+    private InsertGPM_3IMERGDE insertGPM_3IMERGDE;
 
     @Autowired
-    private GLDASMapper gldasMapper;
+    private GPM_3IMERGDEMapper gpm_3IMERGDEMapper;
 
-    @GetMapping(value = "getGLDAS")
+    @GetMapping(value = "getGPM_3IMERGDE")
     @ResponseBody
-    public Map<String, Object> getGLDAS(@Param("startTime")String startTime, @Param("endTime")String endTime) {
+    public Map<String, Object> getGPM_3IMERGDE(@Param("startTime")String startTime, @Param("endTime")String endTime) {
 
         Map<String, Object> res = new HashMap<>();
         Map<String, String> path = new HashMap<>();
         try {
             Instant start = DataCenterUtils.string2Instant(startTime);
             Instant end = DataCenterUtils.string2Instant(endTime);
-            List<GLDAS> gldas = gldasMapper.getFilePath(start,end);
+            List<GPM_3IMERGDE> gldas = gpm_3IMERGDEMapper.getFilePath(start,end);
             if(gldas.size()>0){
                 for(int i=0;i<gldas.size();i++) {
                     String filepath = gldas.get(i).getFilePath();
@@ -58,16 +61,16 @@ public class GLDASController {
     }
 
 
-    @GetMapping(value = "downloadGLDAS")
+    @GetMapping(value = "downloadGPM_3IMERGDE")
     @ResponseBody
-    public Map<String, Object> downloadGLDAS( @Param("startTime")String startTime, @Param("endTime")String endTime) {
+    public Map<String, Object> downloadGPM_3IMERGDE( @Param("startTime")String startTime, @Param("endTime")String endTime) {
         Map<String, Object> res = new HashMap<>();
         boolean flag = false;
         try {
             Instant start = DataCenterUtils.string2Instant(startTime);
             Instant end = DataCenterUtils.string2Instant(endTime);
             while(start.isBefore(end)){
-                flag =insertGLDASService.insertData(start.toString());
+                flag =insertGPM_3IMERGDE.insertData(start.toString());
                 start.plusSeconds(3*60*60);
             }
             if(flag){

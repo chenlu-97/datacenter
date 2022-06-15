@@ -1,5 +1,7 @@
 package com.sensorweb.datacenterlaadsservice.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenterlaadsservice.config.OkHttpUtil;
 import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
 import com.sensorweb.datacenterlaadsservice.entity.*;
 import com.sensorweb.datacenterlaadsservice.feign.ObsFeignClient;
@@ -55,17 +57,22 @@ public class InsertLAADSService implements LAADSConstant {
     @Value("${datacenter.path.laads}")
     private String filePath;
 
+    @Autowired
+    OkHttpUtil okHttpUtil;
+
 
 
     /**
      * 每隔一个小时执行一次，为了以小时为单位接入数据
      */
-    @Scheduled(cron = "0 40 0/1 * * ?")
+
+    @Scheduled(cron = "00 30 12 * * ?")
+//    @Scheduled(cron = "0 40 0/1 * * ?")
     public void insertModisData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
+                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2","MOD13A3",};
                 LocalDateTime dateTime = LocalDateTime.now();
                 DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
                 String strDate3 = dtf3.format(dateTime);
@@ -74,7 +81,8 @@ public class InsertLAADSService implements LAADSConstant {
                     try {
                         Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
                         Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
-                        String bbox = "95,24,123,35";//长江流域经纬度范围
+//                      String bbox = "95,24,123,35";//长江流域经纬度范围
+                        String bbox = "73,18,136,54"; //全国
                         String code = null;
                         try {
                             String start = timeNew.plusSeconds(24 * 60 * 60).toString();
@@ -86,6 +94,7 @@ public class InsertLAADSService implements LAADSConstant {
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                             log.info(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
+                            SendException("Modis--"+product,timeNew.plusSeconds(8 * 60 * 60).toString(),timeNow.plusSeconds(8 * 60 * 60)+"Modis--"+product+"接入数据失败");
                         }
                     }catch (Exception e) {
                         System.out.println(e.getMessage());
@@ -681,25 +690,31 @@ public class InsertLAADSService implements LAADSConstant {
                     for (Entry entry : entries) {
                         if (!StringUtils.isBlank(entry.getLink())) {
                             String fileName = entry.getLink().substring(entry.getLink().lastIndexOf("/") + 1);
-                            File file = new File(filePath);
-                            if (!file.exists()) {
-                                boolean flag = file.mkdirs();
-                            }
-                            String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
-                            int i = 0;
-                            while (localPath.equals("fail")) {
-                                if (i > 2) {
-                                    break;
+                            List<Entry> entrys = entryMapper.getByFileName(fileName);
+                            if(entrys.size()>0){
+            //                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
+            //                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
+                            }else {
+                                File file = new File(filePath);
+                                if (!file.exists()) {
+                                    boolean flag = file.mkdirs();
                                 }
-                                localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
-                                i++;
-                            }
-                            if (localPath != "fail" && localPath != null && localPath != "none") {
-                                entry.setFilePath(localPath);
-                                entry.setSatellite("Modis");
-                                entry.setProductType(productName);
-                                j = entryMapper.insertData(entry);
+                                String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                int i = 0;
+                                while (localPath.equals("fail")) {
+                                    if (i > 2) {
+                                        break;
+                                    }
+                                    localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                    i++;
+                                }
+                                if (localPath != "fail" && localPath != null && localPath != "none") {
+                                    entry.setFilePath(localPath);
+                                    entry.setSatellite("Modis");
+                                    entry.setProductType(productName);
+                                    j = entryMapper.insertData(entry);
 //                                changeAuthority(localPath);
+                                }
                             }
                         }
                     }
@@ -884,5 +899,23 @@ public class InsertLAADSService implements LAADSConstant {
         }
         return  sb.toString();
     }
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
+    }
+
 
 }

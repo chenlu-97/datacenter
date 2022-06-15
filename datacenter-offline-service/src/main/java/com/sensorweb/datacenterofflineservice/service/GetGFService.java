@@ -1,6 +1,8 @@
 package com.sensorweb.datacenterofflineservice.service;
 
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.Quarter;
 import com.sensorweb.datacenterofflineservice.dao.GFMapper;
 import com.sensorweb.datacenterofflineservice.entity.GF;
 import com.sensorweb.datacenterofflineservice.util.OfflineConstant;
@@ -11,17 +13,21 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
 @Service
 @EnableScheduling
+//@Component
 public class GetGFService {
     @Autowired
     private GFMapper gfMapper;
@@ -31,83 +37,98 @@ public class GetGFService {
     }
 
 
+//    @PostConstruct
     public int insertGF() throws Exception {
-
         GF gf = new GF();
         int status = 0;
-        String[] path= OfflineConstant.GF_PATH;
-        for(int h =0; h < path.length;h++) {
-            System.out.println(path[h]);
-            ArrayList<String> seasons = getFiles(path[h]);
-            for (int i = 0; i < seasons.size(); i++) {
-                System.out.println(seasons.get(i));
-                ArrayList<String> image_name = getFiles(path[h] + seasons.get(i) + '/');
-
-                for (int j = 0; j < image_name.size(); j++) {
-                    System.out.println(image_name.get(j));
-                    String filepath = path[h] + seasons.get(i) + '/' + image_name.get(j) + '/';
-                    System.out.println(filepath);
-
-                    File[] list = new File(filepath).listFiles();
-                    for (File file : list) {
-                        if (file.isFile()) {
-                            if (file.getName().endsWith(".xml")) {
-                                System.out.println(file.getAbsolutePath());
-
-                                Element GFelement = parseXml(file.getAbsolutePath());
-
-                                gf.setSatelliteId(GFelement.element("SatelliteID").getText());
-                                gf.setQueryTime(DataCenterUtils.string2LocalDateTime3(GFelement.element("CenterTime").getText()).toInstant(ZoneOffset.ofHours(+8)));
-                                gf.setScenePath(GFelement.element("SatPath").getText());
-                                gf.setSceneRow(GFelement.element("SatRow").getText());
-                                gf.setSeason(seasons.get(i));
-                                gf.setImageId(file.getName().substring(0, file.getName().length() - 3) + "tiff");
-                                gf.setFilePath(filepath + file.getName().substring(0, file.getName().length() - 3) + "tiff");
-
-                                if(GFelement.element("SatelliteID").getText().equals("GF7-1")){
-                                    gf.setImageType(GFelement.element("SensorID").getText());
-                                }else{
-                                    if (GFelement.element("Bands").getText().equals("5")) {
-                                        gf.setImageType("PAN1");
-                                    }else{
-                                        gf.setImageType("MSS1");
-                                    }
+        try {
+//            System.out.println(path[h]);
+//            ArrayList<String> seasons = getFiles(path[h]);
+//            for (int i = 0; i < seasons.size(); i++) {
+//                System.out.println(seasons.get(i));
+//                ArrayList<String> image_name = getFiles(path[h] + seasons.get(i) + '/');
+            ArrayList<String> image_name = getFiles(OfflineConstant.GF_PATH);
+            for (int j = 0; j < image_name.size(); j++) {
+//                    System.out.println(image_name.get(j));
+//                    String filepath = path[h] + seasons.get(i) + '/' + image_name.get(j) + '/';
+                String filepath =OfflineConstant.GF_PATH + image_name.get(j) + '/';
+//                    System.out.println(filepath);
+                File[] list = new File(filepath).listFiles();
+                for (File file : list) {
+                    if (file.isFile()) {
+                        if (file.getName().endsWith(".xml")) {
+                            Element GFelement = parseXml(file.getAbsolutePath());
+                            gf.setSatelliteId(GFelement.element("SatelliteID").getText());
+                            gf.setScenePath(GFelement.element("SatPath").getText());
+                            gf.setSceneRow(GFelement.element("SatRow").getText());
+                            String time123 = GFelement.element("CenterTime").getText();
+                            boolean type = time123.contains(".");
+                            Date date = new Date();
+                            try {
+                                if (type) {
+                                    String time123456 = time123.substring(0, time123.indexOf("."));
+                                    date = new Date(DataCenterUtils.string2LocalDateTime3(time123456.substring(0, time123456.lastIndexOf(":")) + ":00").toInstant(ZoneOffset.ofHours(+8)).toEpochMilli());
+                                    gf.setQueryTime(DataCenterUtils.string2LocalDateTime3(time123456.substring(0, time123456.lastIndexOf(":")) + ":00").toInstant(ZoneOffset.ofHours(+8)));
+                                } else {
+                                    date = new Date(DataCenterUtils.string2LocalDateTime3(time123).toInstant(ZoneOffset.ofHours(+8)).toEpochMilli());
+                                    gf.setQueryTime(DataCenterUtils.string2LocalDateTime3(time123).toInstant(ZoneOffset.ofHours(+8)));
                                 }
-                                gf.setTopleftlatitude(Float.parseFloat(GFelement.element("TopLeftLatitude").getText())) ;
-                                gf.setTopleftlongitude(Float.parseFloat(GFelement.element("TopLeftLongitude").getText()));
-                                gf.setToprightlatitude(Float.parseFloat(GFelement.element("TopRightLatitude").getText()));
-                                gf.setToprightlongitude(Float.parseFloat(GFelement.element("TopRightLongitude").getText()));
-                                gf.setBottomleftlatitude(Float.parseFloat(GFelement.element("BottomLeftLatitude").getText()));
-                                gf.setBottomleftlongitude(Float.parseFloat(GFelement.element("BottomLeftLongitude").getText()));
-                                gf.setBottomrightlatitude(Float.parseFloat(GFelement.element("BottomRightLatitude").getText()));
-                                gf.setBottomrightlongitude(Float.parseFloat(GFelement.element("BottomRightLongitude").getText()));
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            Quarter quarter = DateUtil.quarterEnum(date);
+                            gf.setSeason(quarter.toString());
+                            gf.setImageId(file.getName().substring(0, file.getName().length() - 3) + "tiff");
+                            gf.setFilePath(filepath + file.getName().substring(0, file.getName().length() - 3) + "tiff");
 
-                                String TopLeftLatitude = GFelement.element("TopLeftLatitude").getText();
-                                String TopLeftLongitude = GFelement.element("TopLeftLongitude").getText();
-                                String TopRightLatitude = GFelement.element("TopRightLatitude").getText();
-                                String TopRightLongitude = GFelement.element("TopRightLongitude").getText();
-                                String BottomRightLatitude = GFelement.element("BottomRightLatitude").getText();
-                                String BottomRightLongitude = GFelement.element("BottomRightLongitude").getText();
-                                String BottomLeftLatitude = GFelement.element("BottomLeftLatitude").getText();
-                                String BottomLeftLongitude = GFelement.element("BottomLeftLongitude").getText();
+                            if (GFelement.element("SatelliteID").getText().equals("GF7-1")) {
+                                gf.setImageType(GFelement.element("SensorID").getText());
+                            } else {
+                                if (GFelement.element("Bands").getText().equals("5")) {
+                                    gf.setImageType("PAN1");
+                                } else {
+                                    gf.setImageType("MSS1");
+                                }
+                            }
+                            gf.setTopleftlatitude(Float.parseFloat(GFelement.element("TopLeftLatitude").getText()));
+                            gf.setTopleftlongitude(Float.parseFloat(GFelement.element("TopLeftLongitude").getText()));
+                            gf.setToprightlatitude(Float.parseFloat(GFelement.element("TopRightLatitude").getText()));
+                            gf.setToprightlongitude(Float.parseFloat(GFelement.element("TopRightLongitude").getText()));
+                            gf.setBottomleftlatitude(Float.parseFloat(GFelement.element("BottomLeftLatitude").getText()));
+                            gf.setBottomleftlongitude(Float.parseFloat(GFelement.element("BottomLeftLongitude").getText()));
+                            gf.setBottomrightlatitude(Float.parseFloat(GFelement.element("BottomRightLatitude").getText()));
+                            gf.setBottomrightlongitude(Float.parseFloat(GFelement.element("BottomRightLongitude").getText()));
 
-                                String bbox_tmp = TopLeftLongitude + ' ' + TopLeftLatitude + ',' + TopRightLongitude + ' ' + TopRightLatitude + ','
-                                        + BottomRightLongitude + ' ' + BottomRightLatitude + ',' + BottomLeftLongitude+ ' ' + BottomLeftLatitude + ',' + TopLeftLongitude + ' ' + TopLeftLatitude;
-                                String wkt = "POLYGON((" + bbox_tmp  + "))";
-                                String bbox = '['+TopLeftLongitude+','+TopLeftLatitude+']'+','+'['+TopRightLongitude+','+TopRightLatitude+']'+','
-                                        + '['+BottomRightLongitude+','+BottomRightLatitude+']'+','+'['+BottomLeftLongitude+','+BottomLeftLatitude+']'+','+'['+TopLeftLongitude+','+TopLeftLatitude+']';
-                                gf.setBbox(bbox);
-                                gf.setGeom(wkt);
+                            String TopLeftLatitude = GFelement.element("TopLeftLatitude").getText();
+                            String TopLeftLongitude = GFelement.element("TopLeftLongitude").getText();
+                            String TopRightLatitude = GFelement.element("TopRightLatitude").getText();
+                            String TopRightLongitude = GFelement.element("TopRightLongitude").getText();
+                            String BottomRightLatitude = GFelement.element("BottomRightLatitude").getText();
+                            String BottomRightLongitude = GFelement.element("BottomRightLongitude").getText();
+                            String BottomLeftLatitude = GFelement.element("BottomLeftLatitude").getText();
+                            String BottomLeftLongitude = GFelement.element("BottomLeftLongitude").getText();
+
+                            String bbox_tmp = TopLeftLongitude + ' ' + TopLeftLatitude + ',' + TopRightLongitude + ' ' + TopRightLatitude + ','
+                                    + BottomRightLongitude + ' ' + BottomRightLatitude + ',' + BottomLeftLongitude + ' ' + BottomLeftLatitude + ',' + TopLeftLongitude + ' ' + TopLeftLatitude;
+                            String wkt = "POLYGON((" + bbox_tmp + "))";
+                            String bbox = '[' + TopLeftLongitude + ',' + TopLeftLatitude + ']' + ',' + '[' + TopRightLongitude + ',' + TopRightLatitude + ']' + ','
+                                    + '[' + BottomRightLongitude + ',' + BottomRightLatitude + ']' + ',' + '[' + BottomLeftLongitude + ',' + BottomLeftLatitude + ']' + ',' + '[' + TopLeftLongitude + ',' + TopLeftLatitude + ']';
+                            gf.setBbox(bbox);
+                            gf.setGeom(wkt);
+                            if (GFelement.element("SatelliteID").getText().equals("GF7-1")) {
                                 status = gfMapper.insertGF(gf);
+                                System.out.println(file.getAbsolutePath()+"插入成功");
                             }
                         }
                     }
                 }
             }
+        }catch(Exception e){
+            e.printStackTrace();
         }
-
         return status;
     }
+
 
 
     //    解析xml文档，返回根目录下的元素

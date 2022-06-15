@@ -2,6 +2,7 @@ package com.sensorweb.datacenterairservice.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenterairservice.config.OkHttpUtil;
 import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
 import com.sensorweb.datacenterairservice.dao.AirStationMapper;
 import com.sensorweb.datacenterairservice.entity.AirQualityDay;
@@ -54,6 +55,10 @@ public class InsertAirService extends Thread implements AirConstant {
 
     @Autowired
     private ObsFeignClient obsFeignClient;
+
+    @Autowired
+    OkHttpUtil okHttpUtil;
+
     /**
      * 每小时接入一次数据
      */
@@ -78,9 +83,10 @@ public class InsertAirService extends Thread implements AirConstant {
                             int num = airQualityHourMapper.selectMaxTimeData().size();
                             if(num!=273){
                                 int gap = 273-num;
-                                String mes = "湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                                String mes = "接入时间 ："+ dateTime+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;
                                 // 发送邮件
-                                SendMail.sendemail(mes);
+//                                SendMail.sendemail(mes);
+                                SendException("HB_AIR",dateTime.toString(),mes);
                             }
                         } else {
                             System.out.println("等待中...");
@@ -91,7 +97,8 @@ public class InsertAirService extends Thread implements AirConstant {
                         log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Fail");
                         String mes = "湖北省监测站接入失败！！----失败时间 ："+ dateTime;
                         // 发送邮件
-                        SendMail.sendemail(mes);
+//                        SendMail.sendemail(mes);
+                        SendException("HB_AIR",dateTime.toString(),mes);
                         break;
                     }
                 }
@@ -393,5 +400,23 @@ public class InsertAirService extends Thread implements AirConstant {
             return JSON.parseObject(document);
         }
         return null;
+    }
+
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
     }
 }

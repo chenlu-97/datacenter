@@ -3,6 +3,7 @@ package com.sensorweb.datacenterairservice.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenterairservice.config.OkHttpUtil;
 import com.sensorweb.datacenterairservice.dao.AirStationMapper;
 import com.sensorweb.datacenterairservice.dao.TWEPAMapper;
 import com.sensorweb.datacenterairservice.entity.AirStationModel;
@@ -61,6 +62,10 @@ public class InsertTWEPA implements AirConstant {
     @Autowired
     private ObsFeignClient obsFeignClient;
 
+    @Autowired
+    OkHttpUtil okHttpUtil;
+
+
     /**
      * 每小时接入一次数据
      */
@@ -83,9 +88,10 @@ public class InsertTWEPA implements AirConstant {
                         int num = twepaMapper.selectMaxTimeData().size();
                         if(num!=85){
                             int gap = 85-num;
-                            String mes = "台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                            String mes = "接入时间 ："+ dateTime+ "-----台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
-                            SendMail.sendemail(mes);
+//                            SendMail.sendemail(mes);
+                            SendException("TW_AIR",dateTime.toString(),mes);
                         }
                     }
                 } catch (Exception e) {
@@ -93,7 +99,8 @@ public class InsertTWEPA implements AirConstant {
                     log.info("台湾EPA接入时间: " + dateTime.toString() + "Status: Fail");
                     String mes = "台湾EPA接入失败！！----失败时间 ："+ dateTime;
                     // 发送邮件
-                    SendMail.sendemail(mes);
+//                    SendMail.sendemail(mes);
+                    SendException("TW_AIR",dateTime.toString(),mes);
                     System.out.println(e.getMessage());
                 }
             }
@@ -295,5 +302,23 @@ public class InsertTWEPA implements AirConstant {
             return JSON.parseObject(document);
         }
         return null;
+    }
+
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
     }
 }

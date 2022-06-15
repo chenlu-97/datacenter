@@ -8,6 +8,7 @@ import com.sensorweb.datacentergeeservice.dao.LandsatMapper;
 import com.sensorweb.datacentergeeservice.entity.Landsat;
 import com.sensorweb.datacentergeeservice.util.GoogleServiceConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -81,20 +82,21 @@ public class LandsatService implements GoogleServiceConstant{
     @Scheduled(cron = "0 00 12 * * ?") //每天12点接入
     public void insertData() {
         new Thread(new Runnable() {
+            @SneakyThrows
             @Override
             public void run() {
                 System.out.println("-----------------------------");
+                //获取数据库中最新的数据时间
+                List<Landsat> landsats = landsatMapper.selectNew();
+                String timeNew = landsats.get(0).getDate().toString();
+                timeNew = timeNew.replace("T", " ").replace("Z", "").substring(0, timeNew.indexOf("T")).replace("-", "");
+                //获取当天的时间
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                Calendar calendarNow = Calendar.getInstance();
+                String timeNow = format.format(calendarNow.getTime());
+                Calendar start = Calendar.getInstance();
+                Calendar end = Calendar.getInstance();
                 try {
-                    //获取数据库中最新的数据时间
-                    List<Landsat> landsats = landsatMapper.selectNew();
-                    String timeNew = landsats.get(0).getDate().toString();
-                    timeNew = timeNew.replace("T", " ").replace("Z", "").substring(0, timeNew.indexOf("T")).replace("-", "");
-                    //获取当天的时间
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                    Calendar calendarNow = Calendar.getInstance();
-                    String timeNow = format.format(calendarNow.getTime());
-                    Calendar start = Calendar.getInstance();
-                    Calendar end = Calendar.getInstance();
                     try {
                         start.setTime(format.parse(timeNew));
                         end.setTime(format.parse(timeNow));
@@ -120,6 +122,8 @@ public class LandsatService implements GoogleServiceConstant{
                     log.error(e.getMessage());
                     log.info("GEE获取Landsat-8影像 " + "Status: Fail");
                     System.out.println(e.getMessage());
+                    SendException("landsat",timeNew,timeNow+"当前接入LandSat的数据失败");
+
                 }
             }
         }).start();
@@ -142,7 +146,7 @@ public class LandsatService implements GoogleServiceConstant{
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36");
             connection.setRequestProperty("Connection", "keep-alive");
             connection.setRequestProperty("Host", "hydro1.gesdisc.eosdis.nasa.gov");
-//            connection.setRequestProperty("Cookie", DataCenterUtils.readTxt(cookiePath));
+            connection.setRequestProperty("Cookie", DataCenterUtils.readTxt(cookiePath));
             connection.setRequestProperty("Cookie", landsat_cookie);
             //设置https协议访问
             System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2,SSLv3");
@@ -217,13 +221,14 @@ public class LandsatService implements GoogleServiceConstant{
             for(int path = 117;path<=135;path++){
                 String day_num = YearMouthToday(time);
                 String year = time.substring(0,4);
+                String mounth = time.substring(5,7);
                 Format f1=new DecimalFormat("000");
                 String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
                 String url = baseUrl+filename;
-                res = downloadFromUrl(url, filename+".tar", savePath);
+                res = downloadFromUrl(url, filename+".tar", savePath+ File.separator + year +File.separator + mounth);
                  if (res == "cookie过期"){
 //                   getCookie();
-                     res = downloadFromUrl(url, filename+".tar", savePath);
+                     res = downloadFromUrl(url, filename+".tar", savePath+ File.separator + year +File.separator + mounth);
                     if(res == "cookie过期"){
                         return "cookie error";
                     }else if(res.equals("no_data")){
@@ -282,11 +287,11 @@ public class LandsatService implements GoogleServiceConstant{
         if(flag>0){
             try {
             if(newfilepath !=null){
-                generateThumb(newfilepath);//生成缩略图
+//                generateThumb(newfilepath);//生成缩略图
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Calendar calendarNow = Calendar.getInstance();
                 String timeNow = format.format(calendarNow.getTime());
-                submitRawImage(newfilepath,timeNow);//提交下载后提交初始文件
+                submitRawImage(newfilepath,timeNow);//下载后提交初始文件
 //                changeAuthority(newfilepath);//更改文件权限
             }
             } catch (Exception ex) {
@@ -548,19 +553,19 @@ public class LandsatService implements GoogleServiceConstant{
         String[] params = new String[3];
         params[0] = "/bin/sh";
         params[1] = "-c";
-        String thumb432 = "/home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_432.tif *T1_B{4,3,2}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_432.tif merged_432_translate.jpg";
-        String thumb753 = "/home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_753.tif *T1_B{7,5,3}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_753.tif merged_753_translate.jpg";
+        String thumb432 = "srun /home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_432.tif *T1_B{4,3,2}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_432.tif merged_432_translate.jpg";
+        String thumb753 = "srun /home/deployadmin/anaconda3/envs/modis/bin/gdal_merge.py -separate -o merged_753.tif *T1_B{7,5,3}.TIF && /home/deployadmin/anaconda3/envs/modis/bin/gdal_translate -of JPEG -scale -co worldfile=yes merged_753.tif merged_753_translate.jpg";
         params[2] = "cd " + filePath + " && " + thumb432 + " && " + thumb753;
         String result = exe(params);
         System.out.println(result);
     }
 
-    public static void changeAuthority(String filePath) {
-        String[] params = new String[1];
-        params[0] = "chown -R 1030:1030 " + filePath;
-        String result = exe(params);
-        System.out.println(result);
-    }
+//    public static void changeAuthority(String filePath) {
+//        String[] params = new String[1];
+//        params[0] = "chown -R 1030:1030 " + filePath;
+//        String result = exe(params);
+//        System.out.println(result);
+//    }
 
     private static String exe(String[] params) {
         StringBuilder sb = new StringBuilder();
@@ -601,6 +606,25 @@ public class LandsatService implements GoogleServiceConstant{
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("原始影像产品生成失败！！！");
+        }
+    }
+
+
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
         }
     }
 

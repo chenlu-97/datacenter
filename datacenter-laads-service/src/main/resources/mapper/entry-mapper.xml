@@ -14,6 +14,7 @@
     <insert id="insertData" parameterType="Entry" >
         INSERT INTO entry (<include refid="insertFields"></include>)
         VALUES (#{entryId}, #{title}, #{updated}, #{link}, #{filePath}, #{start}, #{stop}, #{bbox}, ST_GeomFromText(#{wkt}, 4326),#{satellite},#{productType})
+        ON CONFLICT ("title") DO NOTHING
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">
@@ -80,10 +81,14 @@
 
     </select>
 
-
     <select id="selectMaxTimeData" resultMap="entry">
         select <include refid="selectFields"></include>
         from entry where  product_type = #{product}  AND start_time = (select max(start_time) from entry where product_type = #{product});
+    </select>
+
+    <select id="getByFileName" resultMap="entry">
+        select <include refid="selectFields"></include>
+        from entry where title = #{fileName};
     </select>
 
 </mapper>

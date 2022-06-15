@@ -3,6 +3,7 @@ package com.sensorweb.datacentergeeservice;
 import com.sensorweb.datacentergeeservice.dao.LandsatMapper;
 import com.sensorweb.datacentergeeservice.entity.Landsat;
 import com.sensorweb.datacentergeeservice.service.LandsatService;
+import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +43,8 @@ class DatacenterGeeServiceApplicationTests {
 //        time = time.replace("T", " ").replace("Z", "").substring(0, time.indexOf("T")).replace("-", "");
 
 //        googleService.saveToDB("/Users/chenlu/Desktop/landsat/LC08_L2SP_025032_20220404_20220412_02_T1.tar");
+
+//       googleService.SendException("landsat","test","test");
     }
 
 }

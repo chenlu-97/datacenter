@@ -10,6 +10,7 @@ import com.sensorweb.datacenterweatherservice.dao.HBWeatherStationMapper;
 import com.sensorweb.datacenterweatherservice.dao.WeatherStationMapper;
 import com.sensorweb.datacenterweatherservice.entity.HBWeatherStation;
 import com.sensorweb.datacenterweatherservice.entity.WeatherStationModel;
+import com.sensorweb.datacenterweatherservice.util.OkHttpUtil;
 import com.sensorweb.datacenterweatherservice.util.WeatherConstant;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public class HBWeatherStationService {
     HBWeatherStationMapper hbWeatherStationMapper;
     @Autowired
     WeatherStationMapper weatherStationMapper;
+    @Autowired
+    OkHttpUtil okHttpUtil;
 
 
 
@@ -66,9 +69,10 @@ public class HBWeatherStationService {
                         int num = hbWeatherStationMapper.selectMaxTimeData().size();
                         if(num!=2509){
                             int gap = 2509-num;
-                            String mes = "湖北气象站接入部分缺失（站点数据应为2509个），现在接入为：" + num +"差值为"+ gap+"----接入时间 ："+ dateTime;
+                            String mes = "接入时间 ："+ dateTime+"-----湖北气象站接入部分缺失（站点数据应为2509个），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
-                            SendMail.sendemail(mes);
+//                            SendMail.sendemail(mes);
+                            SendException("HB_Weather",dateTime,mes);
                         }
                     }
                     Thread.sleep(2 * 60 * 1000);
@@ -78,7 +82,8 @@ public class HBWeatherStationService {
                     log.info("湖北气象站接入时间: " + dateTime.toString() + "Status: Fail");
                     String mes = "湖北气象接入失败！！----失败时间 ："+ dateTime;
                     // 发送邮件
-                    SendMail.sendemail(mes);
+//                    SendMail.sendemail(mes);
+                    SendException("HB_Weather",dateTime,mes);
                 }
             }
         }).start();
@@ -172,6 +177,25 @@ public class HBWeatherStationService {
         boolean flag= getIOTInfo2(document);
         log.info("flag------:"+flag);
     }
+
+
+    public void SendException(String type, String time, String details) throws IOException {
+
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
+    }
+
 
 
 }

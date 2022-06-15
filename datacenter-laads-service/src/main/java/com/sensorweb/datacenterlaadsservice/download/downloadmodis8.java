@@ -1,8 +1,9 @@
-package com.sensorweb.datacenterlaadsservice.service;
+package com.sensorweb.datacenterlaadsservice.download;
 
 
-import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
-import com.sensorweb.datacenterlaadsservice.entity.Entry;
+import com.sensorweb.datacenterlaadsservice.entity.GLDAS;
+import com.sensorweb.datacenterlaadsservice.entity.GPM_3IMERGDE;
+import com.sensorweb.datacenterlaadsservice.service.InsertGLDASService;
 import com.sensorweb.datacenterlaadsservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,18 +14,15 @@ import java.util.Calendar;
 import java.util.List;
 
 @Slf4j
-public class downloadmodis3 implements Runnable{
+public class downloadmodis8 implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("-----20200101---------20220315--------MOD13A2----");
-        InsertLAADSService insertLAADSService = (InsertLAADSService) ApplicationContextUtil.getBean("insertLAADSService");
-        EntryMapper entryMapper = (EntryMapper) ApplicationContextUtil.getBean("entryMapper");
+        System.out.println("-----20200101---------20220301--------GLDAS----");
+        InsertGLDASService insertGLDASService = (InsertGLDASService) ApplicationContextUtil.getBean("insertGLDASService");
         try {
             String startTime = "2020-01-01 00:00:00";
-            String endTime = "2022-03-15 00:00:00";
-            String product = "MOD13A2";
-            String bbox = "95,24,123,35";
+            String endTime = "2022-03-01 00:00:00";
             SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Calendar startloop = Calendar.getInstance();
             Calendar endloop = Calendar.getInstance();
@@ -36,17 +34,21 @@ public class downloadmodis3 implements Runnable{
             }
             while(startloop.before(endloop))
             {
+                try {
                 Instant start = DataCenterUtils.string2Instant(format.format(startloop.getTime()));
                 Instant end = DataCenterUtils.string2Instant(format.format(startloop.getTime())).plusSeconds(24*60*60);
-                List<Entry> entrys = entryMapper.getFilePath(product,start,end);
-                if(entrys.size()>0){
+                List<GLDAS> gldas = insertGLDASService.getFilePath(start,end);
+                if(gldas.size()>0){
 //                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
 //                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
                 }else{
-                    String flag = insertLAADSService.insertData2(start.toString().replace("T"," ").replace("Z",""), end.toString().replace("T"," ").replace("Z",""), bbox, product);
-                    System.out.println( "获取modis产品："+product+"接入时间："+start.toString()+ "状态："+flag);
-                    log.info("获取modis产品："+product+"接入时间："+start.toString()+ "状态："+flag);
-                    Thread.sleep(60 * 1000); //下载太快会断开连接，这里休息2分钟
+                    Boolean flag = insertGLDASService.insertData(start.plusSeconds(8*60*60).toString());
+                    System.out.println( "GLDAS"+"接入时间："+start.plusSeconds(8*60*60).toString()+ "状态："+flag);
+                    log.info("GLDAS："+"接入时间："+start.plusSeconds(8*60*60).toString()+ "状态："+flag);
+                    Thread.sleep(3 * 1000); //下载太快会断开连接，这里休息3秒
+                }
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
                 }
                 startloop.add(Calendar.DAY_OF_MONTH,1);
             }

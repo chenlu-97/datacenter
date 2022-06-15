@@ -7,15 +7,19 @@ import org.springframework.stereotype.Component;
 public interface OfflineConstant {
 
 
-    String GF1_PATH = "/data/Ai-Sensing/Data-tmp/GF1/3、RPC-Correction/";
+//    String GF1_PATH = "/data/Ai-Sensing/Data-tmp/GF1/3、RPC-Correction/";
+//
+//    String GF2_PATH = "/data/Ai-Sensing/Data-tmp/GF2_new/3、RPC-Correction/";
+//
+//    String GF6_PATH = "/data/Ai-Sensing/Data-tmp/GF6/3、RPC-Correction/";
+//
+//    String GF7_PATH = "/data/Ai-Sensing/Data-tmp/GF7/3、RPC-Correction/";
+//
+//    String[] GF_PATH = {GF1_PATH,GF2_PATH,GF6_PATH,GF7_PATH};
 
-    String GF2_PATH = "/data/Ai-Sensing/Data-tmp/GF2_new/3、RPC-Correction/";
 
-    String GF6_PATH = "/data/Ai-Sensing/Data-tmp/GF6/3、RPC-Correction/";
-
-    String GF7_PATH = "/data/Ai-Sensing/Data-tmp/GF7/3、RPC-Correction/";
-
-    String[] GF_PATH = {GF1_PATH,GF2_PATH,GF6_PATH,GF7_PATH};
+//    String GF_PATH = "/Users/chenlu/Desktop/gf/";
+    String GF_PATH = "/data/Ai-Sensing/Data-tmp/1、GaoFen-All/GF_3rd_249/3、RPC-Correction/";
 
 
     String WF_PATH = "/data/Ai-Sensing/DataCenter/weatherForecastData_whu1km";

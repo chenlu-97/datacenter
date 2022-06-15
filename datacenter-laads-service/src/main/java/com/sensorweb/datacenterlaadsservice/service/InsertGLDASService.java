@@ -1,6 +1,7 @@
 package com.sensorweb.datacenterlaadsservice.service;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenterlaadsservice.config.DownloadUtil;
 import com.sensorweb.datacenterlaadsservice.config.OkHttpUtil;
 import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
@@ -9,6 +10,7 @@ import com.sensorweb.datacenterlaadsservice.entity.HttpsUrlValidator;
 import com.sensorweb.datacenterlaadsservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterlaadsservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterlaadsservice.util.LAADSConstant;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -56,20 +58,24 @@ public class InsertGLDASService {
     @Value("${datacenter.path.other}")
     private String filePath;
 
-    @Scheduled(cron = "00 30 12 * * ?")//每天的12：30分执行一次
+    @Autowired
+    OkHttpUtil okHttpUtil;
+
+    @Scheduled(cron = "00 30 12 20 * ?")//每月20号的12：30分执行一次
     public void insertGLDASData() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
         Calendar calendar = Calendar.getInstance();
-//        String timeNow = format.format(calendar.getTime());
+        String timeNow = format.format(calendar.getTime());
         new Thread(new Runnable() {
+            @SneakyThrows
             @Override
             public void run() {
+                String time = null;
+                if (gldasMapper.selectNew() != null) {
+                    time = gldasMapper.selectNew().getTime().plusSeconds(12*60*60).toString();
+                    System.out.println("time = " + time);
+                }
                 try {
-                    String time = null;
-                    if (gldasMapper.selectNew() != null) {
-                        time = gldasMapper.selectNew().getTime().plusSeconds(12*60*60).toString();
-                        System.out.println("time = " + time);
-                    }
                         boolean flag = insertData(time);
 
                     if (flag) {
@@ -82,6 +88,7 @@ public class InsertGLDASService {
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     log.error("GLDAS接入时间: " + calendar.getTime().toString() + "Status: Fail");
+                    SendException("GLDAS",time,timeNow+"GLDAS接入数据失败");
                     System.out.println("GLDAS接入时间: " + calendar.getTime().toString() + "Status: Fail");
                 }
             }
@@ -90,60 +97,11 @@ public class InsertGLDASService {
 
 
 
-    /**
-     * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
-     */
-    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public boolean insertDataByCookie(String loadfile) throws Exception {
-        boolean res = false;
-        int j = 0;
-        File file = new File(filePath+loadfile);
-        try{
-            BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
-            String downloadurl = null;
-            while((downloadurl = br.readLine())!=null){//使用readLine方法，一次读一行
-                int tmp = downloadurl.lastIndexOf("/");
-                String fileName = downloadurl.substring(tmp+1);
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath);
-                System.out.println("下载状态： " + localPath);
-                String date = downloadurl.substring(downloadurl.indexOf(".A")+2,downloadurl.indexOf(".021")).replace(".","");
-                if (localPath != "fail" && localPath != "none") {
-                  j =  insertDB(fileName,downloadurl,date);
-
-                }else if(localPath == "none"){
-                    log.info("GLDAS暂无数据！！！");
-                    System.out.println("GLDAS暂无数据！！！");
-                }
-            }br.close();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return j > 0;
-    }
-
-
-    public void update(){
-        List<GLDAS> all = gldasMapper.getall();
-        for(GLDAS one :all){
-         String id =  one.getGldasId();
-//            System.out.println("id = " + id);
-           String year = id.substring(id.indexOf(".A")+2).substring(0,4);
-//            System.out.println("year = " + year);
-            String newPath = one.getFilePath();
-            newPath = newPath.substring(0,newPath.lastIndexOf("gldas"))+"GLADS_data"+"/"+year+"/"+id;
-            System.out.println("newPath = " + newPath);
-            gldasMapper.updateFileName(id,newPath);
-        }
-
-
-
-    }
-
 
     /**
      * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
      * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/2022/039/GLDAS_NOAH025_3H_EP.A20220208.2100.021.nc4
-     * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H/2022/039/GLDAS_NOAH025_3H.A20220208.2100.021.nc4
+     * //            https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/2022/039/GLDAS_NOAH025_3H.A20220208.2100.021.nc4
      * @param time 2022-03-01T00:00:00z
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -154,39 +112,34 @@ public class InsertGLDASService {
             String[] moments = {"0000","0300","0600","0900","1200","1500","1800","2100"};
             for(String moment:moments){
                 String year = time.substring(0,4);
+                String mounth = time.substring(5,7);
                 String day = YearMouthToday(date);
                 String downloadurl;
                 String fileName;
-                if(Integer.valueOf(date)<20201101){
-                    fileName = "GLDAS_NOAH025_3H.A" + date +"."+ moment + ".021.nc4";
-                    downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H/" + year  + "/" +day+ "/" + fileName;
-                }else{
-                    fileName = "GLDAS_NOAH025_3H_EP.A" + date +"."+ moment + ".021.nc4";
-                    downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H_EP.2.1/" + year  + "/" +day+ "/" + fileName;
-                }
-
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year);
+                fileName = "GLDAS_NOAH025_3H.A" + date +"."+ moment + ".021.nc4";
+                downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/" + year  + "/" +day+ "/" + fileName;
+                String localPath = downloadFromUrl(downloadurl, fileName, savePath + File.separator + year + File.separator + mounth);
                 int i = 0; //防止失败，重试2次
                 while (localPath.equals("fail")) {
                     i++;
                     if (i > 1) {
                         break;
                     }
-                    localPath = downloadFromUrl(downloadurl, fileName, savePath+ File.separator +year);
+                    localPath = downloadFromUrl(downloadurl, fileName, savePath +File.separator+year + File.separator + mounth);
                 }
                 GLDAS gldas = new GLDAS();
                 if (localPath != "fail" && localPath != "none") {
                     gldas.setFilePath(localPath);
-                    gldas.setTitle("GLDAS_Early_Product");
-                    gldas.setProductType("GLDAS_Early_Product");
+                    gldas.setTitle("GLDAS");
+                    gldas.setProductType("GLDAS_Product");
                     gldas.setGldasId(fileName);
                     gldas.setBbox("-180.0,-90.0,180.0,90.0");
                     gldas.setLink(downloadurl);
                     gldas.setTime(str2Instant(date+moment+"00"));
                     j = gldasMapper.insertData(gldas);
                 }else if(localPath == "none"){
-                    log.info("GLDAS_Early_Product暂无数据！！！");
-                    System.out.println("GLDAS_Early_Product暂无数据！！！");
+                    log.info("GLDAS_Product暂无数据！！！");
+                    System.out.println("GLDAS_Product暂无数据！！！");
                 }
             }
             return j > 0;
@@ -259,7 +212,7 @@ public class InsertGLDASService {
                 if (!saveDir.exists()) {
                     boolean flag = saveDir.mkdir();
                 }
-                File file = new File(saveDir + File.separator + fileName);
+                File file = new File(saveDir + File.separator+fileName);
                 FileOutputStream fos = new FileOutputStream(file);
                 fos.write(getData);
                 fos.close();
@@ -290,49 +243,96 @@ public class InsertGLDASService {
     }
 
 
-    public String getCookie(String downloadurl) {
-        System.setProperty("webdriver.firefox.bin", filePath+"geckodriver");
-        WebDriver driver = new FirefoxDriver();
-        driver.get("https://urs.earthdata.nasa.gov/");
-        WebElement username = driver.findElement(By.id("username"));
-        WebElement password = driver.findElement(By.id("password"));
-        WebElement login_button = driver.findElement(By.name("commit"));
-        username.sendKeys("CUG_chenlu");
-        password.sendKeys("Chenlu1997");
-        login_button.click();
-        String pageSource = driver.getPageSource();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        driver.get(downloadurl);
-        Set<Cookie> cookies = driver.manage().getCookies();
-        String cookieStr = "";
-        for (Cookie cookie : cookies) {
-            cookieStr += cookie.getName() + "=" + cookie.getValue() + "; ";
-        }
-        if (cookieStr.lastIndexOf(";") != -1) {
-            cookieStr = cookieStr.substring(0, cookieStr.lastIndexOf(";"));
-//            System.out.println("cookieStr = " + cookieStr);
-        }
-        return cookieStr;
-    }
 
+//    public void update(){
+//        List<GLDAS> all = gldasMapper.getall();
+//        for(GLDAS one :all){
+//            String id =  one.getGldasId();
+////            System.out.println("id = " + id);
+//            String year = id.substring(id.indexOf(".A")+2).substring(0,4);
+////            System.out.println("year = " + year);
+//            String newPath = one.getFilePath();
+//            newPath = newPath.substring(0,newPath.lastIndexOf("gldas"))+"GLADS_data"+"/"+year+"/"+id;
+//            System.out.println("newPath = " + newPath);
+//            gldasMapper.updateFileName(id,newPath);
+//        }
+//
+//    }
 
-    public int insertDB(String fileName, String downloadurl, String date){
-        int j ;
-        GLDAS gldas = new GLDAS();
-        gldas.setFilePath("/data/Ai-Sensing/DataCenter/gldas/"+fileName);
-        gldas.setTitle("GLDAS");
-        gldas.setProductType("GLDAS");
-        gldas.setGldasId(fileName);
-        gldas.setBbox("-180.0,-90.0,180.0,90.0");
-        gldas.setLink(downloadurl);
-        gldas.setTime(str2Instant(date+"00"));
-        j = gldasMapper.insertData(gldas);
-        return j;
-    }
+    //    /**
+//     * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地
+//     */
+//    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+//    public boolean insertDataByCookie(String loadfile) throws Exception {
+//        boolean res = false;
+//        int j = 0;
+//        File file = new File(filePath+loadfile);
+//        try{
+//            BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
+//            String downloadurl = null;
+//            while((downloadurl = br.readLine())!=null){//使用readLine方法，一次读一行
+//                int tmp = downloadurl.lastIndexOf("/");
+//                String fileName = downloadurl.substring(tmp+1);
+//                String localPath = downloadFromUrl(downloadurl, fileName, savePath);
+//                System.out.println("下载状态： " + localPath);
+//                String date = downloadurl.substring(downloadurl.indexOf(".A")+2,downloadurl.indexOf(".021")).replace(".","");
+//                if (localPath != "fail" && localPath != "none") {
+//                  j =  insertDB(fileName,downloadurl,date);
+//
+//                }else if(localPath == "none"){
+//                    log.info("GLDAS暂无数据！！！");
+//                    System.out.println("GLDAS暂无数据！！！");
+//                }
+//            }br.close();
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//        return j > 0;
+//    }
+
+//    public String getCookie(String downloadurl) {
+//        System.setProperty("webdriver.firefox.bin", filePath+"geckodriver");
+//        WebDriver driver = new FirefoxDriver();
+//        driver.get("https://urs.earthdata.nasa.gov/");
+//        WebElement username = driver.findElement(By.id("username"));
+//        WebElement password = driver.findElement(By.id("password"));
+//        WebElement login_button = driver.findElement(By.name("commit"));
+//        username.sendKeys("CUG_chenlu");
+//        password.sendKeys("Chenlu1997");
+//        login_button.click();
+//        String pageSource = driver.getPageSource();
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        driver.get(downloadurl);
+//        Set<Cookie> cookies = driver.manage().getCookies();
+//        String cookieStr = "";
+//        for (Cookie cookie : cookies) {
+//            cookieStr += cookie.getName() + "=" + cookie.getValue() + "; ";
+//        }
+//        if (cookieStr.lastIndexOf(";") != -1) {
+//            cookieStr = cookieStr.substring(0, cookieStr.lastIndexOf(";"));
+////            System.out.println("cookieStr = " + cookieStr);
+//        }
+//        return cookieStr;
+//    }
+//
+//
+//    public int insertDB(String fileName, String downloadurl, String date){
+//        int j ;
+//        GLDAS gldas = new GLDAS();
+//        gldas.setFilePath("/data/Ai-Sensing/DataCenter/gldas/"+fileName);
+//        gldas.setTitle("GLDAS");
+//        gldas.setProductType("GLDAS");
+//        gldas.setGldasId(fileName);
+//        gldas.setBbox("-180.0,-90.0,180.0,90.0");
+//        gldas.setLink(downloadurl);
+//        gldas.setTime(str2Instant(date+"00"));
+//        j = gldasMapper.insertData(gldas);
+//        return j;
+//    }
 
 
 //    public String getGLDASByBasic(String time) throws Exception {
@@ -377,5 +377,25 @@ public class InsertGLDASService {
 //    }
 
 
+    public void SendException(String type, String time, String details) throws IOException {
 
+        String url = "http://ai-ecloud.whu.edu.cn/gateway/ai-sensing-open-service/exception/data";
+        JSONObject param = new JSONObject();
+        param.put("type", type);
+        param.put("time", time);
+        param.put("details",details);
+        String res = null;
+        try {
+            res  =  okHttpUtil.doPostJson(url,param.toString());
+            System.out.println( "发送成功！！！"+res);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("发送失败！！！" +res);
+        }
+    }
+
+
+    public List<GLDAS> getFilePath(Instant start, Instant end) {
+        return gldasMapper.getFilePath(start,end);
+    }
 }

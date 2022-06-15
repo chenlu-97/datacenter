@@ -3,6 +3,7 @@ package com.sensorweb.datacenterlaadsservice;
 import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
 import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
 import com.sensorweb.datacenterlaadsservice.service.InsertGLDASService;
+import com.sensorweb.datacenterlaadsservice.service.InsertGPM_3IMERGDE;
 import com.sensorweb.datacenterlaadsservice.service.InsertLAADSService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ class DatacenterLaadsServiceApplicationTests {
     private InsertGLDASService insertGLDASService;
     @Autowired
     private GLDASMapper gldasMapper;
+    @Autowired
+    private InsertGPM_3IMERGDE insertGPM_3IMERGDE;
     @Test
     void contextLoads() throws Exception {
         //测试
@@ -121,37 +124,40 @@ class DatacenterLaadsServiceApplicationTests {
 //            start.add(Calendar.DAY_OF_MONTH,1);
 //        }
 //            String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2"};
-            String[] products = new String[]{"MOD11A1"};
-            boolean flag;
-            LocalDateTime dateTime = LocalDateTime.now();
-            DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
-            String strDate3 = dtf3.format(dateTime);
-            dateTime = LocalDateTime.parse(strDate3, dtf3);
-            for (String product : products) {
-                try {
-                        Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
-                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().minusSeconds(24*60*60);
-                        while (timeNew.isBefore(timeNow)) {
-                            String bbox = "95,24,123,35";//长江流域经纬度范围
-                            String code = null;
-                            try {
-                                String start = timeNew.plusSeconds(24 * 60 * 60).toString();
-                                start = start.substring(0, start.indexOf("T")) + " 00:00:00";
-                                String stop = timeNew.plusSeconds(48 * 60 * 60).toString();
-                                stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
-                                System.out.println("start = " + start);
-                                System.out.println("stop = " + stop);
-//                                code = insertLAADSService.insertData2(start, stop, bbox, product);
-//                                System.out.println(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                                System.out.println(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
-                            }
-                            timeNew = timeNew.plusSeconds(48 * 60 * 60);
-                        }
-                    }catch (Exception e) {
-                     System.out.println(e.getMessage());
-                }
-            }
+//            String[] products = new String[]{"MOD11A1"};
+//            boolean flag;
+//            LocalDateTime dateTime = LocalDateTime.now();
+//            DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+//            String strDate3 = dtf3.format(dateTime);
+//            dateTime = LocalDateTime.parse(strDate3, dtf3);
+//            for (String product : products) {
+//                try {
+//                        Instant timeNew = entryMapper.selectMaxTimeData(product).get(0).getStart();
+//                        Instant timeNow = dateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant().minusSeconds(24*60*60);
+//                        while (timeNew.isBefore(timeNow)) {
+//                            String bbox = "95,24,123,35";//长江流域经纬度范围
+//                            String code = null;
+//                            try {
+//                                String start = timeNew.plusSeconds(24 * 60 * 60).toString();
+//                                start = start.substring(0, start.indexOf("T")) + " 00:00:00";
+//                                String stop = timeNew.plusSeconds(48 * 60 * 60).toString();
+//                                stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
+//                                System.out.println("start = " + start);
+//                                System.out.println("stop = " + stop);
+////                                code = insertLAADSService.insertData2(start, stop, bbox, product);
+////                                System.out.println(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
+//                            } catch (Exception e) {
+//                                System.out.println(e.getMessage());
+//                                System.out.println(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
+//                            }
+//                            timeNew = timeNew.plusSeconds(48 * 60 * 60);
+//                        }
+//                    }catch (Exception e) {
+//                     System.out.println(e.getMessage());
+//                }
+//            }
+
+//        insertGLDASService.insertData("2022-05-01T00:00:00Z");
+        insertGPM_3IMERGDE.insertData("2022-06-01T00:00:00Z");
     }
 }

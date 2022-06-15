@@ -7,13 +7,11 @@ import com.sensorweb.datacentermobileservice.entity.SurveyingVessel;
 import com.sensorweb.datacentermobileservice.util.OkHttpUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
+
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -644,4 +642,20 @@ public class SurveyingVesselService {
         }
     }
 
+
+
+
+    public String  gettoken() throws IOException {
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = okhttp3.MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType,"{\"clientId\":\"6a84a017969b10ad\",\"clientSecret\":\"3ab91a689212479aa58e90d611003e63\"}\n");
+        Request request = new Request.Builder()
+                .url(" http://10.42.52.135:21000/sky-api/rate-auth/auth/clientToken")
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+//                .addHeader("Cookie", "JSESSIONID=1kLWVhrAMOErRbDePAQDstROVLLbFAiKinJy-CN_")
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.toString();
+    }
 }

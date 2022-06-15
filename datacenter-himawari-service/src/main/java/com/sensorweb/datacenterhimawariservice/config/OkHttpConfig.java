@@ -1,4 +1,4 @@
-package com.sensorweb.datacentergeeservice.config;
+package com.sensorweb.datacenterhimawariservice.config;
 
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
