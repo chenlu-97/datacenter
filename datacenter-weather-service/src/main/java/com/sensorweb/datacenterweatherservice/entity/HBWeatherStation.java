@@ -15,5 +15,7 @@ public class HBWeatherStation {
     private float rhu;
     private float pre_1h;
     private float gst;
+    private float gst_10cm;
+    private float vis;
     private Instant queryTime;
 }

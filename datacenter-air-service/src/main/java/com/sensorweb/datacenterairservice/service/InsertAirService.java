@@ -1,6 +1,7 @@
 package com.sensorweb.datacenterairservice.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenterairservice.config.OkHttpUtil;
 import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
@@ -8,9 +9,12 @@ import com.sensorweb.datacenterairservice.dao.AirStationMapper;
 import com.sensorweb.datacenterairservice.entity.AirQualityDay;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.AirStationModel;
+import com.sensorweb.datacenterairservice.entity.WaterStation;
 import com.sensorweb.datacenterairservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterairservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterairservice.util.AirConstant;
+import com.sensorweb.datacenterairservice.util.OkHttpUtils.OkHttpRequest;
+import com.sensorweb.datacenterairservice.util.timeTransfer.SecondAndDate;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sensorweb.datacenterutil.utils.SendMail;
 import lombok.SneakyThrows;
@@ -28,17 +32,20 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -59,6 +66,11 @@ public class InsertAirService extends Thread implements AirConstant {
     @Autowired
     OkHttpUtil okHttpUtil;
 
+
+
+
+
+
     /**
      * 每小时接入一次数据
      */
@@ -67,7 +79,6 @@ public class InsertAirService extends Thread implements AirConstant {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
         String time = formatter.format(dateTime);
-
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -89,9 +100,9 @@ public class InsertAirService extends Thread implements AirConstant {
                                 SendException("HB_AIR",dateTime.toString(),mes);
                             }
                         } else {
-                            System.out.println("等待中...");
+                            System.out.println("湖北省监测站，等待中...");
                         }
-                        Thread.sleep(2 * 60 * 1000);
+                        Thread.sleep(1 * 60 * 1000);
                     } catch (Exception e) {
                         log.error(e.getMessage());
                         log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Fail");
@@ -106,12 +117,161 @@ public class InsertAirService extends Thread implements AirConstant {
         }).start();
     }
 
+
+    /**
+     * 每小时接入一次数据
+     */
+//    @Scheduled(cron = "0 35 0/1 * * ?") //每个小时的35分开始接入
+//    @PostConstruct
+    public void insertDataByHour2() {
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00").withZone(ZoneId.of("Asia/Shanghai"));
+        LocalDateTime endDate = dateTime.plusMinutes(24);
+        String start = formatter.format(dateTime);
+        String end = formatter1.format(endDate);
+//        String start = "2020-01-01 00:00:00";
+//        String end = "2020-01-01 23:59:59";
+        new Thread(new Runnable() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                boolean flag ;
+//                while (flag) {
+                    try {
+                        JSONArray access_res = getInfo(start,end,getStationId());
+                        flag = !accessinforming(access_res);
+                        if (!flag) {
+                            log.info("湖北省监测站更新空气数据时间: " + start + "Status: Success");
+//                            DataCenterUtils.sendMessage("HB_water"+ start, "站网-湖北省水质站点","这是一条省站推送的湖北省水质站点数据");
+                            System.out.println("湖北省监测站更新空气数据时间: " + start + "Status: Success");
+                        }
+                        else {
+                            System.out.println("等待中...");
+                        }
+//                        Thread.sleep(2 * 60 * 1000);
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                        log.info("湖北省监测站更新空气数据时间: " + start.toString() + "Status: Fail");
+                        String mes = "湖北省监测站更新空气数据失败！！----失败时间 ："+ start;
+                        // 发送邮件
+//                        SendMail.sendemail(mes);
+//                        SendException("HB_Water",start.toString(),mes);
+//                        break;
+//                    }
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 从okhttp获取站点信息
+     * */
+    public JSONArray getInfo(String start, String end,String Ids){
+        long startSecond = SecondAndDate.datatosecond(start);
+        long endSecond = SecondAndDate.datatosecond(end);
+
+
+        JSONObject body_content = new JSONObject();
+
+        HashMap content1 = new HashMap<String, String>();
+        HashMap content2 = new HashMap<String, String>();
+        content1.put("siteCode", Ids);
+        content1.put("startTime", startSecond + "");
+        content1.put("endTime", endSecond + "");
+
+        content2.put("size", "1000000");
+        content2.put("page", "0");
+        body_content.put("params", content1);
+        body_content.put("page", content2);
+        JSONArray access_res = OkHttpRequest.accessAirStationData(body_content);
+        return access_res;
+    }
+
+    public String getStationId(){
+        int flag = 0;
+        List<String> res = airStationMapper.quaryStationId();
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < res.size(); j++) {
+            sb.append(res.get(j)).append(",");
+        }
+        String Ids = sb.substring(0, sb.length() - 1);
+        return Ids;
+    }
+
+    public boolean accessinforming(JSONArray access_res) {
+        List<String> res = airStationMapper.quaryStationId();
+            int flag = 0 ;
+            if (access_res != null && access_res.size() > 0) {
+                for (int i = 0; i < res.size(); i++) {
+                AirQualityHour airQualityHour = new AirQualityHour();
+                String station_id = res.get(i);
+                for (int j = 0; j < access_res.size(); j++) {
+                    JSONObject access = (JSONObject) access_res.get(j);
+                    if (access.getString("uniqueCode").equals(station_id)) {
+                        String fieldName = access.getString("epName");
+                        if (fieldName.equals("NO")) {
+                            Float no = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setNoOneHour(no.toString().substring(0, no.toString().indexOf(".")));
+                        } else if (fieldName.equals("NOX")) {
+                            Float nox = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setNoxOneHour(nox.toString().substring(0, nox.toString().indexOf(".")));
+                        } else if (fieldName.equals("温度")) {
+                            airQualityHour.setTemperature(access.getString("sValue"));
+                        } else if (fieldName.equals("湿度")) {
+                            airQualityHour.setHumidity(access.getString("sValue"));
+                        } else if (fieldName.equals("风向")) {
+                            airQualityHour.setWindDirection(access.getString("sValue"));
+                        } else if (fieldName.equals("风速")) {
+                            airQualityHour.setWindSpeed(access.getString("sValue"));
+                        } else if (fieldName.equals("能见度")) {
+                            airQualityHour.setVisibility(access.getString("sValue"));
+                        } else if (fieldName.equals("SO2")) {
+                            Float so2 = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setSo2OneHour(so2.toString().substring(0, so2.toString().indexOf(".")));
+                        } else if (fieldName.equals("NO2")) {
+                            Float no2 = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setNo2OneHour(no2.toString().substring(0, no2.toString().indexOf(".")));
+                        } else if (fieldName.equals("CO")) {
+                            airQualityHour.setCoOneHour(access.getString("sValue"));
+                        } else if (fieldName.equals("O3")) {
+                            Float o3 = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setO3OneHour(o3.toString().substring(0, o3.toString().indexOf(".")));
+                        } else if (fieldName.equals("PM25")) {
+                            Float pm25 = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setPm25OneHour(pm25.toString().substring(0, pm25.toString().indexOf(".")));
+                        } else if (fieldName.equals("PM10")) {
+                            Float pm10 = Float.valueOf(access.getString("sValue")) * 1000;
+                            airQualityHour.setPm10OneHour(pm10.toString().substring(0, pm10.toString().indexOf(".")));
+                        }
+                        airQualityHour.setUniqueCode(access.getString("uniqueCode"));
+                        airQualityHour.setStationName(access.getString("sStationName"));
+                        long data = Long.parseLong(access.getString("sDatetime"));
+                        airQualityHour.setQueryTime(SecondAndDate.sceondtodata(data).toInstant());
+                    }
+                }
+
+                try {
+                    if (airQualityHour.getUniqueCode() == null) {
+                    } else {
+                        flag =  airQualityHourMapper.insertData(airQualityHour);
+                    }
+                } catch (Exception e) {
+                        e.printStackTrace();
+                }
+            }
+        }
+        return flag>0;
+    }
+
+
     /**
      * 根据时间接入指定时间的小时数据（当数据库中缺少某个时间段的数据时，可作为数据补充）
      * @throws Exception
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean insertHourDataByHour(String time) throws Exception {
+        int status = 0 ;
         String param = "UsrName=" + AirConstant.USER_NAME + "&passWord=" + AirConstant.PASSWORD +
                 "&date=" + URLEncoder.encode(time, "utf-8");
         String document = DataCenterUtils.doGet(AirConstant.GET_LAST_HOURS_DATA, param);
@@ -123,7 +283,7 @@ public class InsertAirService extends Thread implements AirConstant {
         for (Object o : objects) {
             if (o instanceof AirQualityHour) {
                 AirQualityHour airQualityHour = (AirQualityHour) o;
-                int status = airQualityHourMapper.insertData(airQualityHour);
+                status = airQualityHourMapper.insertData(airQualityHour);
 //                if (status>0) {
 //                    Observation observation = new Observation();
 //                    observation.setProcedureId(airQualityHour.getUniqueCode());
@@ -173,9 +333,10 @@ public class InsertAirService extends Thread implements AirConstant {
 //                    }
 //                }
             } else {
+//                return false;
             }
         }
-        return true;
+        return status>0;
     }
 
     /**
@@ -419,4 +580,6 @@ public class InsertAirService extends Thread implements AirConstant {
             System.out.println("发送失败！！！" +res);
         }
     }
+
+
 }

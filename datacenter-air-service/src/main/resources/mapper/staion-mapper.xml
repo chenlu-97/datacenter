@@ -16,7 +16,7 @@
         VALUES (#{stationId}, #{stationName}, #{township}, #{region}, #{city}, #{province}, #{lon}, #{lat}, #{stationType}, ST_GeomFromText(#{geom}, 4326) )
     </insert>
 
-    <insert id="insertDataBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDataBatch" parameterType="java.util.List">
         INSERT INTO station (<include refid="insertFields"></include>)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -105,6 +105,11 @@
         SELECT station_name
         FROM station
         WHERE stype=#{stype}
+    </select>
+    <select id="quaryStationId" resultType="java.lang.String">
+        SELECT station_id
+        FROM station
+        WHERE stype= 'NEW_HB_AIR'
     </select>
 
 

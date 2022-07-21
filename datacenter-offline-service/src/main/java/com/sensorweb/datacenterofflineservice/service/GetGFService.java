@@ -115,10 +115,10 @@ public class GetGFService {
                                     + '[' + BottomRightLongitude + ',' + BottomRightLatitude + ']' + ',' + '[' + BottomLeftLongitude + ',' + BottomLeftLatitude + ']' + ',' + '[' + TopLeftLongitude + ',' + TopLeftLatitude + ']';
                             gf.setBbox(bbox);
                             gf.setGeom(wkt);
-                            if (GFelement.element("SatelliteID").getText().equals("GF7-1")) {
-                                status = gfMapper.insertGF(gf);
-                                System.out.println(file.getAbsolutePath()+"插入成功");
-                            }
+//                            if (GFelement.element("SatelliteID").getText().equals("GF7-1")) {
+                            status = gfMapper.insertGF(gf);
+                            System.out.println(file.getAbsolutePath()+"插入成功");
+//                            }
                         }
                     }
                 }

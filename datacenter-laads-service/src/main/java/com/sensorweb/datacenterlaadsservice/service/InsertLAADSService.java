@@ -72,7 +72,7 @@ public class InsertLAADSService implements LAADSConstant {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2","MOD13A3",};
+                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2","MOD13A3","MOD09A1"};
                 LocalDateTime dateTime = LocalDateTime.now();
                 DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
                 String strDate3 = dtf3.format(dateTime);

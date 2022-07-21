@@ -15,6 +15,7 @@ topleftlongitude,toprightlatitude,toprightlongitude,bottomrightlatitude,bottomri
         insert into gf (<include refid="insertFields"></include>)
         values (#{satelliteId}, #{season},#{imageId}, #{imageType}, #{bbox}, ST_GeomFromText(#{geom}, 4326), #{queryTime}, #{scenePath},#{sceneRow},
                 #{filePath},#{topleftlatitude},#{topleftlongitude},#{toprightlatitude},#{toprightlongitude},#{bottomrightlatitude},#{bottomrightlongitude},#{bottomleftlatitude},#{bottomleftlongitude})
+        ON CONFLICT ("image_id") DO NOTHING
     </insert>
 
     <select id="selectByIds" resultMap="GF">

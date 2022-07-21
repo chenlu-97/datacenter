@@ -33,7 +33,7 @@
 
     INSERT INTO landsat (<include refid="insertFields"></include>)
     VALUES (#{imageID}, #{sensorID}, #{spacecraftID}, #{Coordinates},ST_GeomFromText(#{Coordinates}, 4326), #{Date}, #{Time}, #{imageSize}, #{Ellipsoid}, #{Cloudcover}, #{Thumburl}, #{imageType}, #{filePath}, #{waveBand}, #{bandInfo}, #{row}, #{path})
-
+    ON CONFLICT ("imageid") DO NOTHING
   </insert>
 
 
@@ -112,5 +112,11 @@
       FROM landsat
       WHERE imagetype = #{type} AND date <![CDATA[>=]]> #{startTime} AND date <![CDATA[<]]> #{endTime}
     </select>
+
+  <select id="getLandsat2" resultType="com.sensorweb.datacentergeeservice.entity.Landsat">
+    SELECT <include refid="selectFields"></include>
+    FROM landsat
+    WHERE imagetype = #{type} AND date <![CDATA[>=]]> #{startTime} AND date <![CDATA[<]]> #{endTime} AND row = #{row} AND path = #{path}
+  </select>
 
 </mapper>

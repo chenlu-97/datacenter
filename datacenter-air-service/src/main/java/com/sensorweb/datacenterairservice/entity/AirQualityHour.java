@@ -22,4 +22,12 @@ public class AirQualityHour {
     private String aqDegree;
     private String aqType;
 
+    //2022.7.1新加字段
+    private String noOneHour;
+    private String noxOneHour;
+    private String temperature;
+    private String humidity;
+    private String windDirection;
+    private String windSpeed;
+    private String visibility;
 }

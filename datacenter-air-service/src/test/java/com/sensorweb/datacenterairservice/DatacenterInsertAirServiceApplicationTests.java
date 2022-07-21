@@ -2,6 +2,8 @@ package com.sensorweb.datacenterairservice;
 
 import com.sensorweb.datacenterairservice.service.InsertAirService;
 import com.sensorweb.datacenterairservice.service.NewInsertChinaAirService;
+import com.sensorweb.datacenterairservice.service.SuperStationService;
+import com.sensorweb.datacenterairservice.service.WaterQualityWaterstationHourlyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,12 @@ class DatacenterInsertAirServiceApplicationTests {
 
     @Autowired
     private InsertAirService insertAirService;
+    @Autowired
+    private WaterQualityWaterstationHourlyService waterQualityWaterstationHourlyService;
+
+
+    @Autowired
+    private SuperStationService superStationService;
     @Test
     void contextLoads() throws Exception {
 //        String bbox = "180 0,180 0";
@@ -52,9 +60,11 @@ class DatacenterInsertAirServiceApplicationTests {
 //        System.out.println("end = " + end);
 
 
-        boolean flag =  newInsertChinaAirService.getFromCSV2();
-        System.out.println("flag = " + flag);
-
+//        insertAirService.insertDataByHour();
+//        insertAirService.insertDataByHour2();
+//        Thread.sleep(2 * 60 * 1000);
+//        insertAirService.insertHourDataByHour("2022-07-07 10:00:00");
+//        superStationService.accessinforming12313();
     }
 
 

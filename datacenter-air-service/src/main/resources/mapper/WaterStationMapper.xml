@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterairservice.dao.WaterStationMapper">
+
+    <resultMap id="BaseResultMap" type="com.sensorweb.datacenterairservice.entity.WaterStation">
+            <result property="mn" column="mn" jdbcType="VARCHAR"/>
+            <result property="areaid" column="areaId" jdbcType="VARCHAR"/>
+            <result property="areaname" column="areaName" jdbcType="VARCHAR"/>
+            <result property="riverid" column="riverId" jdbcType="VARCHAR"/>
+            <result property="rivername" column="riverName" jdbcType="VARCHAR"/>
+            <result property="mnname" column="mnName" jdbcType="VARCHAR"/>
+            <result property="lon" column="lon" />
+            <result property="lat" column="lat" />
+            <result property="geom" column="geom" jdbcType="OTHER"/>
+            <result property="geoType" column="geo_type" jdbcType="SMALLINT"/>
+    </resultMap>
+
+<!--    <sql id="Base_Column_List">-->
+<!--        mn,areaId,areaName,-->
+<!--        riverId,riverName,mnName,-->
+<!--        lon,lat,geom,-->
+<!--        geo_type-->
+<!--    </sql>-->
+
+    <insert id="store"  parameterType="com.sensorweb.datacenterairservice.entity.WaterStation">
+        insert into hb_water_station("mn", "areaId", "areaName", "riverId", "riverName", "mnName", "lon", "lat", "geom", "geo_type")
+        values(#{mn},#{areaid},#{areaname},#{riverid},#{rivername},#{mnname},#{lon},#{lat},ST_GeomFromText(#{geom}, 4326),#{geoType})
+    </insert>
+
+    <select id="quaryMnId" resultType="com.sensorweb.datacenterairservice.entity.WaterStation">
+        select mn from hb_water_station
+    </select>
+</mapper>

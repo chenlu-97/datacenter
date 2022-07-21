@@ -39,10 +39,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -105,8 +102,8 @@ public class LandsatService implements GoogleServiceConstant{
                     }
                     while (start.before(end)) {
                         log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");
-                        String statue1 = downloadLandsat(format.format(start.getTime()),"https://earthexplorer.usgs.gov/download/5e81f14f92acf9ef/"); //L1TP
-                        String statue2 = downloadLandsat(format.format(start.getTime()),"https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/"); //L2SP
+                        String statue1 = downloadLandsat(format.format(start.getTime()),"https://earthexplorer.usgs.gov/download/5e81f14f92acf9ef/","L1TP"); //L1TP
+                        String statue2 = downloadLandsat(format.format(start.getTime()),"https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/","L2SP"); //L2SP
                         if (statue1.equals("cookie error")||statue2.equals("cookie error")) {
                             log.info("------ cookie error 过期了，要更换cookie-----");
                         } else if (statue1.equals("fail")||statue2.equals("fail")) {
@@ -146,7 +143,7 @@ public class LandsatService implements GoogleServiceConstant{
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36");
             connection.setRequestProperty("Connection", "keep-alive");
             connection.setRequestProperty("Host", "hydro1.gesdisc.eosdis.nasa.gov");
-            connection.setRequestProperty("Cookie", DataCenterUtils.readTxt(cookiePath));
+//            connection.setRequestProperty("Cookie", DataCenterUtils.readTxt(cookiePath));
             connection.setRequestProperty("Cookie", landsat_cookie);
             //设置https协议访问
             System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2,SSLv3");
@@ -182,7 +179,7 @@ public class LandsatService implements GoogleServiceConstant{
                     outputStream.write(buffer, 0, len);
                 }
                 inputStream.close();
-                res = savePath + fileName;
+                res = savePath + File.separator +fileName;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -190,6 +187,19 @@ public class LandsatService implements GoogleServiceConstant{
         }
         return res;
     }
+
+
+//    public String getlandsatbyid(String time) throws IOException {
+//        for (int row = 35; row <= 46; row++) {
+//            for (int path = 117; path <= 135; path++) {
+//                String day_num = YearMouthToday(time);
+//                String year = time.substring(0, 4);
+//                String mounth = time.substring(5, 7);
+//                Format f1 = new DecimalFormat("000");
+//                String filename = "LC8" + path + f1.format(row) + year + day_num + "LGN00";
+//            }
+//        }
+//    }
 
 
 
@@ -214,40 +224,49 @@ public class LandsatService implements GoogleServiceConstant{
      *
      * https://earthexplorer.usgs.gov/download/5e83d14fec7cae84/
     */
-    public String downloadLandsat(String time,String baseUrl) throws IOException {
+    public String downloadLandsat(String time,String baseUrl,String type) throws IOException {
         String res = null;
         boolean finalres = false;
         for(int row = 35;row<=46;row++){
             for(int path = 117;path<=135;path++){
-                String day_num = YearMouthToday(time);
-                String year = time.substring(0,4);
-                String mounth = time.substring(5,7);
-                Format f1=new DecimalFormat("000");
-                String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
-                String url = baseUrl+filename;
-                res = downloadFromUrl(url, filename+".tar", savePath+ File.separator + year +File.separator + mounth);
-                 if (res == "cookie过期"){
-//                   getCookie();
-                     res = downloadFromUrl(url, filename+".tar", savePath+ File.separator + year +File.separator + mounth);
-                    if(res == "cookie过期"){
-                        return "cookie error";
-                    }else if(res.equals("no_data")){
 
+                Instant startTime = string2Instant(time);
+                Instant endTime = string2Instant(time).plusSeconds(24*60*60);
+                List<Landsat> landsat_exit = landsatMapper.getLandsat2(type,row,path,startTime,endTime);
+                if(landsat_exit.size()>0){
+//                    System.out.println("已经存在该影像！！！");
+                }else{
+//                    System.out.println("没有该影像，需要下载，下载中！！！");
+                    String day_num = YearMouthToday(time);
+                    String year = time.substring(0,4);
+                    String mounth = time.substring(4,6);
+                    Format f1=new DecimalFormat("000");
+                    String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
+                    String url = baseUrl+filename;
+                    res = downloadFromUrl(url, filename+".tar", savePath+  year +File.separator + mounth);
+                    if (res == "cookie过期"){
+//                   getCookie();
+                        res = downloadFromUrl(url, filename+".tar", savePath+ year +File.separator + mounth);
+                        if(res == "cookie过期"){
+                            return "cookie error";
+                        }else if(res.equals("no_data")){
+
+                        }else if(res.equals("error")){
+                            return "fail";
+                        }
+                        else{
+                            System.out.println("下载成功 : " +url+ " "+res);
+                            finalres =  saveToDB(res);
+                        }
+                    }else if(res.equals("no_data")){
+//                     System.out.println(url+ " "+res);
                     }else if(res.equals("error")){
                         return "fail";
-                    }
-                    else{
+                    }else{
                         System.out.println("下载成功 : " +url+ " "+res);
-                        finalres =  saveToDB(res);
+                        finalres = saveToDB(res);
                     }
-                 }else if(res.equals("no_data")){
-//                     System.out.println(url+ " "+res);
-                 }else if(res.equals("error")){
-                     return "fail";
-                 }else{
-                     System.out.println("下载成功 : " +url+ " "+res);
-                     finalres = saveToDB(res);
-                 }
+                }
             }
         }
         if(finalres){
@@ -743,6 +762,19 @@ public class LandsatService implements GoogleServiceConstant{
     public List<Landsat> getLandsat(String type,Instant startTime, Instant endTime) {
         return landsatMapper.getLandsat(type,startTime,endTime);
 
+    }
+
+    public static Instant string2Instant(String date) {
+        Date time = null;
+        try {
+            time = new SimpleDateFormat("yyyyMMdd").parse(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (time!=null) {
+            return time.toInstant();
+        }
+        return null;
     }
 
 }

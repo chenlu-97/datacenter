@@ -25,4 +25,6 @@ public interface AirStationMapper {
     boolean updateGeom(@Param("wkt") String wkt,@Param("lon") double lon,@Param("lat") double lat);
 
     List<String> selectStation(@Param("stype")String stype);
+
+    List<String> quaryStationId();
 }

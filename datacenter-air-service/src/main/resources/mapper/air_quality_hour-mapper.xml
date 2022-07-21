@@ -4,16 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenterairservice.dao.AirQualityHourMapper">
     <sql id="insertFields">
-        station_name, uniquecode, querytime, pm25OneHour, pm10OneHour, so2OneHour, no2OneHour, coOneHour, o3OneHour, aqi, primaryEP, aqDegree, aqType
+        station_name, uniquecode, querytime, pm25OneHour, pm10OneHour, so2OneHour, no2OneHour, coOneHour, o3OneHour, aqi, primaryEP, aqDegree, aqType ,noonehour ,noxonehour,temperature,humidity,wind_direction,wind_speed,visibility
     </sql>
 
     <sql id="selectFields">
-        station_name, uniquecode, querytime, pm25OneHour, pm10OneHour, so2OneHour, no2OneHour, coOneHour, o3OneHour, aqi, primaryEP, aqDegree, aqType
+        station_name, uniquecode, querytime, pm25OneHour, pm10OneHour, so2OneHour, no2OneHour, coOneHour, o3OneHour, aqi, primaryEP, aqDegree, aqType ,noonehour ,noxonehour,temperature,humidity,wind_direction,wind_speed,visibility
     </sql>
 
     <insert id="insertData" parameterType="AirQualityHour">
         INSERT INTO "wuhanCC_air_hourly" (<include refid="insertFields"></include>)
-        VALUES (#{stationName}, #{uniqueCode}, #{queryTime}, #{pm25OneHour}, #{pm10OneHour}, #{so2OneHour}, #{no2OneHour}, #{coOneHour}, #{o3OneHour}, #{aqi}, #{primaryEP}, #{aqDegree}, #{aqType})
+        VALUES (#{stationName}, #{uniqueCode}, #{queryTime}, #{pm25OneHour}, #{pm10OneHour}, #{so2OneHour}, #{no2OneHour}, #{coOneHour}, #{o3OneHour}, #{aqi}, #{primaryEP}, #{aqDegree}, #{aqType} , #{noOneHour},#{noxOneHour}, #{temperature} , #{humidity} , #{windDirection} , #{windSpeed} ,#{visibility})
+--         ON CONFLICT ("uniquecode","querytime") DO NOTHING
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">
@@ -23,6 +24,7 @@
             (#{item.stationName}, #{item.uniqueCode}, #{item.queryTime}, #{item.pm25OneHour}, #{item.pm10OneHour}, #{item.so2OneHour}, #{item.no2OneHour}, #{item.coOneHour}, #{item.o3OneHour}, #{item.aqi}, #{item.primaryEP}, #{item.aqDegree}, #{item.aqType})
         </foreach>
     </insert>
+
 
     <select id="selectByIds" resultMap="airQualityHour">
         SELECT <include refid="selectFields"></include>
@@ -115,7 +117,13 @@
         <result column="aqi" property="aqi"/>
         <result column="primaryEP" property="primaryEP"/>
         <result column="aqDegree" property="aqDegree"/>
-        <result column="aqType" property="aqType"/>
+        <result column="noonehour" property="noOneHour"/>
+        <result column="noxonehour" property="noxOneHour"/>
+        <result column="temperature" property="temperature"/>
+        <result column="humidity" property="humidity"/>
+        <result column="wind_direction" property="windDirection"/>
+        <result column="wind_speed" property="windSpeed"/>
+        <result column="visibility" property="visibility"/>
     </resultMap>
 
     <select id="selectNum" resultType="java.lang.Integer">
@@ -140,5 +148,12 @@
         select <include refid="selectFields"></include>
         from "wuhanCC_air_hourly" where querytime = (select max(querytime) from "wuhanCC_air_hourly");
     </select>
+
+
+
+    <update id="update" parameterType="com.sensorweb.datacenterairservice.entity.AirQualityHour">
+        UPDATE "wuhanCC_air_hourly" SET noonehour = #{noOneHour},noxonehour = #{noxOneHour}, temperature = #{temperature} ,humidity = #{humidity} ,wind_direction = #{windDirection} ,wind_speed = #{windSpeed} ,visibility = #{visibility}
+        WHERE querytime = #{queryTime} AND uniquecode = #{uniqueCode}
+    </update>
 
 </mapper>

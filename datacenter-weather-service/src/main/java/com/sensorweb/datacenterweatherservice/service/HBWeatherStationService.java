@@ -136,6 +136,8 @@ public class HBWeatherStationService {
             hbWeatherStation.setRhu(Float.parseFloat(object.getString("RHU")));
             hbWeatherStation.setPre_1h(Float.parseFloat(object.getString("PRE_1h")));
             hbWeatherStation.setGst(Float.parseFloat(object.getString("GST")));
+            hbWeatherStation.setGst_10cm(Float.parseFloat(object.getString("GST_10cm")));
+            hbWeatherStation.setVis(Float.parseFloat(object.getString("VIS")));
             hbWeatherStation.setQueryTime(queryTime);
             statue = hbWeatherStationMapper.insertData(hbWeatherStation);
         }
@@ -146,7 +148,9 @@ public class HBWeatherStationService {
        return hbWeatherStationMapper.selectByPage(pageNum, pageSize);
     }
 
-
+    /**
+     * 通过api请求站点信息的入库
+     */
 
     public boolean getIOTInfo2(String document) throws IOException {
         int statue = 0;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterairservice.dao.RawDataSuperStationHourlyMapper">
+
+    <resultMap id="BaseResultMap" type="com.sensorweb.datacenterairservice.entity.RawDataSuperStationHourly">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="st" column="ST" jdbcType="VARCHAR"/>
+        <result property="svalue" column="SVALUE" jdbcType="VARCHAR"/>
+        <result property="times" column="TIMES" jdbcType="DATE"/>
+        <result property="categpry" column="CATEGPRY" jdbcType="VARCHAR"/>
+        <result property="stNa" column="ST_NA" jdbcType="VARCHAR"/>
+        <result property="epname" column="EPNAME" jdbcType="VARCHAR"/>
+    </resultMap>
+
+<!--    <sql id="Base_Column_List">-->
+<!--        ST,SVALUE,TIMES,-->
+<!--        CATEGPRY,ST_NA,EPNAME-->
+<!--    </sql>-->
+
+    <insert id="store">
+        insert into "wuhanCC_super_station_hourly"("id","ST", "SVALUE", "TIMES", "CATEGPRY", "ST_NA", "EPNAME")
+        VALUES (#{id},
+                #{st},
+                #{svalue},
+                #{times},
+                #{categpry},
+                #{stNa},
+                #{epname})
+        ON CONFLICT ("id") DO NOTHING
+    </insert>
+    <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterairservice.entity.RawDataSuperStationHourly">
+        select "ST"
+        from "wuhanCC_super_station_hourly" where "TIMES" = (select max("TIMES") from "wuhanCC_super_station_hourly");
+    </select>
+</mapper>

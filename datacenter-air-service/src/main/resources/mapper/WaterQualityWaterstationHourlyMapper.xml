@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterairservice.dao.WaterQualityWaterstationHourlyMapper">
+
+    <resultMap id="BaseResultMap" type="com.sensorweb.datacenterairservice.entity.WaterQualityWaterstationHourly">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="areacode" column="areaCode" jdbcType="VARCHAR"/>
+        <result property="datatime" column="dataTime" jdbcType="DATE"/>
+        <result property="riverid" column="riverId" jdbcType="OTHER"/>
+<!--        <result property="paramunit" column="ParamUnit" jdbcType="VARCHAR"/>-->
+<!--        <result property="datavalue" column="dataValue" jdbcType="VARCHAR"/>-->
+        <result property="siteid" column="siteId" jdbcType="OTHER"/>
+<!--        <result property="paramname" column="paramName" jdbcType="VARCHAR"/>-->
+<!--        <result property="hcodeid" column="1HCodeID" jdbcType="OTHER"/>-->
+        <result property="wpcode" column="WPCode" jdbcType="VARCHAR"/>
+        <result property="mnname" column="mnName" jdbcType="VARCHAR"/>
+        <result property="e01001" column="e01001" />
+        <result property="e01002" column="e01002" />
+        <result property="w01001" column="w01001" />
+        <result property="w01003" column="w01003" />
+        <result property="w01009" column="w01009" />
+        <result property="w01010" column="w01010" />
+        <result property="w01014" column="w01014" />
+        <result property="w01016" column="w01016" />
+        <result property="w01022" column="w01022" />
+        <result property="w19011" column="w19011" />
+        <result property="w21001" column="w21001" />
+        <result property="w21003" column="w21003" />
+        <result property="w21011" column="w21011" />
+        <result property="w22008" column="w22008" />
+        <result property="w01019" column="w01019" />
+        <result property="w01023" column="w01023" />
+        <result property="w02007" column="w02007" />
+        <result property="w02005" column="w02005" />
+        <result property="w01024" column="w01024" />
+    </resultMap>
+
+    <insert id="store">
+        insert into hb_water_hourly( "id","areaCode", "dataTime", "riverId"
+                                                     , "siteId", "WPCode", "mnName"
+                                                     , e01001, e01002, w01001, w01003, w01009, w01010, w01014, w01016
+                                                     , w01022, w19011, w21001, w21003, w21011, w22008, w01019, w01023
+                                                     , w02007, w02005, w01024)
+        VALUES (#{id},#{areacode}, #{datatime}, #{riverid}, #{siteid},
+                #{wpcode}, #{mnname},
+                #{e01001}, #{e01002},
+                #{w01001},
+                #{w01003},
+                #{w01009},
+                #{w01010},
+                #{w01014},
+                #{w01016},
+                #{w01022},
+                #{w19011},
+                #{w21001},
+                #{w21003},
+                #{w21011},
+                #{w22008},
+                #{w01019},
+                #{w01023},
+                #{w02007},
+                #{w02005},
+                #{w01024})
+        ON CONFLICT ("id") DO NOTHING
+    </insert>
+
+    <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterairservice.entity.WaterQualityWaterstationHourly">
+        select "siteId"
+        from hb_water_hourly where "dataTime" = (select max("dataTime") from hb_water_hourly);
+    </select>
+</mapper>

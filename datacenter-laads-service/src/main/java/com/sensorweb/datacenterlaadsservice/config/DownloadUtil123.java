@@ -18,7 +18,7 @@ import java.io.InputStream;
  */
 @Component
 @Slf4j
-public class DownloadUtil {
+public class DownloadUtil123 {
 
     @Autowired
     private OkHttpClient okHttpClient;

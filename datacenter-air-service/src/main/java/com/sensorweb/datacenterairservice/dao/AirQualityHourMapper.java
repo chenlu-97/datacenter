@@ -41,4 +41,5 @@ public interface AirQualityHourMapper {
 
     List<AirQualityHour> selectMaxTimeData();
 
+    int update(AirQualityHour airQualityHour);
 }

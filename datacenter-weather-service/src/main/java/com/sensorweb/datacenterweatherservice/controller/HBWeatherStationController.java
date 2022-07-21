@@ -21,8 +21,10 @@ public class HBWeatherStationController {
     HBWeatherStation hbWeatherStation;
     @Autowired
     HBWeatherStationMapper hbWeatherStationMapper;
+
+
     @GetMapping(value = "insertHBWeatherStation")
-    public void insertHBWeatherStation(@ApiParam(name = "time", value = "当前页码") @Param("time") String time)
+    public void insertHBWeatherStation(@ApiParam(name = "time", value = "时间") @Param("time") String time)
     {
 
         try {

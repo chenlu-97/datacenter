@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacenterweatherservice.dao.ChinaWeatherMapper">
+    <sql id="insertFields">
+    station_id,lng,lat,win_s_avg,tem,rhu,prs,vis,time,prs_sea,prs_max,prs_min,tem_max,tem_min,rhu_min,vap,pre_1h,win_d_inst_max,win_s_max,win_d_s_max,win_s_avg_2mi,win_d_avg_2mi,win_s_inst_max,windpower
+    </sql>
+
+    <sql id="selectFields">
+    id,station_id,lng,lat,win_s_avg,tem,rhu,prs,vis,time,prs_sea,prs_max,prs_min,tem_max,tem_min,rhu_min,vap,pre_1h,win_d_inst_max,win_s_max,win_d_s_max,win_s_avg_2mi,win_d_avg_2mi,win_s_inst_max,windpower
+    </sql>
+
+    <insert id="insertData" parameterType="com.sensorweb.datacenterweatherservice.entity.ChinaWeather2" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO china_meteorological_network (<include refid="insertFields"></include>)
+        VALUES (#{stationId},#{lng},#{lat},#{win_s_avg},#{tem},#{rhu},#{prs},#{vis},#{time},#{prs_sea},#{prs_max},#{prs_min},#{tem_max},#{tem_min},#{rhu_min},#{vap},#{pre_1h},#{win_d_inst_max},#{win_s_max},#{win_d_s_max},#{win_s_avg_2mi},#{win_d_avg_2mi},#{win_s_inst_max},#{windPower})
+    </insert>
+    <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterweatherservice.entity.ChinaWeather2">
+        select <include refid="selectFields"></include>
+        from china_meteorological_network where time = (select max(time) from china_meteorological_network);
+    </select>
+
+
+    <resultMap id="chinaWeather2" type="com.sensorweb.datacenterweatherservice.entity.ChinaWeather2">
+        <result column="station_id" property="stationId"/>
+        <result column="lng" property="lng"/>
+        <result column="lat" property="lat"/>
+        <result column="win_s_avg" property="win_s_avg"/>
+        <result column="tem" property="tem"/>
+        <result column="rhu" property="rhu"/>
+        <result column="prs" property="prs"/>
+        <result column="vis" property="vis"/>
+        <result column="time" property="time"/>
+        <result column="prs_sea" property="prs_sea"/>
+        <result column="prs_max" property="prs_max"/>
+        <result column="prs_min" property="prs_min"/>
+        <result column="tem_max" property="tem_max"/>
+        <result column="tem_min" property="tem_min"/>
+        <result column="rhu_min" property="rhu_min"/>
+        <result column="vap" property="vap"/>
+        <result column="pre_1h" property="pre_1h"/>
+        <result column="win_d_inst_max" property="win_d_inst_max"/>
+        <result column="win_s_max" property="win_s_max"/>
+        <result column="win_d_s_max" property="win_d_s_max"/>
+        <result column="win_s_avg_2mi" property="win_s_avg_2mi"/>
+        <result column="win_d_avg_2mi" property="win_d_avg_2mi"/>
+        <result column="win_s_inst_max" property="win_s_inst_max"/>
+        <result column="windpower" property="windPower"/>
+    </resultMap>
+
+
+</mapper>

@@ -2,13 +2,13 @@ package com.sensorweb.datacenterlaadsservice.service;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.sensorweb.datacenterlaadsservice.config.DownloadUtil;
 import com.sensorweb.datacenterlaadsservice.config.OkHttpUtil;
 import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
 import com.sensorweb.datacenterlaadsservice.entity.GLDAS;
 import com.sensorweb.datacenterlaadsservice.entity.HttpsUrlValidator;
 import com.sensorweb.datacenterlaadsservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterlaadsservice.feign.SensorFeignClient;
+import com.sensorweb.datacenterlaadsservice.util.DownloadUtil;
 import com.sensorweb.datacenterlaadsservice.util.LAADSConstant;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +60,9 @@ public class InsertGLDASService {
 
     @Autowired
     OkHttpUtil okHttpUtil;
+
+    @Autowired
+    DownloadUtil downloadUtil;
 
     @Scheduled(cron = "00 30 12 20 * ?")//每月20号的12：30分执行一次
     public void insertGLDASData() {
@@ -118,14 +121,24 @@ public class InsertGLDASService {
                 String fileName;
                 fileName = "GLDAS_NOAH025_3H.A" + date +"."+ moment + ".021.nc4";
                 downloadurl = "https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/" + year  + "/" +day+ "/" + fileName;
-                String localPath = downloadFromUrl(downloadurl, fileName, savePath + File.separator + year + File.separator + mounth);
+//                String[] headers = new  String[4];
+//                headers[0] = "Host";
+//                headers[1] = "hydro1.gesdisc.eosdis.nasa.gov";
+//                headers[2] = "Cookie";
+//                headers[3] = "nasa_gesdisc_data_archive=3rxxwfeDT1ektQrt07auFY7W5TrVIaSKkp5IMs+fiRmj0RSdKC8qvIwAPwNb9QiKb4WxiVubgbFonzxejxiA/zHpTkVrXLRpYa9DpxjHvwYsqohRXdSWcL6Btkw9zXeslavwZ3Ssvut/hWQ3IbUkHA==; 191111097613312241618150851714=s%3AxHQf7mE5NbCl8ogP5AsutLuqu7BGJMbI.wAk7uNv84kYiilFLLJsM%2F6MiyNufQgXRT1DOe54EaYw; _gid=GA1.2.40201582.1655280106; _ga=GA1.1.936238580.1654653312; _ga_XXXXXXXXXX=GS1.1.1655280109.1.0.1655280153.0; _dd_s=logs=1&id=a3b84765-f14c-40e9-b915-75c2086f2f50&created=1655280153396&expire=1655281258506";
+////                headers[3] = LAADSConstant.Cookie;
+//                System.out.println(headers);
+//                System.out.println(downloadurl);
+//                String localPath = downloadUtil.downloadBySysc(downloadurl, headers, savePath + year + File.separator + mounth, fileName);
+                String localPath = downloadFromUrl(downloadurl, fileName, savePath +  year + File.separator + mounth);
                 int i = 0; //防止失败，重试2次
                 while (localPath.equals("fail")) {
                     i++;
                     if (i > 1) {
                         break;
                     }
-                    localPath = downloadFromUrl(downloadurl, fileName, savePath +File.separator+year + File.separator + mounth);
+                    localPath = downloadFromUrl(downloadurl, fileName, savePath +  year + File.separator + mounth);
+//                    localPath  = downloadUtil.downloadBySysc(downloadurl, headers, savePath + File.separator + year + File.separator + mounth, fileName);
                 }
                 GLDAS gldas = new GLDAS();
                 if (localPath != "fail" && localPath != "none") {
@@ -217,7 +230,7 @@ public class InsertGLDASService {
                 fos.write(getData);
                 fos.close();
                 inputStream.close();
-                res = savePath + fileName;
+                res = savePath + File.separator + fileName;
             }
         } catch (Exception e) {
             Matcher error = Pattern.compile("java.io.FileNotFoundException").matcher(e.toString());
