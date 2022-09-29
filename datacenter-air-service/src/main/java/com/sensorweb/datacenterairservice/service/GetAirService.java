@@ -1,9 +1,6 @@
 package com.sensorweb.datacenterairservice.service;
 
-import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
-import com.sensorweb.datacenterairservice.dao.AirStationMapper;
-import com.sensorweb.datacenterairservice.dao.ChinaAirQualityHourMapper;
-import com.sensorweb.datacenterairservice.dao.TWEPAMapper;
+import com.sensorweb.datacenterairservice.dao.*;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.AirStationModel;
 import com.sensorweb.datacenterairservice.entity.ChinaAirQualityHour;
@@ -47,6 +44,13 @@ public class GetAirService {
     @Autowired
     private ChinaAirQualityHourMapper chinaAirQualityHourMapper;
 
+    @Autowired
+    RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
+
+    @Autowired
+    WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
+
+
 
 
 
@@ -69,9 +73,11 @@ public class GetAirService {
     public int getCHAirQualityHourNum() {
         return chinaAirQualityHourMapper.selectNum();
     }
-    public int getTWAirQualityHourNum() {
-        return twepaMapper.selectNum();
-    }
+    public int getTWAirQualityHourNum() {return  twepaMapper.selectNum();}
+
+    public int getSuperAirQualityHourNum() {return  rawDataSuperStationHourlyMapper.selectNum();}
+
+    public int getWaterAirQualityHourNum() {return waterQualityWaterstationHourlyMapper.selectNum();}
 
 
 

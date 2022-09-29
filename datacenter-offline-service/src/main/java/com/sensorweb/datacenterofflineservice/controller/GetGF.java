@@ -247,9 +247,15 @@ public class GetGF {
     @ApiOperation("查询影像数据的空间范围")
     @GetMapping(value = "getGFCoordinates")
     @ResponseBody
-    public List<Map> getGFCoordinates() {
+    public List<Map> getGFCoordinates(@RequestParam(value="pageNum", required=false) Integer pageNum,
+                                      @RequestParam(value="pageSize", required=false) Integer pageSize) {
         List<Map> res = new ArrayList<>();
-        List<GF> info =  getGFService.selectGF();
+        List<GF> info = new ArrayList<>();
+        if(pageNum!=null && pageSize!=null ) {
+             info = getGFService.selectGF123(pageNum, pageSize);
+        }else{
+            info = getGFService.selectGF();
+        }
         if(info.size()>0&& info !=null) {
             for (GF gf : info) {
                 Map map = new LinkedHashMap();

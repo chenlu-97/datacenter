@@ -19,9 +19,9 @@ public class downloadWater implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str="2022-07-07 10:00:00";
+            String str="2022-09-13 15:00:00";
             //结束时间
-            String str1="2022-07-22 01:00:00";
+            String str1="2022-09-14 12:00:00";
             System.out.println("-----------"+str+"-----------"+str1+"------------湖北省水质站点---------");
             //2022-07-07 10:00:00 之前的没有接入
             WaterQualityWaterstationHourlyService waterQualityWaterstationHourlyService = (WaterQualityWaterstationHourlyService) ApplicationContextUtil.getBean("waterQualityWaterstationHourlyService");

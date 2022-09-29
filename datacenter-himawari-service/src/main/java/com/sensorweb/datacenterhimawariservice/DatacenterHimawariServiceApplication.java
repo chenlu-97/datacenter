@@ -15,7 +15,7 @@ public class DatacenterHimawariServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(DatacenterHimawariServiceApplication.class, args);
         new Thread(new downloadHimawari()).start();
-//        new Thread(new downloadHimawari1()).start();
+        new Thread(new downloadHimawari1()).start();
     }
 
 }

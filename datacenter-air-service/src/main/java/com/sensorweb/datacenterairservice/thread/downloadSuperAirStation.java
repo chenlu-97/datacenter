@@ -17,9 +17,9 @@ public class downloadSuperAirStation implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str = "2022-07-21 23:00:00";
+            String str="2022-04-01 00:00:00";
             //结束时间
-            String str1 = "2022-07-22 00:00:00";
+            String str1="2022-05-01 00:00:00";
             //2022-07-07 10:00:00 之前的没有接入
             RawDataSuperStationHourlyService rawDataSuperStationHourlyService = (RawDataSuperStationHourlyService) ApplicationContextUtil.getBean("rawDataSuperStationHourlyService");
             log.info("------ 开始下载" + str + "到" + str1 + "的空气超级站-----");
@@ -43,7 +43,8 @@ public class downloadSuperAirStation implements Runnable{
                 } else {
                     System.out.println("空气超级站接入时间: " + begin + "Status: Fail");
                 }
-                start.add(Calendar.DAY_OF_MONTH, 1);
+                start.add(Calendar.DAY_OF_MONTH,1);
+//                start.add(Calendar.DAY_OF_MONTH, 1);
                 Thread.sleep(2 * 1000); //下载太快会断开连接，这里休息2秒
             }
 

@@ -28,7 +28,7 @@ topleftlongitude,toprightlatitude,toprightlongitude,bottomrightlatitude,bottomri
     </select>
 
     <select id="selectGF" resultMap="GF">
-        SELECT *
+        SELECT <include refid="selectFields"></include>
         FROM gf
         ORDER BY query_time DESC
     </select>
@@ -125,6 +125,11 @@ topleftlongitude,toprightlatitude,toprightlongitude,bottomrightlatitude,bottomri
                 AND ST_Intersects(geom, ST_GeomFromText(#{wkt}, 4326)) = true
             </if>
         </if>
+    </select>
+    <select id="selectGF123" resultType="com.sensorweb.datacenterofflineservice.entity.GF">
+        SELECT <include refid="selectFields"></include>
+        FROM gf ORDER BY query_time DESC
+        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
 

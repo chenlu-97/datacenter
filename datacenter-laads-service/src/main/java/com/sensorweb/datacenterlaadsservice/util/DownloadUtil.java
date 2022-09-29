@@ -218,7 +218,7 @@ public class DownloadUtil {
                         int process = (int) Math.floor(((double) len / total) * 100);
                         if (process > progressbar) {
                             progressbar = process;
-                            bar.show(progressbar);
+//                            bar.show(progressbar);
                         }
                     }
                     fos.flush();

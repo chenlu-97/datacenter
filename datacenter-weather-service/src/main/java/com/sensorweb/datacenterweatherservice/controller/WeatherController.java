@@ -1,9 +1,13 @@
 package com.sensorweb.datacenterweatherservice.controller;
 
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import com.sensorweb.datacenterweatherservice.dao.ChinaWeatherMapper;
+import com.sensorweb.datacenterweatherservice.dao.HBWeatherStationMapper;
+import com.sensorweb.datacenterweatherservice.dao.TianXingZhouMapper;
 import com.sensorweb.datacenterweatherservice.dao.WeatherMapper;
 import com.sensorweb.datacenterweatherservice.entity.ChinaWeather;
 import com.sensorweb.datacenterweatherservice.service.GetWeatherInfo;
+import com.sensorweb.datacenterweatherservice.service.HBWeatherStationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +34,15 @@ public class WeatherController {
     @Autowired
     private GetWeatherInfo getWeatherInfo;
 
+    @Autowired
+    private ChinaWeatherMapper chinaWeatherMapper;
+
+    @Autowired
+    private HBWeatherStationMapper hbWeatherStationMapper;
+
+    @Autowired
+    private TianXingZhouMapper tianXingZhouMapper;
+
 
     @ApiOperation("查询气象数据数据总量")
     @GetMapping(path = "getWeatherNumber")
@@ -37,6 +50,40 @@ public class WeatherController {
         int count = weatherMapper.selectNum();
         return count;
     }
+
+
+
+    @ApiOperation("查询湖北气象数据数据总量")
+    @GetMapping(path = "getHBWeatherNumber")
+    public int getHBWeatherNum() {
+        int count = hbWeatherStationMapper.selectNum();
+        return count;
+    }
+
+    @ApiOperation("查询全国气象数据数据总量")
+    @GetMapping(path = "getCHWeatherNumber")
+    public int getCHWeatherNum() {
+        int count = chinaWeatherMapper.selectNum();
+        return count;
+    }
+
+    @ApiOperation("查询天新洲数据数据总量")
+    @GetMapping(path = "getTXZNumber")
+    public int getTXZNumber() {
+        int count = tianXingZhouMapper.selectNum();
+        return count;
+    }
+
+
+
+    @ApiOperation("查询天新洲数据数据总量")
+    @GetMapping(path = "getWeatherNumberByTime")
+    public int getWeatherNumberByTime() {
+        int count = tianXingZhouMapper.selectNum();
+        return count;
+    }
+
+
 
 
     @GetMapping("getAllWeather")

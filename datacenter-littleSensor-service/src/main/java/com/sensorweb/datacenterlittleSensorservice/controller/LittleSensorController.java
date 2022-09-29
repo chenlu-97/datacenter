@@ -9,9 +9,12 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -27,6 +30,15 @@ public class LittleSensorController {
     @GetMapping(path = "getLittleSensorNumber")
     public int getLittleSensorNumber() {
         int count = littleSensorMapper.selectNum();
+        return count;
+    }
+
+
+    @ApiOperation("查询数据接入数量")
+    @GetMapping(path = "getNumberByTime")
+    @ResponseBody
+    public Integer getNumberByTime(@RequestParam(value = "startTime") Instant startTime, @RequestParam(value = "endTime") Instant endTime) {
+        int count = littleSensorMapper.selectNumByTime(startTime,endTime);
         return count;
     }
 

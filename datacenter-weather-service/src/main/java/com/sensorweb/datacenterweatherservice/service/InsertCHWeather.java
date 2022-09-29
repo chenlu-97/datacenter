@@ -49,9 +49,10 @@ public class InsertCHWeather {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 20 0/1 * * ?") //每个小时的20分开始接入
+    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的20分开始接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -60,27 +61,26 @@ public class InsertCHWeather {
                 try {
                     flag = getWeatherInfo();
                     if (flag) {
-                        log.info("接入中国地面气象站逐小时数据时间: " + dateTime.toString() + "Status: Success");
-                        System.out.println("接入中国地面气象站逐小时数据时间: " + dateTime.toString() + "Status: Success");
-                        DataCenterUtils.sendMessage("CH_WEATHER_"+dateTime.toString(), "站网-中国气象","这是一条接入中国地面气象站逐小时数据");
+                        log.info("接入中国地面气象站逐小时数据时间: " + date + "Status: Success");
+                        System.out.println("接入中国地面气象站逐小时数据时间: " + date + "Status: Success");
+                        DataCenterUtils.sendMessage("CH_WEATHER_"+date, "站网-中国气象","这是一条接入中国地面气象站逐小时数据");
                         int num = chinaWeatherMapper.selectMaxTimeData().size();
-                        if(num!=2169){
+                        if(num<2169){
                             int gap = 2169-num;
-                            String mes = "接入时间 ："+ dateTime+"-----接入中国地面气象站逐小时数据部分缺失（站点数据应为2169），现在接入为：" + num +"差值为"+ gap;
+                            String mes = "接入时间 ："+ date+"-----接入中国地面气象站逐小时数据部分缺失（站点数据应为2169），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
 //                            SendMail.sendemail(mes);
-                            SendException("CH_WEATHER",dateTime.toString(),mes);
+                            SendException("CH_WEATHER",date,mes);
                         }
                     }
-                    Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
-                    log.info("接入中国地面气象站逐小时数据时间: " + dateTime.toString() + "Status: Fail");
-                    String mes = "接入中国地面气象站逐小时数据接入失败！！----失败时间 ："+ dateTime;
+                    log.info("接入中国地面气象站逐小时数据时间: " + date + "Status: Fail");
+                    String mes = "接入中国地面气象站逐小时数据接入失败！！----失败时间 ："+ date;
                     // 发送邮件
 //                    SendMail.sendemail(mes);
-                    SendException("CH_WEATHER",dateTime.toString(),mes);
+                    SendException("CH_WEATHER",date,mes);
                 }
             }
         }).start();

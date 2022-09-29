@@ -120,7 +120,6 @@ public class GetObservationExpandService {
     }
 
     public long getFileSize(final File file) {
-
         // 递归方式 计算文件的大小
             if (file.isFile())
                 return file.length();
@@ -130,6 +129,5 @@ public class GetObservationExpandService {
                 for (final File child : children)
                     total += getFileSize(child);
             return total;
-
     }
 }

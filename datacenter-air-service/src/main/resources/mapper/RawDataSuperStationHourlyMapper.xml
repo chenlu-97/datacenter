@@ -34,4 +34,14 @@
         select "ST"
         from "wuhanCC_super_station_hourly" where "TIMES" = (select max("TIMES") from "wuhanCC_super_station_hourly");
     </select>
+
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM "wuhanCC_super_station_hourly"
+    </select>
+    <select id="selectByTime" resultType="java.lang.Integer">
+        SELECT  count(*)
+        FROM "wuhanCC_super_station_hourly"
+        WHERE times <![CDATA[>=]]> #{begin} AND times <![CDATA[<=]]> #{end}
+    </select>
 </mapper>

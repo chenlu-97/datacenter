@@ -115,7 +115,11 @@
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
     </select>
-
+    <select id="selectNumByTime" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM surveying_vessel
+        WHERE datatime <![CDATA[>=]]> #{begin} AND datatime <![CDATA[<=]]> #{end}
+    </select>
 
 
     <update id="UpdateSpaByTime" parameterType="SurveyingVessel">

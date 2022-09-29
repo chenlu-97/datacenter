@@ -27,6 +27,7 @@ public interface AirQualityHourMapper {
 
     int selectNum();
 
+
     int selectNumberByIds(List<String> uniquecode);
 
     List<AirQualityHour> selectByTemporal(@Param("begin") Instant begin, @Param("end") Instant end);

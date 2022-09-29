@@ -72,6 +72,7 @@ public class InsertTWEPA implements AirConstant {
     @Scheduled(cron = "0 30 0/1 * * ?") //每个小时的30分开始接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -82,25 +83,25 @@ public class InsertTWEPA implements AirConstant {
                     String document = getDocumentByGZip(path);
                     flag = insertTwEPAInfoBatch(getEPAInfo(document));
                     if (flag) {
-                        log.info("台湾EPA接入时间: " + dateTime.toString() + "Status: Success");
-                        DataCenterUtils.sendMessage("TW_AIR"+ dateTime.toString(), "站网-台湾空气质量","这是一条获取的台湾省空气质量数据");
-                        System.out.println("台湾EPA接入时间: " + dateTime.toString() + "Status: Success");
+                        log.info("台湾EPA接入时间: " + date + "Status: Success");
+                        DataCenterUtils.sendMessage("TW_AIR"+ date, "站网-台湾空气质量","这是一条获取的台湾省空气质量数据");
+                        System.out.println("台湾EPA接入时间: " + date + "Status: Success");
                         int num = twepaMapper.selectMaxTimeData().size();
                         if(num!=85){
                             int gap = 85-num;
-                            String mes = "接入时间 ："+ dateTime+ "-----台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap;
+                            String mes = "接入时间 ："+ date+ "-----台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
 //                            SendMail.sendemail(mes);
-                            SendException("TW_AIR",dateTime.toString(),mes);
+                            SendException("TW_AIR",date,mes);
                         }
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
-                    log.info("台湾EPA接入时间: " + dateTime.toString() + "Status: Fail");
-                    String mes = "台湾EPA接入失败！！----失败时间 ："+ dateTime;
+                    log.info("台湾EPA接入时间: " +date + "Status: Fail");
+                    String mes = "台湾EPA接入失败！！----失败时间 ："+ date;
                     // 发送邮件
 //                    SendMail.sendemail(mes);
-                    SendException("TW_AIR",dateTime.toString(),mes);
+                    SendException("TW_AIR",date,mes);
                     System.out.println(e.getMessage());
                 }
             }

@@ -17,6 +17,7 @@ import com.sensorweb.datacenterairservice.util.OkHttpUtils.OkHttpRequest;
 import com.sensorweb.datacenterairservice.util.timeTransfer.SecondAndDate;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sensorweb.datacenterutil.utils.SendMail;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,12 +28,14 @@ import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -50,6 +53,8 @@ import java.util.*;
 @Slf4j
 @Service
 @EnableScheduling
+@Component
+@RequiredArgsConstructor
 public class InsertAirService extends Thread implements AirConstant {
     @Autowired
     private AirQualityHourMapper airQualityHourMapper;
@@ -65,9 +70,6 @@ public class InsertAirService extends Thread implements AirConstant {
 
     @Autowired
     OkHttpUtil okHttpUtil;
-
-
-
 
 
 
@@ -88,28 +90,28 @@ public class InsertAirService extends Thread implements AirConstant {
                     try {
                         flag = !insertHourDataByHour(time);
                         if (!flag) {
-                            log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Success");
+                            log.info("湖北省监测站接入时间: " + time + "Status: Success");
                             DataCenterUtils.sendMessage("HB_AIR"+ time, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据");
-                            System.out.println("湖北省监测站接入时间: " + dateTime.toString() + "Status: Success");
+                            System.out.println("湖北省监测站接入时间: " + time + "Status: Success");
                             int num = airQualityHourMapper.selectMaxTimeData().size();
                             if(num!=273){
                                 int gap = 273-num;
-                                String mes = "接入时间 ："+ dateTime+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;
+                                String mes = "接入时间 ："+ time+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;
                                 // 发送邮件
 //                                SendMail.sendemail(mes);
-                                SendException("HB_AIR",dateTime.toString(),mes);
+                                SendException("HB_AIR",time,mes);
                             }
                         } else {
                             System.out.println("湖北省监测站，等待中...");
                         }
-                        Thread.sleep(1 * 60 * 1000);
+                        Thread.sleep(2 * 60 * 1000);
                     } catch (Exception e) {
                         log.error(e.getMessage());
-                        log.info("湖北省监测站接入时间: " + dateTime.toString() + "Status: Fail");
-                        String mes = "湖北省监测站接入失败！！----失败时间 ："+ dateTime;
+                        log.info("湖北省监测站接入时间: " + time + "Status: Fail");
+                        String mes = "湖北省监测站接入失败！！----失败时间 ："+ time;
                         // 发送邮件
 //                        SendMail.sendemail(mes);
-                        SendException("HB_AIR",dateTime.toString(),mes);
+                        SendException("HB_AIR",time,mes);
                         break;
                     }
                 }
@@ -121,7 +123,7 @@ public class InsertAirService extends Thread implements AirConstant {
     /**
      * 每小时接入一次数据
      */
-//    @Scheduled(cron = "0 35 0/1 * * ?") //每个小时的35分开始接入
+//    @Scheduled(cron = "0 40 0/1 * * ?") //每个小时的35分开始接入
 //    @PostConstruct
     public void insertDataByHour2() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
@@ -170,7 +172,6 @@ public class InsertAirService extends Thread implements AirConstant {
     public JSONArray getInfo(String start, String end,String Ids){
         long startSecond = SecondAndDate.datatosecond(start);
         long endSecond = SecondAndDate.datatosecond(end);
-
 
         JSONObject body_content = new JSONObject();
 

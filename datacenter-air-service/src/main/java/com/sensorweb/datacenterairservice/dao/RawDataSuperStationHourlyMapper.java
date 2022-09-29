@@ -3,7 +3,9 @@ package com.sensorweb.datacenterairservice.dao;
 
 import com.sensorweb.datacenterairservice.entity.RawDataSuperStationHourly;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,4 +20,8 @@ public interface RawDataSuperStationHourlyMapper {
     int store(RawDataSuperStationHourly rawDataSuperStationHourly);
 
     List<RawDataSuperStationHourly> selectMaxTimeData();
+
+    int selectNum();
+
+    int selectByTime(@Param("begin") Instant begin, @Param("end") Instant end);
 }

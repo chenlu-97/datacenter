@@ -47,15 +47,15 @@ public class RawDataSuperStationHourlyService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 45 0/1 * * ?") //每个小时的35分开始接入
+    @Scheduled(cron = "0 10 0/1 * * ?") //每个小时的35分开始接入
 //    @PostConstruct
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00").withZone(ZoneId.of("Asia/Shanghai"));
-        LocalDateTime endDate = dateTime.plusMinutes(14);
-        String start = formatter.format(dateTime);
-        String end = formatter1.format(endDate);
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
+//        LocalDateTime endDate = dateTime.plusMinutes(14);
+        String start = formatter.format(dateTime.minusHours(1));
+        String end = formatter1.format(dateTime.minusMinutes(10).minusSeconds(1));
 //        String start = "2021-01-01 00:00:00";
 //        String end = "2022-07-1 00:00:00";
         new Thread(new Runnable() {
@@ -67,17 +67,17 @@ public class RawDataSuperStationHourlyService {
                         flag = accessinforming(start,end);
                         if (flag) {
                             log.info("空气超级站接入时间: " + start + "Status: Success");
-//                            DataCenterUtils.sendMessage("SuperAirStation"+ start, "站网-空气超级站点","这是一条省站推送的空气超级站点数据");
+                            DataCenterUtils.sendMessage("SuperAirStation"+ start, "站网-空气超级站点","这是一条省站推送的空气超级站点数据");
                             System.out.println("空气超级站接入时间: " + start + "Status: Success");
                         } else {
-                            System.out.println("空气超级站接入时间: " + start.toString() + "Status: Fail");
+                            System.out.println("空气超级站接入时间: " + start + "Status: Fail");
                         }
                     } catch (Exception e) {
                         log.error(e.getMessage());
-                        log.info("空气超级站接入时间: " + start.toString() + "Status: Fail");
+                        log.info("空气超级站接入时间: " + start + "Status: Fail");
                         String mes = "空气超级站接入失败！！----失败时间 ："+ start;
                         // 发送邮件
-                        SendException("SuperAirStation",start.toString(),mes);
+                        SendException("SuperAirStation",start,mes);
                     }
 
             }
@@ -95,12 +95,12 @@ public class RawDataSuperStationHourlyService {
         HashMap content2 = new HashMap<String, String>();
         content2.put("size", "10000000");
         content2.put("page", "0");
-        for (Object s : Url.SuperStationCode) {
+//        for (Object s : Url.SuperStationCode) {
             JSONArray access_res = new JSONArray();
             try {
                 JSONObject body_content = new JSONObject();
                 HashMap content1 = new HashMap<String, String>();
-                content1.put("st", s);
+                content1.put("st","SW4200001,SW4201001,SW4202001,SW4205001,SW4206001,SW4207001,SW4208001,SW4209001,SW4209002,SW4211001,SW4212001" );
                 content1.put("startTime", startSecond + "");
                 content1.put("endTime", endSecond + "");
 
@@ -130,7 +130,7 @@ public class RawDataSuperStationHourlyService {
                 }
             }
 
-        }
+//        }
         return flag>0 ;
     }
 
@@ -151,4 +151,9 @@ public class RawDataSuperStationHourlyService {
             System.out.println("发送失败！！！" +res);
         }
     }
+
+
+
+
+
 }

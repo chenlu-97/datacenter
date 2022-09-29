@@ -1,7 +1,5 @@
 package com.sensorweb.datacenterairservice.controller;
-import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
-import com.sensorweb.datacenterairservice.dao.ChinaAirQualityHourMapper;
-import com.sensorweb.datacenterairservice.dao.TWEPAMapper;
+import com.sensorweb.datacenterairservice.dao.*;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.ChinaAirQualityHour;
 import com.sensorweb.datacenterairservice.entity.TWEPA;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -40,6 +39,12 @@ public class GetAirQualityHour {
     @Autowired
     private InsertTWEPA insertTWEPA;
 
+    @Autowired
+    private RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
+
+    @Autowired
+    private WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
+
 
 
     @ApiOperation("查询24小时的Air数据接入数量")
@@ -51,11 +56,14 @@ public class GetAirQualityHour {
         Long time2  = Long.valueOf(start.plusSeconds(9*60*60).toString().replace("-","").replace("T","").replace(":","").replace("Z",""));
         int count1 =airQualityHourMapper.selectByTime(start, start.plusSeconds(60*60));
             int count2 =twepaMapper.selectByTime(start, start.plusSeconds(60*60));
-            int count3 = chinaAirQualityHourMapper.selectByTime(time1, time2);
+            int count3 = chinaAirQualityHourMapper.selectByTime2(time1, time2);
             int count = count1+count2+count3;
 
         return count;
     }
+
+
+
 
 
     @GetMapping(value = "getAllAirQualityHourly")
@@ -149,23 +157,66 @@ public class GetAirQualityHour {
         return getAirService.getAirQualityHourlyNumberByID(uniquecode);
     }
 
+    @ApiOperation("查询24小时的站点数据接入数量")
+    @GetMapping(path = "getAirNumberByTime")
+    @ResponseBody
+    public Integer getAirNumberByTime(@RequestParam(value = "start") Instant start,@RequestParam(value = "end") Instant end) {
+       List<Integer> res = new ArrayList<>();
+        CompletableFuture.allOf(
+                CompletableFuture.runAsync(() ->{
+                   res.add(airQualityHourMapper.selectByTime(start, end));
+                }),
+                CompletableFuture.runAsync(() ->{
+                    res.add(twepaMapper.selectByTime(start, end));
+                }),
+                CompletableFuture.runAsync(() ->{
+                    res.add( chinaAirQualityHourMapper.selectByTime(start, end));
+                }),
+                CompletableFuture.runAsync(() ->{
+                    res.add( rawDataSuperStationHourlyMapper.selectByTime(start, end));
+                }),
+                CompletableFuture.runAsync(() ->{
+                    res.add( waterQualityWaterstationHourlyMapper.selectByTime(start, end));
+                })
+        ).join();
+        int count = 0;
+        for(int one:res){
+            count = count +one ;
+        }
+        return count;
+    }
 
-    @ApiOperation("查询气象数据数据总量")
+
+    @ApiOperation("查询湖北数据总量")
     @GetMapping(path = "getHBAirNumber")
     public int getHBAirNum() {
         int count = getAirService.getHBAirQualityHourNum();
         return count;
     }
-    @ApiOperation("查询气象数据数据总量")
+    @ApiOperation("查询全国数据总量")
     @GetMapping(path = "getCHAirNumber")
     public int getCHAirNum() {
         int count = getAirService.getCHAirQualityHourNum();
         return count;
     }
-    @ApiOperation("查询气象数据数据总量")
+    @ApiOperation("查询台湾数据总量")
     @GetMapping(path = "getTWAirNumber")
     public int getTWAirNum() {
         int count = getAirService.getTWAirQualityHourNum();
+        return count;
+    }
+
+    @ApiOperation("查询超级数据总量")
+    @GetMapping(path = "getSuperAirNumber")
+    public int getSuperAirNum() {
+        int count = getAirService.getSuperAirQualityHourNum();
+        return count;
+    }
+
+    @ApiOperation("查询水数据总量")
+    @GetMapping(path = "getWaterNumber")
+    public int getWaterNum() {
+        int count = getAirService.getWaterAirQualityHourNum();
         return count;
     }
 

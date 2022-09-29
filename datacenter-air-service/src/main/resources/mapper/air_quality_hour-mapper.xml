@@ -14,7 +14,7 @@
     <insert id="insertData" parameterType="AirQualityHour">
         INSERT INTO "wuhanCC_air_hourly" (<include refid="insertFields"></include>)
         VALUES (#{stationName}, #{uniqueCode}, #{queryTime}, #{pm25OneHour}, #{pm10OneHour}, #{so2OneHour}, #{no2OneHour}, #{coOneHour}, #{o3OneHour}, #{aqi}, #{primaryEP}, #{aqDegree}, #{aqType} , #{noOneHour},#{noxOneHour}, #{temperature} , #{humidity} , #{windDirection} , #{windSpeed} ,#{visibility})
---         ON CONFLICT ("uniquecode","querytime") DO NOTHING
+        ON CONFLICT ("uniquecode","querytime") DO NOTHING
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">

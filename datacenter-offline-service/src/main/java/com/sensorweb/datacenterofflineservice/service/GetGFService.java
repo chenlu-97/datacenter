@@ -199,4 +199,10 @@ public class GetGFService {
     public List<String> selectGFGeom(Instant begin, Instant end) {
         return gfMapper.selectGFGeom(begin,end);
     }
+
+    public List<GF> selectGF123(Integer pageNum, Integer pageSize) {
+        List<GF> res = gfMapper.selectGF123(pageNum,pageSize);
+        return res;
+
+    }
 }

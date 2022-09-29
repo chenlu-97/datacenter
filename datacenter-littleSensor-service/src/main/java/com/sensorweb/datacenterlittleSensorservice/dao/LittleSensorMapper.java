@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -16,6 +17,8 @@ public interface LittleSensorMapper {
     LittleSensor selectById(int id);
 
     int selectNum();
+
+    int selectNumByTime(@Param("begin") Instant begin, @Param("end") Instant end);
 
     List<LittleSensor> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 

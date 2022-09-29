@@ -23,7 +23,7 @@ public class downloadmodis2 implements Runnable{
         EntryMapper entryMapper = (EntryMapper) ApplicationContextUtil.getBean("entryMapper");
         try {
             String startTime = "2020-01-01 00:00:00";
-            String endTime = "2022-03-15 00:00:00";
+            String endTime = "2022-07-25 00:00:00";
             String product = "MYD11A1";
             //          String bbox = "95,24,123,35"; //长江流域
 //          String bbox = "113.8,29.9,115,32"; //1+8城市圈

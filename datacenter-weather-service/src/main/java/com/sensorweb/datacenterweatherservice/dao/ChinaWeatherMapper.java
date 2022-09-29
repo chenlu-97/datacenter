@@ -16,4 +16,6 @@ public interface ChinaWeatherMapper {
     int insertData(ChinaWeather2 chinaWeather2);
 
     List<ChinaWeather2> selectMaxTimeData();
+
+    int selectNum();
 }

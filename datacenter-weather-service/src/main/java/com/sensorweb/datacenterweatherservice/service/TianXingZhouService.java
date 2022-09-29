@@ -32,25 +32,26 @@ public class TianXingZhouService {
     @Scheduled(cron = "0 */1 * * * ?") //每分钟接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     String flag = getIOTInfo();
                     if (flag.equals("接入成功")) {
-                        log.info("天兴洲综合站接入时间: " + dateTime.toString() + "Status: Success");
-                        System.out.println("天兴洲综合站接入时间: " + dateTime.toString() + "Status: Success");
-                        DataCenterUtils.sendMessage("TianXingZhou_Weather_"+dateTime.toString(), "站网-天兴洲综合站","这是一条武汉天兴洲综合站气象数据的");
+                        log.info("天兴洲综合站接入时间: " + date + "Status: Success");
+                        System.out.println("天兴洲综合站接入时间: " +date + "Status: Success");
+                        DataCenterUtils.sendMessage("TianXingZhou_Weather_"+date, "站网-天兴洲综合站","这是一条武汉天兴洲综合站气象数据的");
                     }else if(flag.equals("接入失败")){
-                        log.info("天兴洲综合站接入时间: " + dateTime.toString() + "Status: fail");
-                        System.out.println("天兴洲综合站接入时间: " + dateTime.toString() + "Status: fail");
+                        log.info("天兴洲综合站接入时间: " + date + "Status: fail");
+                        System.out.println("天兴洲综合站接入时间: " + date + "Status: fail");
                     }else{
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
-                    log.info("天兴洲综合站接入时间: " + dateTime.toString() + "Status: fail");
-                    System.out.println("天兴洲综合站接入时间: " + dateTime.toString() + "Status: fail");
+                    log.info("天兴洲综合站接入时间: " + date+ "Status: fail");
+                    System.out.println("天兴洲综合站接入时间: " + date + "Status: fail");
                 }
             }
         }).start();

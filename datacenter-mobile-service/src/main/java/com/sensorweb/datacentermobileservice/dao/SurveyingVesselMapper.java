@@ -32,4 +32,6 @@ public interface SurveyingVesselMapper {
     List<SurveyingVessel> getTime(SurveyingVessel surveyingVessel);
 
     int updateDataByTime(SurveyingVessel surveyingVessel);
+
+    int selectNumByTime(@Param("begin") Instant begin, @Param("end") Instant end);
 }

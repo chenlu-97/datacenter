@@ -123,10 +123,66 @@
         WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
     </select>
 
-    <select id="selectNum" resultType="java.lang.Integer">
+
+
+    <select id="selectNum1" resultType="java.lang.Integer">
         SELECT count(*)
-        FROM measuring_vehicle
+        FROM measuring_vehicle_vocs
     </select>
+
+    <select id="selectNum2" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_ht
+    </select>
+
+    <select id="selectNum3" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_pm
+    </select>
+
+    <select id="selectNum4" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_air
+    </select>
+
+    <select id="selectNum5" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_spms
+    </select>
+
+
+    <select id="selectNumByTime1" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_vocs
+        WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
+    </select>
+
+    <select id="selectNumByTime2" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_ht
+        WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
+    </select>
+
+    <select id="selectNumByTime3" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_pm
+        WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
+    </select>
+
+    <select id="selectNumByTime4" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_air
+        WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
+    </select>
+
+    <select id="selectNumByTime5" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM measuring_vehicle_spms
+        WHERE datatime <![CDATA[>]]> #{begin} AND datatime <![CDATA[<]]> #{end}
+    </select>
+
+
+
 
     <select id="getVocsByPage" resultMap="measuringVehicle">
         SELECT datatime,lon,lat, air_temperature, air_humidity, air_pressure ,wind_speed , wind_direction,tvocs

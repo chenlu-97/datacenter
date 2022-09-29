@@ -17,9 +17,9 @@ public class downloadWater1 implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str = "2022-07-22 00:00:00";
+            String str="2022-09-06 00:00:00";
             //结束时间
-            String str1 = "2022-07-22 01:00:00";
+            String str1="2022-09-06 12:00:00";
             System.out.println("-----------"+str+"-----------"+str1+"------------湖北省水质站点---------");
             WaterQualityWaterstationHourlyService waterQualityWaterstationHourlyService = (WaterQualityWaterstationHourlyService) ApplicationContextUtil.getBean("waterQualityWaterstationHourlyService");
             SimpleDateFormat format= new  SimpleDateFormat("yyyy-MM-dd HH:ss:00");

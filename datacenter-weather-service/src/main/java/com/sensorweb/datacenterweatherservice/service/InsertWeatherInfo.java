@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -58,9 +59,11 @@ public class InsertWeatherInfo {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 35 0/1 * * ?") //每个小时的35分开始接入
+    @Scheduled(cron = "0 35,50 0/1 * * ?") //每个小时的35和50分开始接入
+//    @PostConstruct
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -69,27 +72,19 @@ public class InsertWeatherInfo {
                 try {
                     flag = insertWeatherInfoBatch(getWeatherInfo());
                     if (flag) {
-                        log.info("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Success");
-                        System.out.println("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Success");
-                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+dateTime.toString(), "站网-武汉城市圈气象","这是一条武汉1+8城市圈气象数据的");
-                        int num = weatherMapper.selectMaxTimeData().size();
-                        if(num!=736){
-                            int gap = 736-num;
-                            String mes = "接入时间 ："+ dateTime+"-----中国气象局接入武汉1+8城市圈的接入部分缺失（站点数据应为736），现在接入为：" + num +"差值为"+ gap;
-                            // 发送邮件
-//                            SendMail.sendemail(mes);
-                            SendException("WH_1+8_Weather",dateTime.toString(),mes);
-                        }
+                        log.info("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Success");
+                        System.out.println("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Success");
+                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+date, "站网-武汉城市圈气象","这是一条武汉1+8城市圈气象数据的");
                     }
                     Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
-                    log.info("中国气象局接入武汉1+8城市圈时间: " + dateTime.toString() + "Status: Fail");
-                    String mes = "中国气象局接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ dateTime;
+                    log.info("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Fail");
+                    String mes = "中国气象局接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
                     // 发送邮件
 //                    SendMail.sendemail(mes);
-                    SendException("WH_1+8_Weather",dateTime.toString(),mes);
+                    SendException("WH_1+8_Weather",date,mes);
                 }
             }
         }).start();
@@ -204,7 +199,7 @@ public class InsertWeatherInfo {
                     chinaWeather.setHumidity(result.getString("005"));
                     chinaWeather.setTemperature(result.getString("002"));
                     chinaWeather.setWp(getWPInfo(chinaWeather.getWindP()));
-                    chinaWeather.setQs(getQSInfo(chinaWeather.getStationId(), result.getString("000")));
+                    chinaWeather.setQs(chinaWeather.getStationId()+getNowTime(result.getString("000")).plusSeconds(8*60*60).toString().replace("-","").replace(" ","").replace(":","").replace("T","").replace("Z",""));
                     res.add(chinaWeather);
                 }
             }
@@ -239,7 +234,7 @@ public class InsertWeatherInfo {
                     chinaWeather.setHumidity(result.getString("005"));
                     chinaWeather.setTemperature(result.getString("002"));
                     chinaWeather.setWp(getWPInfo(chinaWeather.getWindP()));
-                    chinaWeather.setQs(getQSInfo(chinaWeather.getStationId(), result.getString("000")));
+                    chinaWeather.setQs(chinaWeather.getStationId()+getNowTime(result.getString("000")).plusSeconds(8*60*60).toString().replace("-","").replace(" ","").replace(":","").replace("T","").replace("Z",""));
                     res.add(chinaWeather);
                 }
             }
@@ -266,6 +261,7 @@ public class InsertWeatherInfo {
         LocalDateTime localDateTime = LocalDateTime.parse(dateTime, dateTimeFormatter);
         return localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
     }
+
 
     public Instant str2Instant(String time) {
         String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -306,9 +302,9 @@ public class InsertWeatherInfo {
     public String getQSInfo(String stationId, String queryTime) {
         SimpleDateFormat sd = new SimpleDateFormat();// 格式化时间
         sd.applyPattern("yyyyMMddHH:mm:ss");
-        Date date = new Date();// 获取当前时间
+//        Date date = new Date();// 获取当前时间
 //        System.out.println("现在时间：" + sd.format(date));
-        String time = sd.format(date);
+        String time = sd.format(queryTime);
         String time1 = time.substring(0,time.indexOf(":"));
         String time2 = time1+"0000";
         return stationId + time2;

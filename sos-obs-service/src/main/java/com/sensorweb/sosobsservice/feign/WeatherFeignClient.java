@@ -14,9 +14,20 @@ public interface WeatherFeignClient {
     @GetMapping(path = "getWeatherNumber")
     int getWeatherNum();
 
+    @GetMapping(path = "getHBWeatherNumber")
+    int getHBWeatherNum();
+
+    @GetMapping(path = "getCHWeatherNumber")
+    int getCHWeatherNum();
+
+
     @GetMapping(path = "getWeatherCountOfHour")
     Integer getWeatherCountOfHour(@RequestParam(value = "start") Instant start);
 
 
+    @GetMapping(path = "getTXZNumber")
+    int getTXZNumber();
 
+    @GetMapping(path = "getWeatherNumberByTime")
+    int getWeatherNumberByTime(@RequestParam(value = "startTime")Instant startTime, @RequestParam(value = "endime")Instant endTime);
 }

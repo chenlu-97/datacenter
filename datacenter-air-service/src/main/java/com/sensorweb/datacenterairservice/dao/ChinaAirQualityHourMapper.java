@@ -17,7 +17,9 @@ public interface ChinaAirQualityHourMapper {
 
     List<ChinaAirQualityHour> selectByIdAndTime(@Param("stationcode") List<String> stationcode, @Param("time")Long time);
 
-    int selectByTime(@Param("begin") Long begin, @Param("end") Long end);
+    int selectByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int selectByTime2(@Param("begin") Long begin, @Param("end") Long end);
 
     int selectNum();
 

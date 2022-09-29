@@ -1,6 +1,8 @@
 package com.sensorweb.datacenterlaadsservice.controller;
 
 import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
+import com.sensorweb.datacenterlaadsservice.dao.GLDASMapper;
+import com.sensorweb.datacenterlaadsservice.dao.GPM_3IMERGDEMapper;
 import com.sensorweb.datacenterlaadsservice.entity.Entry;
 import com.sensorweb.datacenterlaadsservice.service.InsertLAADSService;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
@@ -26,6 +28,14 @@ public class LAADSController {
 
     @Autowired
     private InsertLAADSService insertLaadsService;
+
+    @Autowired
+    private GLDASMapper gldasMapper;
+
+    @Autowired
+    private GPM_3IMERGDEMapper gpm_3IMERGDEMapper;
+
+
 
     @GetMapping(value = "getLaadsData")
     public Map<String, String> getLaadsData(String satellite, String product, String startTime, String endTime, String bbox) {
@@ -76,8 +86,22 @@ public class LAADSController {
 
     @ApiOperation("查询数据总量")
     @GetMapping(path = "getModisNumber")
-    public int getModisNum() {
+    public int getModisNumber() {
         int count = entryMapper.selectNum();
+        return count;
+    }
+
+    @ApiOperation("查询数据总量")
+    @GetMapping(path = "getGLDASNumber")
+    public int getGLDASNumber() {
+        int count = gldasMapper.selectNum();
+        return count;
+    }
+
+    @ApiOperation("查询数据总量")
+    @GetMapping(path = "getGPMNumber")
+    public int getGPMNumber() {
+        int count = gpm_3IMERGDEMapper.selectNum();
         return count;
     }
 

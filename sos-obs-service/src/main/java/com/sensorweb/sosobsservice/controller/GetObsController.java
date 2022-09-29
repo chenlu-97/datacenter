@@ -6,6 +6,7 @@ import com.sensorweb.sosobsservice.entity.Observation;
 import com.sensorweb.sosobsservice.feign.*;
 import com.sensorweb.sosobsservice.service.GetObservationExpandService;
 import com.sensorweb.sosobsservice.util.ObsConstant;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -95,6 +96,7 @@ public class GetObsController implements ObsConstant {
         return res;
     }
 
+
     @ApiOperation("查询所有的观测数据量")
     @GetMapping(path = "getObservationNum")
     public int getObservationNum() {
@@ -110,7 +112,6 @@ public class GetObsController implements ObsConstant {
 
         return num;
     }
-
 
 
     @ApiOperation("查询各平台的接入数据总量")
@@ -215,7 +216,6 @@ public class GetObsController implements ObsConstant {
         List<Integer> res = new ArrayList<>();
         calendar.add(Calendar.HOUR_OF_DAY, -24);
         for (int i=0; i<24; i++) {
-
             String begin = DataCenterUtils.getFirstDay(calendar);
             String end = DataCenterUtils.getLastDay(calendar);
 

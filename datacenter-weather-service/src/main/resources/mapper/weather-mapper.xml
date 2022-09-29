@@ -14,6 +14,7 @@
     <insert id="insertData" parameterType="ChinaWeather">
         INSERT INTO "wuhanCC_weather_hourly" (<include refid="insertFields"></include>)
         VALUES (#{stationId},#{stationName}, #{queryTime}, #{precipitation}, #{updateTime}, #{pressure}, #{windD}, #{windP}, #{weatherP},#{humidity}, #{temperature}, #{lng},#{lat},#{wp}, #{qs})
+        ON CONFLICT ("QS") DO NOTHING
     </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">

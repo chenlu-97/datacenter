@@ -46,13 +46,15 @@ public class HBWeatherStationService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 20 0/1 * * ?") //每个小时的20分开始接入
+    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
     public void insertDataByHour() {
 //        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHH0000");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, -8);//由于接入时间是utc时间和正常的系统时间差8小时，这里需要减去8小时
         String dateTime = format.format(calendar.getTime());
+        LocalDateTime dateTime1 = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        String date = dateTime1.toString().substring(0,dateTime1.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -63,27 +65,26 @@ public class HBWeatherStationService {
                     flag= getIOTInfo(document);
 //                    flag= getIOTInfo2(document);
                     if (flag) {
-                        log.info("湖北气象接入时间: " + dateTime.toString() + "         Status: Success");
-                        System.out.println("湖北气象接入时间: " + dateTime.toString() + "         Status: Success");
-                        DataCenterUtils.sendMessage("HB_Weather_"+dateTime.toString(), "站网-湖北省气象","这是一条湖北省气象数据的");
+                        log.info("湖北气象接入时间: " + date + "         Status: Success");
+                        System.out.println("湖北气象接入时间: " + date+ "         Status: Success");
+                        DataCenterUtils.sendMessage("HB_Weather_"+date, "站网-湖北省气象","这是一条湖北省气象数据的");
                         int num = hbWeatherStationMapper.selectMaxTimeData().size();
-                        if(num!=2509){
+                        if(num<2509){
                             int gap = 2509-num;
-                            String mes = "接入时间 ："+ dateTime+"-----湖北气象站接入部分缺失（站点数据应为2509个），现在接入为：" + num +"差值为"+ gap;
+                            String mes = "接入时间 ："+ date+"-----湖北气象站接入部分缺失（站点数据应为2509个），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
 //                            SendMail.sendemail(mes);
-                            SendException("HB_Weather",dateTime,mes);
+                            SendException("HB_Weather",date,mes);
                         }
                     }
-                    Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
-                    log.info("湖北气象站接入时间: " + dateTime.toString() + "Status: Fail");
-                    String mes = "湖北气象接入失败！！----失败时间 ："+ dateTime;
+                    log.info("湖北气象站接入时间: " + date + "Status: Fail");
+                    String mes = "湖北气象接入失败！！----失败时间 ："+ date;
                     // 发送邮件
 //                    SendMail.sendemail(mes);
-                    SendException("HB_Weather",dateTime,mes);
+                    SendException("HB_Weather",date,mes);
                 }
             }
         }).start();
@@ -94,8 +95,6 @@ public class HBWeatherStationService {
 
     public String getApiDocument(String time) throws IOException {
         String param = "userId=" + WeatherConstant.HBWEATHER_STATION_ID +"&pwd=" + WeatherConstant.HBWEATHER_STATION_PASSWORD + "&interfaceId=" + WeatherConstant.HBWEATHER_STATION_INTERFACEID + "&times=" + time + "&dataCode=" + WeatherConstant.HBWEATHER_STATION_DATACODE + "&dataFormat=" + WeatherConstant.HBWEATHER_STATION_DATAFORMAT;
-        String s = WeatherConstant.GET_HBWEATHER_STATION_URL+param;
-        System.out.println(s);
         String document = DataCenterUtils.doGet(WeatherConstant.GET_HBWEATHER_STATION_URL, param);
         return document;
     }

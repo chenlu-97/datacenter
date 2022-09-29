@@ -19,7 +19,7 @@ import java.util.List;
 public class downloadHimawari1 implements Runnable{
     @Override
     public void run() {
-        System.out.println("-----2021-01-01 00:00:00---------2022-03-26 00:00:00--------Himawari----");
+        System.out.println("-----2021-01-01 00:00:00---------2022-08-16 00:00:00--------Himawari----");
         HimawariMapper himawariMapper = (HimawariMapper) ApplicationContextUtil.getBean("himawariMapper");
         NewInsertHimawariService newInsertHimawariService = (NewInsertHimawariService) ApplicationContextUtil.getBean("newInsertHimawariService");
         boolean flag ;
@@ -48,7 +48,6 @@ public class downloadHimawari1 implements Runnable{
                         DataCenterUtils.sendMessage("Himawari-8" + timeNew.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据");
                     } else {
                         log.info("Himawari接入时间: ----" + time + "下载失败！！");
-                        return;
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());

@@ -2,9 +2,20 @@ package com.sensorweb.sosobsservice.service;
 
 import com.sensorweb.sosobsservice.dao.ObservationMapper;
 import com.sensorweb.sosobsservice.entity.Observation;
+import com.sensorweb.sosobsservice.feign.*;
+import com.sensorweb.sosobsservice.util.ObsConstant;
+import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.context.XxlJobContext;
+import com.xxl.job.core.handler.annotation.XxlJob;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.vast.ogc.om.IObservation;
 import org.vast.ogc.om.OMUtils;
 import org.vast.ows.OWSException;
@@ -19,17 +30,50 @@ import org.vast.xml.DOMHelperException;
 import org.vast.xml.XMLReaderException;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class GetObservationService {
+    @Autowired
+    private GetObservationExpandService getObservationExpandService;
 
     @Autowired
     private ObservationMapper observationMapper;
+    @Autowired
+    private AirFeignClient airFeignClient;
+    @Autowired
+    private WeatherFeignClient weatherFeignClient;
+    @Autowired
+    private HimawariFeignClient himawariFeignClient;
+    @Autowired
+    private GeeFeignClient geeFeignClient;
+    @Autowired
+    private LaadsFeignClient laadsFeignClient;
+    @Autowired
+    private OfflineFeignClient offlineFeignClient;
+    @Autowired
+    private LittleSensorFeignClient littleSensorFeignClient;
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+
+
+    @XxlJob("TestJob_test")
+    public ReturnT<String> TestJob_test() {
+        XxlJobContext xxlJobContext = XxlJobContext.getXxlJobContext();
+        String jobParam = xxlJobContext.getJobParam();
+        log.info("---------xxlJobTest定时任务执行成功--------{}",jobParam);
+        return ReturnT.SUCCESS;
+    }
+
 
     /**
      * 根据查询获得的O&M数据内容，封装成Response，并以Element的形式返回

@@ -52,15 +52,17 @@ public class WaterQualityWaterstationHourlyService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 45 0/1 * * ?") //每个小时的50分开始接入
+    @Scheduled(cron = "0 10 0/1 * * ?") //每个小时的50分开始接入
 //    @PostConstruct
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00").withZone(ZoneId.of("Asia/Shanghai"));
-        LocalDateTime endDate = dateTime.plusMinutes(14);
-        String start = formatter.format(dateTime);
-        String end = formatter1.format(endDate);
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
+        String start = formatter.format(dateTime.minusHours(1));
+        String end = formatter1.format(dateTime.minusMinutes(10).minusSeconds(1));
+//        LocalDateTime endDate = dateTime.plusMinutes(14);
+//        String start = formatter.format(dateTime);
+//        String end = formatter1.format(endDate);
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -71,7 +73,7 @@ public class WaterQualityWaterstationHourlyService {
                         flag = accessinforming(access_res);
                         if (flag) {
                             log.info("湖北省水质站点接入时间: " + start + "Status: Success");
-//                            DataCenterUtils.sendMessage("HB_water"+ start, "站网-湖北省水质站点","这是一条省站推送的湖北省水质站点数据");
+                            DataCenterUtils.sendMessage("HB_water"+ start, "站网-湖北省水质站点","这是一条省站推送的湖北省水质站点数据");
                             System.out.println("湖北省水质站点接入时间: " + start + "Status: Success");
                         }else{
                             log.info("湖北省水质站点接入时间: " + start + "Status: Fail");
@@ -79,10 +81,10 @@ public class WaterQualityWaterstationHourlyService {
                         }
                     } catch (Exception e) {
                         log.error(e.getMessage());
-                        log.info("湖北省水质站点接入时间: " + start.toString() + "Status: Fail");
+                        log.info("湖北省水质站点接入时间: " + start + "Status: Fail");
                         String mes = "湖北省水质站点接入失败！！----失败时间 ："+ start;
                         // 发送邮件
-                        SendException("HB_Water",start.toString(),mes);
+                        SendException("HB_Water",start,mes);
                 }
             }
         }).start();

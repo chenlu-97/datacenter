@@ -50,7 +50,6 @@ public class downloadHimawari implements Runnable{
                         DataCenterUtils.sendMessage("Himawari-8" + timeNew.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据");
                     } else {
                         log.info("Himawari接入时间: ----" + time + "下载失败！！");
-                        return;
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());

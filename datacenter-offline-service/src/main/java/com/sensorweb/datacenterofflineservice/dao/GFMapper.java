@@ -35,4 +35,6 @@ public interface GFMapper {
     List<String> selectGFGeom(@Param("begin") Instant begin, @Param("end") Instant end);
 
     List<String> selectGFByWKT(@Param("wkt")String wkt, @Param("satelliteID")String satelliteID, @Param("season")String season);
+
+    List<GF> selectGF123(@Param("pageNum")Integer pageNum, @Param("pageSize")Integer pageSize);
 }

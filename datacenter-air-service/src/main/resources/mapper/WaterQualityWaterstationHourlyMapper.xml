@@ -70,4 +70,15 @@
         select "siteId"
         from hb_water_hourly where "dataTime" = (select max("dataTime") from hb_water_hourly);
     </select>
+
+
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM hb_water_hourly
+    </select>
+    <select id="selectByTime" resultType="java.lang.Integer">
+        SELECT  count(*)
+        FROM hb_water_hourly
+        WHERE "dataTime" <![CDATA[>=]]> #{begin} AND "dataTime" <![CDATA[<=]]> #{end}
+    </select>
 </mapper>

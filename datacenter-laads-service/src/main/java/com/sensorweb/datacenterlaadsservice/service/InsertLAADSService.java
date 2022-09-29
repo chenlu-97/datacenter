@@ -6,6 +6,7 @@ import com.sensorweb.datacenterlaadsservice.dao.EntryMapper;
 import com.sensorweb.datacenterlaadsservice.entity.*;
 import com.sensorweb.datacenterlaadsservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterlaadsservice.feign.SensorFeignClient;
+import com.sensorweb.datacenterlaadsservice.util.DownloadUtil;
 import com.sensorweb.datacenterlaadsservice.util.LAADSConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sun.corba.se.spi.logging.CORBALogDomains;
@@ -59,6 +60,9 @@ public class InsertLAADSService implements LAADSConstant {
 
     @Autowired
     OkHttpUtil okHttpUtil;
+
+    @Autowired
+    DownloadUtil downloadUtil;
 
 
 
@@ -699,12 +703,17 @@ public class InsertLAADSService implements LAADSConstant {
                                 if (!file.exists()) {
                                     boolean flag = file.mkdirs();
                                 }
+//                                String[] headers = new  String[2];
+//                                headers[0] = "Authorization";
+//                                headers[1] = LAADS_DOWNLOAD_TOKEN;
+//                                String localPath = downloadUtil.downloadBySysc(entry.getLink(), headers, filePath, fileName);
                                 String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
                                 int i = 0;
                                 while (localPath.equals("fail")) {
                                     if (i > 2) {
                                         break;
                                     }
+//                                    localPath = downloadUtil.downloadBySysc(entry.getLink(), headers, filePath, fileName);
                                     localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
                                     i++;
                                 }

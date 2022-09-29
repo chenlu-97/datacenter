@@ -25,7 +25,7 @@ public class downloadmodis7 implements Runnable{
 //        GPM_3IMERGDEMapper gpm_3IMERGDEMapper = (GPM_3IMERGDEMapper) ApplicationContextUtil.getBean("gpm_3IMERGDEMapper");
         try {
             String startTime = "2020-01-01 00:00:00";
-            String endTime = "2022-06-08 00:00:00";
+            String endTime = "2022-07-25 00:00:00";
             SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Calendar startloop = Calendar.getInstance();
             Calendar endloop = Calendar.getInstance();

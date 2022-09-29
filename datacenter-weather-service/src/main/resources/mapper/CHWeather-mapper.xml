@@ -20,6 +20,11 @@
         from china_meteorological_network where time = (select max(time) from china_meteorological_network);
     </select>
 
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM china_meteorological_network
+    </select>
+
 
     <resultMap id="chinaWeather2" type="com.sensorweb.datacenterweatherservice.entity.ChinaWeather2">
         <result column="station_id" property="stationId"/>

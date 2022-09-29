@@ -21,8 +21,16 @@ public interface AirFeignClient {
     @GetMapping(path = "getTWAirNumber")
     int getTWAirNum();
 
+    @GetMapping(path = "getSuperAirNumber")
+    int getSuperAirNum();
+
+    @GetMapping(path = "getWaterNumber")
+    int getWaterNum();
+
     @GetMapping(path = "getAirCountOfHour")
     Integer getAirCountOfHour(@RequestParam(value = "start") Instant start);
 
 
+    @GetMapping(path = "getAirNumberByTime")
+    int getAirNumberByTime(@RequestParam(value = "startTime")Instant startTime, @RequestParam(value = "endime")Instant endTime);
 }

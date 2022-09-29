@@ -3,8 +3,10 @@ package com.sensorweb.datacenterairservice.dao;
 
 import com.sensorweb.datacenterairservice.entity.WaterQualityWaterstationHourly;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,4 +22,8 @@ public interface WaterQualityWaterstationHourlyMapper {
     int store(WaterQualityWaterstationHourly waterQualityWaterstationHourly);
 
     List<WaterQualityWaterstationHourly> selectMaxTimeData();
+
+    int selectNum();
+
+    int selectByTime(@Param("begin") Instant begin, @Param("end") Instant end);
 }

@@ -22,7 +22,7 @@ public class downloadmodis8 implements Runnable{
         InsertGLDASService insertGLDASService = (InsertGLDASService) ApplicationContextUtil.getBean("insertGLDASService");
         try {
             String startTime = "2020-01-01 00:00:00";
-            String endTime = "2022-03-01 00:00:00";
+            String endTime = "2022-07-25 00:00:00";
             SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Calendar startloop = Calendar.getInstance();
             Calendar endloop = Calendar.getInstance();

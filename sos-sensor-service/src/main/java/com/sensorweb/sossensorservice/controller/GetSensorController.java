@@ -1,6 +1,7 @@
 package com.sensorweb.sossensorservice.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sensorweb.sossensorservice.entity.Platform;
@@ -43,6 +44,7 @@ public class GetSensorController {
     @GetMapping(path = "getCZML")
     public String getCZML() throws IOException {
         String url = "http://www.orbitalpredictor.com/api/predict_orbit";
+//        String ids="40267";
         String ids="40267,39084,25994,27424,39150,40118,43484,44703,41882,40697,38038,49256";
         //Himawari8 40267 landsat8 39084  TERRA  25994  AQUA 27424  GAOFEN 1  39150  GAOFEN 2 40118  GAOFEN 6 43484  GAOFEN 7 44703, FY-4 40697  zy 38038 jilin-2 49256
         SimpleDateFormat sd = new SimpleDateFormat();// 格式化时间
@@ -51,19 +53,28 @@ public class GetSensorController {
         Date date2 = date;
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
-        calendar.add(calendar.DATE,-1);//把日期往后增加一天.整数往后推,负数往前移动
+        calendar.add(calendar.DATE,+1);//把日期往增加一天.整数往后推,负数往前移动
         date=calendar.getTime();   //这个时间就是日期往后推一天的结果
+        System.out.println("start_time：" + sd.format(date2));
+        System.out.println("end_time：" + sd.format(date)); // 输出已经格式化的现在时间(24小时制)
 
-        System.out.println("现在时间：" + sd.format(date2)); // 输出已经格式化的现在时间(24小时制)
-        System.out.println("现在时间：" + sd.format(date));
-
-        String start_time = sd.format(date);
-        String end_time = sd.format(date2);
+        String start_time = sd.format(date2);
+        String end_time = sd.format(date);
         String param = "sats="+ids+"&start="+start_time+"&end="+end_time+"&format=czml&type=orbit";
+//        log.info("开始获取到卫星轨迹");
         String document = DataCenterUtils.doGet(url, param);
         if (document!=null) {
-            return document;
+            JSONArray resJson = (JSONArray) JSONArray.parse(document);
+            JSONObject json = resJson.getJSONObject(0);
+            String json1 = json.get("clock").toString();
+            JSONObject json2 = JSONObject.parseObject(json1);
+            json2.put("multiplier", 1);
+            json.put("clock",json2);
+            resJson.set(0,json);
+//            log.info("卫星轨迹获取成功");
+            return resJson.toString();
         }
+//        log.info("卫星轨迹获取失败");
         return null;
     }
 

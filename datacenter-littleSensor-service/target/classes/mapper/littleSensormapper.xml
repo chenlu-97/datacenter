@@ -49,6 +49,12 @@
         FROM sensors_data
     </select>
 
+    <select id="selectNumByTime" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sensors_data
+        WHERE sample_time <![CDATA[>=]]> #{begin} AND sample_time <![CDATA[<=]]> #{end}
+    </select>
+
     <select id="selectByIds" resultMap="littleSensor" >
         SELECT <include refid="selectFields"></include>
         FROM sensors_data
