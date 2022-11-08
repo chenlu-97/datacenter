@@ -38,7 +38,9 @@ public class SurveyingVesselController {
     public Map<String, Object> getSurveyingVesselByPage(@RequestParam(value="pageNum", required=false) Integer pageNum,
                                                         @RequestParam(value="pageSize", required=false) Integer pageSize,
                                                         @RequestParam(value="startTime" ,required=false)String startTime,
-                                                        @RequestParam(value="endTime" ,required=false)String endTime) {
+                                                        @RequestParam(value="endTime" ,required=false)String endTime,
+                                                        @RequestParam(value="region" ,required=false)String region,
+                                                        @RequestParam(value="id" ,required=false)String id) {
         Map<String, Object> res = new HashMap<>();
         List<SurveyingVessel> info;
         Instant start = null;

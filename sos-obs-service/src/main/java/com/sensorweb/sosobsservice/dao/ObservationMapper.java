@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
@@ -43,4 +44,13 @@ public interface ObservationMapper {
     boolean selectCJSpa(@Param("wkt") String wkt);
 
     List<Observation> selectByTimeAndSpa(@Param("begin") Instant begin, @Param("end") Instant end,@Param("spa") String spa);
+
+
+
+
+    List<String> getDataBySpa(@Param("dataType")String dataType, @Param("spa")String spa, @Param("id")String id);
+
+    List<Map> getDataByPage(@Param("pageNum")int pageNum, @Param("pageSize")int pageSize, @Param("dataType")String dataType,@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") List<String> id);
+
+    int getDataNum(@Param("dataType")String dataType,@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") List<String> id);
 }

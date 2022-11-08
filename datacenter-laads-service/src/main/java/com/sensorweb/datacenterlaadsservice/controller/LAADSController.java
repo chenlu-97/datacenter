@@ -118,7 +118,6 @@ public class LAADSController {
         res.put("Info", info);
         res.put("num",num);
         return res;
-
     }
 
     @ApiOperation("根据id的laads分页查询")
@@ -191,6 +190,7 @@ public class LAADSController {
         }
         return res;
     }
+
 
     @GetMapping(value = "getMerra2DataTest")
     @ResponseBody

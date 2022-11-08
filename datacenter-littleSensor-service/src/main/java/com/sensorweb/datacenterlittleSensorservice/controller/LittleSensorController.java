@@ -2,6 +2,7 @@ package com.sensorweb.datacenterlittleSensorservice.controller;
 
 import com.sensorweb.datacenterlittleSensorservice.dao.LittleSensorMapper;
 import com.sensorweb.datacenterlittleSensorservice.entity.LittleSensor;
+import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,10 @@ public class LittleSensorController {
     @ApiOperation("查询数据接入数量")
     @GetMapping(path = "getNumberByTime")
     @ResponseBody
-    public Integer getNumberByTime(@RequestParam(value = "startTime") Instant startTime, @RequestParam(value = "endTime") Instant endTime) {
-        int count = littleSensorMapper.selectNumByTime(startTime,endTime);
+    public Integer getNumberByTime(@RequestParam(value = "startTime") String startTime, @RequestParam(value = "endTime") String endTime) {
+
+        int count = littleSensorMapper.selectNumByTime(DataCenterUtils.string2Instant(startTime.replace("T"," ").replace("Z","")),
+                DataCenterUtils.string2Instant(endTime.replace("T"," ").replace("Z","")));
         return count;
     }
 
@@ -47,15 +50,24 @@ public class LittleSensorController {
     @ApiOperation("分页查询littleSensor数据")
     @GetMapping(path = "getLittleSensorByPage")
     public Map<String, Object> getLittleSensorByPage(@ApiParam(name = "pageNum", value = "当前页码") @Param("pageNum") int pageNum,
-                                                          @ApiParam(name = "pageSize", value = "每页的数据条目数") @Param("pageSize") int pageSize) {
+                                                     @ApiParam(name = "pageSize", value = "每页的数据条目数") @Param("pageSize") int pageSize,
+                                                     @RequestParam(value="startTime" ,required=false)String startTime,
+                                                     @RequestParam(value="endTime" ,required=false)String endTime,
+                                                     @RequestParam(value="region" ,required=false)String region,
+                                                     @RequestParam(value="id" ,required=false)String id) {
         Map<String, Object> res = new HashMap<>();
-        List<LittleSensor> info = littleSensorMapper.selectByPage(pageNum, pageSize);
-        int count = littleSensorMapper.selectNum();
+        Instant start = null;
+        Instant end = null;
+        if(endTime!=null && startTime!=null ){
+            start = DataCenterUtils.string2Instant(startTime);
+            end = DataCenterUtils.string2Instant(endTime);
+        }
+        List<LittleSensor> info = littleSensorMapper.selectByPage(pageNum, pageSize, start, end);
+        int count = littleSensorMapper.selectNum2( start, end);
         Object num = new Integer(count);
         res.put("Info", info);
         res.put("num",num);
         return res;
-
     }
 
     @ApiOperation("根据id的分页查询LittleSensor数据")
@@ -75,7 +87,6 @@ public class LittleSensorController {
         res.put("Info", info);
         return res;
     }
-
 
 
     @ApiOperation("LittleSensor点的数量，站点数量")

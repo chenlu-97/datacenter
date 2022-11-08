@@ -13,5 +13,5 @@ public interface LittleSensorFeignClient {
     int getLittleSensorNumber();
 
     @GetMapping(path = "getNumberByTime")
-    int getNumberByTime(@RequestParam(value = "startTime")Instant startTime, @RequestParam(value = "endTime")Instant endTime);
+    int getNumberByTime(@RequestParam(value = "startTime")String startTime, @RequestParam(value = "endTime")String endTime);
 }

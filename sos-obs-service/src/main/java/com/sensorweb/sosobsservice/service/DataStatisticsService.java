@@ -124,12 +124,10 @@ public class DataStatisticsService {
         int num = AirStation+WeatherStation+offline+himawari+laads+gee+mobile +littleSensor+ uav;
 
         dataStatistics statistics = new dataStatistics();
-        String res = null;
-        if(num!=0){
-            res = String.valueOf((int)Math.floor(num/10000))+"W";
-        }else{
-            res = "error";
-        }
+        int res = 0;
+
+        res = ((int)Math.floor(num/10000));
+
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
         Instant time= DataCenterUtils.string2Instant(formatter.format(dateTime));
@@ -192,7 +190,7 @@ public class DataStatisticsService {
         }
 
         try{
-            other = littleSensorFeignClient.getNumberByTime(preTime,nowTime) ;
+            other = littleSensorFeignClient.getNumberByTime(preTime.toString(),nowTime.toString()) ;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -204,7 +202,7 @@ public class DataStatisticsService {
         JSONObject number = new JSONObject();
         number.put("Overview_DataNumberToday",num);
         statistics.setStatistics(number.toString());
-        System.out.println("statistics = " + statistics);
+//        System.out.println("statistics = " + statistics);
         int i = dataStatisticsMapper.insert(statistics);
         if(i>0){
             System.out.println("DC_Overview_DataNumberToday数据条数统计成功！！");
@@ -216,9 +214,25 @@ public class DataStatisticsService {
 
     @XxlJob("DC_Overview_DataSize")
     public boolean DataSize() {
-        long tmp = getObservationExpandService.getFileSize(new File(ObsConstant.File_Path));
+
+
+        long size = 0;
+
+        List<String> filePaths = dataStatisticsMapper.getFilepath2("file");
+        if(filePaths.size()>0) {
+            for (String filePath : filePaths) {
+                if (filePath == null || filePath.equals(" ")) {
+
+                } else {
+                    long tmp = getObservationExpandService.getFileSize(new File(filePath));
+                    size = size + tmp;
+                }
+
+            }
+        }
         DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-        String res = df.format((float)tmp/1024/1024/1024/1024)+"T";
+
+        double res = Double.valueOf(df.format((float)size/1024/1024/1024/1024));
 
         dataStatistics statistics = new dataStatistics();
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
@@ -248,28 +262,29 @@ public class DataStatisticsService {
         int update=0;
         int other = 0;
         try{
-            query = dataStatisticsMapper.getInterfaceNum("GET");
+            query = dataStatisticsMapper.getInterfaceNum("Data_Query");
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            delete = dataStatisticsMapper.getInterfaceNum("DELETE");;
+            delete = dataStatisticsMapper.getInterfaceNum("User_Base");;
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            add =dataStatisticsMapper.getInterfaceNum("GET/POST");;
+            add =dataStatisticsMapper.getInterfaceNum("Data_ADD");;
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            update = dataStatisticsMapper.getInterfaceNum("POST");;
+            update = dataStatisticsMapper.getInterfaceNum("Handle_Air")+dataStatisticsMapper.getInterfaceNum("Handle_Water")
+            +dataStatisticsMapper.getInterfaceNum("Handle_Ecology")+dataStatisticsMapper.getInterfaceNum("Handle_Soil");
         }catch(Exception e){
             e.printStackTrace();
         }
 
         try{
-            other = dataStatisticsMapper.getInterfaceNum(" ");;
+            other = 16;;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -277,11 +292,37 @@ public class DataStatisticsService {
         Map station = new LinkedHashMap();
 
 
-        station.put("查询",query);
-        station.put("删除",delete);
-        station.put("增加",add);
-        station.put("修改",update);
-        station.put("其他",other);
+        Map querys = new LinkedHashMap();
+        querys.put("name","查询");
+        querys.put("number",query);
+
+        Map deletes = new LinkedHashMap();
+        deletes.put("name","删除");
+        deletes.put("number",delete);
+
+        Map adds = new LinkedHashMap();
+        adds.put("name","添加");
+        adds.put("number",add);
+
+        Map updates = new LinkedHashMap();
+        updates.put("name","更新");
+        updates.put("number",update);
+
+        Map others = new LinkedHashMap();
+        others.put("name","其他");
+        others.put("number",other);
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",query+delete+add+update+other);
+
+
+        station.put("query",querys);
+        station.put("delete",deletes);
+        station.put("add",adds);
+        station.put("update",updates);
+        station.put("other",others);
+        station.put("total",totals);
 
 
         dataStatistics statistics = new dataStatistics();
@@ -304,187 +345,266 @@ public class DataStatisticsService {
 
     }
 
+//    @PostConstruct
+//    public void test() {
+//        long station=0;
+//
+//        try{
+//            station = station + dataStatisticsMapper.getDatabaseSize('"' +"gf"+ '"');
+//            System.out.println("station = " + station);
+//            station = 1000000000;
+//            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
+//            double station_size = Double.valueOf(df.format((float)station/1024/1024/1024));
+//            System.out.println("station_size = " + station_size);
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//
+//    }
+
     @XxlJob("DC_Overview_StorageContent")
     public boolean StorageContent() {
-        int station=0;
-        int satellite=0;
-        int mobile=0;
-        int uav=0;
-        int product = 0;
-        String station_size = null;
-        String satellite_size = null;
-        String mobile_size = null;
-        String uav_size = null;
-        String product_size = null;
-        try{
-            List<String> databases = dataStatisticsMapper.getFilepath("地面站网","file");
-            List<String> filePaths = dataStatisticsMapper.getFilepath("地面站网","database");
+        long station=0;
+        long satellite=0;
+        long mobile=0;
+        long uav=0;
+        long product = 0;
 
+        double station_size = 0;
+        double satellite_size = 0;
+        double mobile_size = 0;
+        double uav_size = 0;
+        double product_size = 0;
+
+
+        try{
+            List<String> databases = dataStatisticsMapper.getFilepath("地面站网","database");
             if(databases.size()>0) {
                 for (String database : databases) {
-                    if (database.isEmpty()) {
+                    if (database == null || database.equals(" ")) {
 
                     } else {
-                        station = station + dataStatisticsMapper.getDatabaseSize(database);
+                        station = station + dataStatisticsMapper.getDatabaseSize('"'+database+'"');
                     }
 
                 }
             }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
+        try{
+            List<String> filePaths = dataStatisticsMapper.getFilepath("地面站网","file");
             if(filePaths.size()>0) {
                 for (String filePath : filePaths) {
-                    if (filePath.isEmpty()) {
+                    if (filePath == null || filePath.equals(" ")) {
 
                     } else {
                         long tmp = getObservationExpandService.getFileSize(new File(filePath));
-                        station = station + Integer.valueOf((int) tmp);
+                        station = station + tmp;
                     }
 
                 }
             }
-            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-            station_size = df.format((float)station/1024/1024/1024/1024)+"T";
+            DecimalFormat df1=new DecimalFormat("0.0");//设置保留位数
+//            System.out.println("station = " + station);
+            station_size = Double.valueOf(df1.format((float)station/1024/1024/1024));
+//            System.out.println("station_size = " + station_size);
         }catch(Exception e){
             e.printStackTrace();
         }
+
+
 
         try {
-            List<String> databases = dataStatisticsMapper.getFilepath("卫星遥感", "file");
-            List<String> filePaths = dataStatisticsMapper.getFilepath("卫星遥感", "database");
-
+            List<String> databases = dataStatisticsMapper.getFilepath("卫星遥感", "database");
             if (databases.size() > 0) {
                 for (String database : databases) {
-                    if (database.isEmpty()) {
+                    if (database == null || database.equals(" ")) {
 
                     } else {
-                        satellite = satellite + dataStatisticsMapper.getDatabaseSize(database);
+                        satellite = satellite + dataStatisticsMapper.getDatabaseSize('"'+database+'"');
                     }
 
                 }
             }
-
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try {
+            List<String> filePaths = dataStatisticsMapper.getFilepath("卫星遥感", "file");
             if (filePaths.size() > 0){
                 for (String filePath : filePaths) {
-                    if (filePath.isEmpty()) {
+                    if (filePath == null || filePath.equals(" ")) {
 
                     } else {
                         long tmp = getObservationExpandService.getFileSize(new File(filePath));
-                        satellite = satellite + Integer.valueOf((int) tmp);
+                        satellite = satellite + tmp;
                     }
 
                 }
             }
-            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-            satellite_size = df.format((float)satellite/1024/1024/1024/1024)+"T";
+//            System.out.println("satellite = " + satellite);
+            DecimalFormat df2 =new DecimalFormat("0.0");//设置保留位数
+            satellite_size = Double.valueOf(df2.format((float)satellite/1024/1024/1024));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        try{
+            List<String> databases = dataStatisticsMapper.getFilepath("移动车船","database");
+
+            if(databases.size()>0){
+                for(String database:databases){
+                    if(database == null || database.equals(" ")){
+
+                    }else{
+                        mobile = mobile + dataStatisticsMapper.getDatabaseSize('"'+database+'"');
+                    }
+
+                }
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            List<String> databases = dataStatisticsMapper.getFilepath("移动车船","file");
-            List<String> filePaths = dataStatisticsMapper.getFilepath("移动车船","database");
 
-            if(databases.size()>0){
-                for(String database:databases){
-                    if(database.isEmpty()){
-
-                    }else{
-                        mobile = mobile + dataStatisticsMapper.getDatabaseSize(database);
-                    }
-
-                }
-            }
-
+            List<String> filePaths = dataStatisticsMapper.getFilepath("移动车船","file");
             if(filePaths.size()>0){
                 for(String filePath:filePaths){
-                    if(filePath.isEmpty()){
+                    if(filePath == null || filePath.equals(" ")){
 
                     }else{
                         long tmp = getObservationExpandService.getFileSize(new File(filePath));
-                        mobile = mobile + Integer.valueOf((int) tmp);
+                        mobile = mobile + tmp;
                     }
 
                 }
             }
 
-            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-            mobile_size = df.format((float)satellite/1024/1024/1024/1024)+"T";
+//            System.out.println("mobile = " + mobile);
+            DecimalFormat df3=new DecimalFormat("0.0");//设置保留位数
+            mobile_size = Double.valueOf(df3.format((float)mobile/1024/1024/1024));
+//            System.out.println("mobile_size = " + mobile_size);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        try{
+            List<String> databases = dataStatisticsMapper.getFilepath("低空遥感","database");
+            if(databases.size()>0){
+                for(String database:databases){
+                    if(database == null || database.equals(" ")){
+
+                    }else{
+                        uav = uav + dataStatisticsMapper.getDatabaseSize('"'+database+'"');
+                    }
+
+                }
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            List<String> databases = dataStatisticsMapper.getFilepath("低空遥感","file");
-            List<String> filePaths = dataStatisticsMapper.getFilepath("低空遥感","database");
-
-            if(databases.size()>0){
-                for(String database:databases){
-                    if(database.isEmpty()){
-
-                    }else{
-                        uav = uav + dataStatisticsMapper.getDatabaseSize(database);
-                    }
-
-                }
-            }
-
+            List<String> filePaths = dataStatisticsMapper.getFilepath("低空遥感","file");
             if(filePaths.size()>0){
                 for(String filePath:filePaths){
-                    if(filePath.isEmpty()){
+                    if(filePath == null || filePath.equals(" ")){
 
                     }else{
                         long tmp = getObservationExpandService.getFileSize(new File(filePath));
-                        uav = uav + Integer.valueOf((int) tmp);
+                        uav = uav + tmp;
                     }
 
                 }
             }
-
-            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-            uav_size = df.format((float)satellite/1024/1024/1024/1024)+"T";
+//            System.out.println("uav = " + uav);
+            DecimalFormat df4=new DecimalFormat("0.0");//设置保留位数
+            uav_size = Double.valueOf(df4.format((float)uav/1024/1024/1024));
+//            System.out.println("uav_size = " + uav_size);
         }catch(Exception e){
             e.printStackTrace();
         }
+
+
 
         try{
-            List<String> databases = dataStatisticsMapper.getFilepath("产品","file");
-            List<String> filePaths = dataStatisticsMapper.getFilepath("产品","database");
+            List<String> databases = dataStatisticsMapper.getFilepath("产品","database");
 
             if(databases.size()>0){
                 for(String database:databases){
-                    if(database.isEmpty()){
+                    if(database == null || database.equals(" ")){
 
                     }else{
-                        product = product + dataStatisticsMapper.getDatabaseSize(database);
+                        product = product + dataStatisticsMapper.getDatabaseSize('"'+database+'"');
                     }
 
                 }
             }
-
-            if(filePaths.size()>0){
-                for(String filePath:filePaths){
-                    if(filePath.isEmpty()){
-
-                    }else{
-                        long tmp = getObservationExpandService.getFileSize(new File(filePath));
-                        product = product + Integer.valueOf((int) tmp);
-                    }
-
-                }
-            }
-
-            DecimalFormat df=new DecimalFormat("0.0");//设置保留位数
-            product_size = df.format((float)satellite/1024/1024/1024/1024)+"T";
         }catch(Exception e){
             e.printStackTrace();
         }
+        try{
+            List<String> filePaths = dataStatisticsMapper.getFilepath("产品","file");
+            if(filePaths.size()>0){
+                for(String filePath:filePaths){
+                    if(filePath == null || filePath.equals(" ")){
+
+                    }else{
+                        long tmp = getObservationExpandService.getFileSize(new File(filePath));
+                        product = product + tmp;
+                    }
+
+                }
+            }
+
+//            System.out.println("product = " + product);
+            DecimalFormat df5=new DecimalFormat("0.0");//设置保留位数
+            product_size = Double.valueOf(df5.format((float)product/1024/1024/1024));
+//            System.out.println("product_size = " + product_size);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
 
         Map result = new LinkedHashMap();
+        Map stations = new LinkedHashMap();
+        stations.put("name","地面站网");
+        stations.put("number",station_size);
+
+        Map satellites = new LinkedHashMap();
+        satellites.put("name","卫星遥感");
+        satellites.put("number",satellite_size);
+
+        Map mobiles = new LinkedHashMap();
+        mobiles.put("name","移动车船");
+        mobiles.put("number",mobile_size);
+
+        Map uavs = new LinkedHashMap();
+        uavs.put("name","低空遥感");
+        uavs.put("number",uav_size);
+
+        Map products = new LinkedHashMap();
+        products.put("name","产品");
+        products.put("number",product_size);
 
 
-        result.put("地面站网",station_size);
-        result.put("卫星遥感",satellite_size);
-        result.put("移动车船",mobile_size);
-        result.put("低空遥感",uav_size);
-        result.put("产品",product_size);
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",station_size+satellite_size+mobile_size+uav_size+product_size);
+
+
+        result.put("station_size",station_size);
+        result.put("satellite_size",satellite_size);
+        result.put("mobile_size",mobile_size);
+        result.put("uav_size",uav_size);
+        result.put("product_size",product_size);
+        result.put("total",totals);
 
 
         dataStatistics statistics = new dataStatistics();
@@ -610,24 +730,99 @@ public class DataStatisticsService {
 
         Map sensor = new LinkedHashMap();
 
-        sensor.put("湖北省环境监测站",((int)Math.floor(HBHJStation/10000))+"w");
-        sensor.put("中国空气质量网",((int)Math.floor(CHAirStation/10000))+"w");
-        sensor.put("台湾ERA空气质量网",((int)Math.floor(tw/10000))+"w");
-        sensor.put("湖北气象局",((int)Math.floor(HBWeatherStation/10000))+"w");
-        sensor.put("中国气象网",((int)Math.floor(CHWeatherStation/10000))+"w");
 
-        sensor.put("NASA",((int)Math.floor(nasa/10000))+"w");
-        sensor.put("USGS",((int)Math.floor(usgs/10000))+"w");
-        sensor.put("Himawari卫星官网",((int)Math.floor(himawari/10000))+"w");
-        sensor.put("风云卫星遥感数据服务网",((int)Math.floor(fy/10000))+"w");
-        sensor.put("高分中心",((float)Math.floor(GF/10000))+"w");
+        Map HBHJStations = new LinkedHashMap();
+        HBHJStations.put("name","湖北省环境监测中心");
+        HBHJStations.put("number",((double)(Math.round(HBHJStation/10000))));
 
-        sensor.put("武大空气传感器",((int)Math.floor(littleSensor/10000))+"w");
-        sensor.put("移动车船",((int)Math.floor(mobile/10000))+"w");
-        sensor.put("天兴洲综合站",((float)Math.floor(tianxingzhou/10000))+"w");
+        Map CHAirStations = new LinkedHashMap();
+        CHAirStations.put("name","全国空气质量网");
+        CHAirStations.put("number",((double)(Math.round(CHAirStation/10000))));
 
-        sensor.put("无人机",((float)Math.floor(uav/10000))+"w");
+        Map TWEPStations = new LinkedHashMap();
+        TWEPStations.put("name","台湾EPA空气质量网");
+        TWEPStations.put("number",((double)(Math.round(tw/10000))));
 
+        Map HBWeatherStations = new LinkedHashMap();
+        HBWeatherStations.put("name","湖北气象局");
+        HBWeatherStations.put("number",((double)(Math.round(HBWeatherStation/10000))));
+
+        Map CHWeatherStations = new LinkedHashMap();
+        CHWeatherStations.put("name","中国气象局");
+        CHWeatherStations.put("number",((double)(Math.round(CHWeatherStation/10000))));
+
+        Map NASAs = new LinkedHashMap();
+        NASAs.put("name","NASA");
+        NASAs.put("number",((double)(Math.round(nasa/10000))));
+
+        Map USGSs = new LinkedHashMap();
+        USGSs.put("name","USGS");
+        USGSs.put("number",((double)(Math.round(usgs/10000))));
+
+        Map Himawaris = new LinkedHashMap();
+        Himawaris.put("name","葵花卫星");
+        Himawaris.put("number",((double)(Math.round(himawari/10000))));
+
+        Map fengyuns = new LinkedHashMap();
+        fengyuns.put("name","风云卫星");
+        fengyuns.put("number",((double)(Math.round(fy/10000))));
+
+        Map gaofengs = new LinkedHashMap();
+        gaofengs.put("name","高分卫星");
+        gaofengs.put("number",((double)(Math.round(GF/10000))));
+
+
+        Map WuhanSensors = new LinkedHashMap();
+        WuhanSensors.put("name","武汉微小传感器");
+        WuhanSensors.put("number",((double)(Math.round(littleSensor/10000))));
+
+
+        Map mobiles = new LinkedHashMap();
+        mobiles.put("name","移动平台");
+        mobiles.put("number",((double)(Math.round(mobile/10000))));
+
+
+        Map uavs = new LinkedHashMap();
+        uavs.put("name","无人机");
+        uavs.put("number",((double)(Math.round(uav/10000))));
+
+
+        Map tianxingzhouStations = new LinkedHashMap();
+        tianxingzhouStations.put("name","天兴洲综合站");
+        tianxingzhouStations.put("number",((double)(Math.round(tianxingzhou/10000))));
+
+
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",(int)Math.floor(HBHJStation/10000)+
+                (int)Math.floor(CHAirStation/10000)+ (int)Math.floor(HBWeatherStation/10000)
+                +(int)Math.floor(CHWeatherStation/10000)+(int)Math.floor(nasa/10000)+(int)Math.floor(usgs/10000)
+                +(int)Math.floor(himawari/10000)+(int)Math.floor(fy/10000)+(int)Math.floor(GF/10000)
+                + (int)Math.floor(littleSensor/10000)+(int)Math.floor(tianxingzhou/10000)+(int)Math.floor(uav/10000)
+                + (double)(Math.round(uav/10000)));
+
+
+        sensor.put("HBHJStation",HBHJStations);
+        sensor.put("CHAirStation",CHAirStations);
+        sensor.put("TWEPStation",TWEPStations);
+
+        sensor.put("HBWeatherStation",HBWeatherStations);
+        sensor.put("CHWeatherStation",CHWeatherStations);
+
+        sensor.put("NASA",NASAs);
+        sensor.put("USGS",USGSs);
+        sensor.put("Himawari",Himawaris);
+        sensor.put("fengyun",fengyuns);
+        sensor.put("gaofeng",gaofengs);
+
+        sensor.put("WuhanSensor",WuhanSensors);
+        sensor.put("mobile",mobiles);
+        sensor.put("tianxingzhouStation",((double)(Math.round(tianxingzhou/10000))));
+
+        sensor.put("uav",uavs);
+
+        sensor.put("total", totals);
 
         dataStatistics statistics = new dataStatistics();
 
@@ -680,18 +875,62 @@ public class DataStatisticsService {
 
 
         int num = AirStation+WeatherStation+WaterStation+SuperStation;
+
         Map station = new LinkedHashMap();
 
-        station.put("总计",((int)Math.floor(num/10000)));
-        station.put("空气数据量",((int)Math.floor(AirStation/10000)));
-        station.put("气象数据量",((int)Math.floor(WeatherStation/10000)));
-        station.put("水质数据量",((int)Math.floor(WaterStation/10000)));
-        station.put("超级数据量",((int)Math.floor(SuperStation/10000)));
 
-        station.put("空气站点数量",2351);
-        station.put("气象站点数量",5468);
-        station.put("水质站点数量",811);
-        station.put("超级站点数量",11);
+        Map Airs = new LinkedHashMap();
+        Airs.put("name","空气");
+        Airs.put("number",((double)(Math.round(AirStation/10000))));
+
+        Map Weathers = new LinkedHashMap();
+        Weathers.put("name","气象");
+        Weathers.put("number",((double)(Math.round(WeatherStation/10000))));
+
+        Map Waters = new LinkedHashMap();
+        Waters.put("name","水质");
+        Waters.put("number",((double)(Math.round(WaterStation/10000))));
+
+        Map Supers = new LinkedHashMap();
+        Supers.put("name","超级");
+        Supers.put("number",((double)(Math.round(SuperStation/10000))));
+
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",((int)Math.floor(num/10000)));
+
+
+        station.put("total",totals);
+        station.put("Air_num",Airs);
+        station.put("Weather_num",Weathers);
+        station.put("Water_num",Waters);
+        station.put("Super_num",Supers);
+
+
+
+        Map AirStations = new LinkedHashMap();
+        AirStations.put("name","空气");
+        AirStations.put("number",2351);
+
+        Map WeatherStations = new LinkedHashMap();
+        WeatherStations.put("name","气象");
+        WeatherStations.put("number",5468);
+
+        Map WaterStations = new LinkedHashMap();
+        WaterStations.put("name","水质");
+        WaterStations.put("number",811);
+
+        Map SuperStations = new LinkedHashMap();
+        SuperStations.put("name","超级");
+        SuperStations.put("number",11);
+
+
+
+        station.put("AirStation",AirStations);
+        station.put("WeatherStation",WeatherStations);
+        station.put("WaterStation",WaterStations);
+        station.put("SuperStation",SuperStations);
 
         dataStatistics statistics = new dataStatistics();
 
@@ -712,7 +951,6 @@ public class DataStatisticsService {
         }
         return i>0;
     }
-
 
 
     @XxlJob("DC_BasicData_Satellite")
@@ -769,14 +1007,50 @@ public class DataStatisticsService {
 
         Map satellite = new LinkedHashMap();
 
+        int total = modis+landsat+himawari+fy+GF+gldas+gpm;
 
-        satellite.put("Modis",modis);
-        satellite.put("Landsat",landsat);
-        satellite.put("葵花",himawari);
-        satellite.put("风云",fy);
-        satellite.put("高分",GF);
-        satellite.put("GLDAS",gldas);
-        satellite.put("GPM",gpm);
+        Map Modiss = new LinkedHashMap();
+        Modiss.put("name","Modis");
+        Modiss.put("number",((double)(Math.round(modis/10000))));
+
+        Map Landsats = new LinkedHashMap();
+        Landsats.put("name","Landsat");
+        Landsats.put("number",((double)(Math.round(landsat/10000))));
+
+        Map himawaris = new LinkedHashMap();
+        himawaris.put("name","葵花");
+        himawaris.put("number",((double)(Math.round(himawari/10000))));
+
+        Map fengyuns = new LinkedHashMap();
+        fengyuns.put("name","风云");
+        fengyuns.put("number",((double)(Math.round(fy/10000))));
+
+        Map gaofens = new LinkedHashMap();
+        gaofens.put("name","高分");
+        gaofens.put("number",((double)(Math.round(GF/10000))));
+
+        Map GLDASs = new LinkedHashMap();
+        GLDASs.put("name","GLDAS");
+        GLDASs.put("number",((double)(Math.round(gldas/10000))));
+
+        Map GPMs = new LinkedHashMap();
+        GPMs.put("name","GPM");
+        GPMs.put("number",((double)(Math.round(gpm/10000))));
+
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",((int)(Math.floor(total/10000))));
+
+
+        satellite.put("total",totals);
+        satellite.put("Modis",Modiss);
+        satellite.put("Landsat",Landsats);
+        satellite.put("himawari",himawaris);
+        satellite.put("fengyun",fengyuns);
+        satellite.put("gaofen",gaofens);
+        satellite.put("GLDAS",GLDASs);
+        satellite.put("GPM",GPMs);
 
 
 
@@ -826,12 +1100,31 @@ public class DataStatisticsService {
         }
 
         //需要确定人工采样的数据接口！！！！
+        int total = Vehicle+Vessel+sampling;
 
         Map sensor = new LinkedHashMap();
 
-        sensor.put("走航车",Vehicle);
-        sensor.put("走航船",Vessel);
-        sensor.put("人工采样",sampling);
+        Map Vehicles = new LinkedHashMap();
+        Vehicles.put("name","走航车");
+        Vehicles.put("number",((double)(Math.round(Vehicle/10000))));
+
+        Map Vessels = new LinkedHashMap();
+        Vessels.put("name","走航船");
+        Vessels.put("number",((double)(Math.round(Vessel/10000))));
+
+        Map samplings = new LinkedHashMap();
+        samplings.put("name","人工采样");
+        samplings.put("number",((double)(Math.round(sampling/10000))));
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",((int)(Math.floor(total/10000))));
+
+
+        sensor.put("Vehicle",Vehicles);
+        sensor.put("Vessel",Vessels);
+        sensor.put("sampling",samplings);
+        sensor.put("total",totals);
 
 
         dataStatistics statistics = new dataStatistics();
@@ -880,9 +1173,26 @@ public class DataStatisticsService {
 
         Map sensor = new LinkedHashMap();
 
-        sensor.put("UHD185",uhd185);
-        sensor.put("热红外相机",Thermal_infrared_camera);
-        sensor.put("探测仪",detecting_instrument);
+        Map UHD185s = new LinkedHashMap();
+        UHD185s.put("name","UHD185");
+        UHD185s.put("number",uhd185);
+
+        Map Thermal_infrared_cameras = new LinkedHashMap();
+        Thermal_infrared_cameras.put("name","热红外相机");
+        Thermal_infrared_cameras.put("number",Thermal_infrared_camera);
+
+        Map detecting_instruments = new LinkedHashMap();
+        detecting_instruments.put("name","探测仪");
+        detecting_instruments.put("number",detecting_instrument);
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",uhd185+Thermal_infrared_camera+detecting_instrument);
+
+        sensor.put("UHD185",UHD185s);
+        sensor.put("Thermal_infrared_camera",Thermal_infrared_cameras);
+        sensor.put("detecting_instrument",detecting_instruments);
+        sensor.put("total",totals);
 
 
         dataStatistics statistics = new dataStatistics();
@@ -942,11 +1252,38 @@ public class DataStatisticsService {
         Map station = new LinkedHashMap();
 
 
-        station.put("大气",air);
-        station.put("水质",water);
-        station.put("土壤",soli);
-        station.put("生态",ecology);
-        station.put("其他",other);
+        Map airs = new LinkedHashMap();
+        airs.put("name","大气");
+        airs.put("number",air);
+
+        Map waters = new LinkedHashMap();
+        waters.put("name","水质");
+        waters.put("number",water);
+
+        Map solis = new LinkedHashMap();
+        solis.put("name","土壤");
+        solis.put("number",soli);
+
+        Map ecologys = new LinkedHashMap();
+        ecologys.put("name","生态");
+        ecologys.put("number",ecology);
+
+        Map others = new LinkedHashMap();
+        others.put("name","其他");
+        others.put("number",other);
+
+
+        Map totals = new LinkedHashMap();
+        totals.put("name","总计");
+        totals.put("number",air+water+soli+ecology+other);
+
+
+        station.put("air",airs);
+        station.put("water",waters);
+        station.put("soli",solis);
+        station.put("ecology",ecologys);
+        station.put("other",others);
+        station.put("total",totals);
 
 
         dataStatistics statistics = new dataStatistics();
@@ -971,57 +1308,93 @@ public class DataStatisticsService {
 
     @XxlJob("DC_Product_ProductNumber")
     public boolean ProductNumber() {
-        int air=1;
-        int ecology=1;
-        int soli=1;
-        int water=1;
-        int other = 1;
-        try{
-            air = dataStatisticsMapper.getProductNum("Air");
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        try{
-            ecology = dataStatisticsMapper.getProductNum("Ecology");;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        try{
-            soli =dataStatisticsMapper.getProductNum("Soli");;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        try{
-            water = dataStatisticsMapper.getProductNum("Water");;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        List<Map<String,Object>> res = new ArrayList<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        String time_now = df.format(new Date());// new Date()为获取当前系统时间
+        Instant start = DataCenterUtils.string2Instant(time_now).minusSeconds(24*60*60);//减24小时
+        Instant stop = DataCenterUtils.string2Instant(time_now);
 
-        try{
-            other = dataStatisticsMapper.getProductNum(" ");;
-        }catch(Exception e){
-            e.printStackTrace();
+        while(start.isBefore(stop)){
+            int air=0;
+            int ecology=0;
+            int soli=0;
+            int water=0;
+            int other = 0;
+            Instant end = start.plusSeconds(60*60);
+            try{
+                air = dataStatisticsMapper.getProductNumByTime2("Air",end);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                ecology =dataStatisticsMapper.getProductNumByTime2("Ecology",end);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                soli =dataStatisticsMapper.getProductNumByTime2("Soli",end);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                water =dataStatisticsMapper.getProductNumByTime2("Water",end);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            try{
+                other = dataStatisticsMapper.getProductNumByTime2(" ",end);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            Map airs = new LinkedHashMap();
+            airs.put("name","大气");
+            airs.put("number",air);
+
+            Map waters = new LinkedHashMap();
+            waters.put("name","水质");
+            waters.put("number",water);
+
+            Map solis = new LinkedHashMap();
+            solis.put("name","土壤");
+            solis.put("number",soli);
+
+            Map ecologys = new LinkedHashMap();
+            ecologys.put("name","生态");
+            ecologys.put("number",ecology);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+            Map<String,Object> tmp = new LinkedHashMap();
+            String time = start.plusSeconds(9*60*60).toString();
+            tmp.put("air",airs);
+            tmp.put("water",waters);
+            tmp.put("soli",solis);
+            tmp.put("ecology",ecologys);
+            tmp.put("other",others);
+            tmp.put("time",time.substring(time.indexOf("T")+1,time.indexOf("Z")).substring(0,2)+"时");
+            res.add(tmp);
+            start = start.plusSeconds(60*60);
         }
-
-        Map station = new LinkedHashMap();
-
-
-        station.put("大气",air);
-        station.put("水质",water);
-        station.put("土壤",soli);
-        station.put("生态",ecology);
-        station.put("其他",other);
-
 
         dataStatistics statistics = new dataStatistics();
+
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
         Instant time= DataCenterUtils.string2Instant(formatter.format(dateTime));
         statistics.setCreateTime(time);
+
+
+
         statistics.setJobId("DC_Product_ProductNumber");
 
+
         JSONObject number = new JSONObject();
-        number.put("Product_ProductNumber", station);
+        number.put("Product_ProductNumber", res);
         statistics.setStatistics(number.toString());
         int i = dataStatisticsMapper.insert(statistics);
         if(i>0){
@@ -1036,16 +1409,198 @@ public class DataStatisticsService {
     @XxlJob("DC_RealTime_Data")
     public boolean Data() {
 
-        List<Map<String,Object>> res = new ArrayList<>();
+        List<Map<String,Object>> year = new ArrayList<>();
+
+        List<Map<String,Object>> month = new ArrayList<>();
+
+        List<Map<String,Object>> day = new ArrayList<>();
+
+        Map<String,Object> res = new LinkedHashMap<>();
+
+
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 //        System.out.println(df.format(new Date()));
         String timeNow = df.format(new Date());// new Date()为获取当前系统时间
 
         Instant start = DataCenterUtils.string2Instant(timeNow).minusSeconds(24*60*60);//减24小时
         Instant stop = DataCenterUtils.string2Instant(timeNow);
-        System.out.println("start = " + start);
+//        System.out.println("start = " + start);
 
 
+
+        //年的
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        calendar.add(Calendar.MONTH, -12);
+        for (int i=0; i<12; i++) {
+            String begin = DataCenterUtils.getFirstDay(calendar);
+            String end = DataCenterUtils.getLastDay(calendar);
+            Instant start_mounth = DataCenterUtils.string2Instant(begin);
+            Instant stop_mounth = DataCenterUtils.string2Instant(end);
+
+            int Station=0;
+            int satellite =0;
+            int mobile  = 0;
+            int  uva= 0;
+            int other =0;
+
+            try{
+                Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                satellite = dataStatisticsMapper.getHimawariNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getModisNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getLandsatNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getGLDASNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getGPMNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getFYNumByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                uva = dataStatisticsMapper.getUAVNumByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                mobile =  getVehicleNumberByTime(start_mounth,stop_mounth)+getVesselNumberByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            try{
+                other = littleSensorFeignClient.getNumberByTime(start_mounth.toString(),stop_mounth.toString()) ;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            Map<String,Object> tmp = new LinkedHashMap();
+
+            String time = start_mounth.plusSeconds(8*60*60).toString();
+
+
+            Map Stations = new LinkedHashMap();
+            Stations.put("name","地面站网");
+            Stations.put("number",Station);
+
+            Map satellites = new LinkedHashMap();
+            satellites.put("name","卫星遥感");
+            satellites.put("number",satellite);
+
+            Map mobiles = new LinkedHashMap();
+            mobiles.put("name","移动车船");
+            mobiles.put("number",mobile);
+
+            Map uvas = new LinkedHashMap();
+            uvas.put("name","低空遥感");
+            uvas.put("number",uva);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+
+            tmp.put("Station",Stations);
+            tmp.put("satellite",satellites);
+            tmp.put("mobile",mobiles);
+            tmp.put("uva",uvas);
+            tmp.put("other",others);
+            tmp.put("time",time.substring(0,4)+"年"+time.substring(5,7)+"月");
+            year.add(tmp);
+            calendar.add(Calendar.MONTH, 1);
+        }
+
+        //月的
+        Calendar calendar1 = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        calendar1.add(Calendar.DAY_OF_MONTH, -14);
+        for (int i=0; i<14; i++) {
+            String begin = DataCenterUtils.getFirstDay(calendar1);
+            String end = DataCenterUtils.getLastDay(calendar1);
+            Instant start_mounth = DataCenterUtils.string2Instant(begin);
+            Instant stop_mounth = DataCenterUtils.string2Instant(end);
+
+            int Station=0;
+            int satellite =0;
+            int mobile  = 0;
+            int  uva= 0;
+            int other =0;
+
+            try{
+                Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                satellite = dataStatisticsMapper.getHimawariNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getModisNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getLandsatNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getGLDASNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getGPMNumByTime(start_mounth,stop_mounth)
+                        +dataStatisticsMapper.getFYNumByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                uva = dataStatisticsMapper.getUAVNumByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                mobile =  getVehicleNumberByTime(start_mounth,stop_mounth)+getVesselNumberByTime(start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            try{
+                other = littleSensorFeignClient.getNumberByTime(start_mounth.toString(),stop_mounth.toString()) ;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            Map<String,Object> tmp = new LinkedHashMap();
+
+            String time = start_mounth.plusSeconds(8*60*60).toString();
+
+
+            Map Stations = new LinkedHashMap();
+            Stations.put("name","地面站网");
+            Stations.put("number",Station);
+
+            Map satellites = new LinkedHashMap();
+            satellites.put("name","卫星遥感");
+            satellites.put("number",satellite);
+
+            Map mobiles = new LinkedHashMap();
+            mobiles.put("name","移动车船");
+            mobiles.put("number",mobile);
+
+            Map uvas = new LinkedHashMap();
+            uvas.put("name","低空遥感");
+            uvas.put("number",uva);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+
+            tmp.put("Station",Stations);
+            tmp.put("satellite",satellites);
+            tmp.put("mobile",mobiles);
+            tmp.put("uva",uvas);
+            tmp.put("other",others);
+
+
+            tmp.put("time",time.substring(5,7)+"月"+time.substring(8,10)+"日");
+            month.add(tmp);
+            calendar1.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        //天的
         while(start.isBefore(stop)){
             int Station=0;
             int satellite =0;
@@ -1082,22 +1637,52 @@ public class DataStatisticsService {
             }
 
             try{
-                other = littleSensorFeignClient.getNumberByTime(start,end) ;
+                other = littleSensorFeignClient.getNumberByTime(start.toString(),end.toString()) ;
             }catch(Exception e){
                 e.printStackTrace();
             }
 
             Map<String,Object> tmp = new LinkedHashMap();
             String time = start.plusSeconds(9*60*60).toString();
-            tmp.put("地面站网",Station);
-            tmp.put("卫星遥感",satellite);
-            tmp.put("移动车船",mobile);
-            tmp.put("低空遥感",uva);
-            tmp.put("其他",other);
+
+
+            Map Stations = new LinkedHashMap();
+            Stations.put("name","地面站网");
+            Stations.put("number",Station);
+
+            Map satellites = new LinkedHashMap();
+            satellites.put("name","卫星遥感");
+            satellites.put("number",satellite);
+
+            Map mobiles = new LinkedHashMap();
+            mobiles.put("name","移动车船");
+            mobiles.put("number",mobile);
+
+            Map uvas = new LinkedHashMap();
+            uvas.put("name","低空遥感");
+            uvas.put("number",uva);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+
+            tmp.put("Station",Stations);
+            tmp.put("satellite",satellites);
+            tmp.put("mobile",mobiles);
+            tmp.put("uva",uvas);
+            tmp.put("other",others);
             tmp.put("time",time.substring(time.indexOf("T")+1,time.indexOf("Z")).substring(0,2)+"时");
-            res.add(tmp);
+            day.add(tmp);
             start = start.plusSeconds(60*60);
         }
+
+
+        res.put("year_table",year);
+        res.put("month_table",month);
+        res.put("day_table",day);
+
+
 
         dataStatistics statistics = new dataStatistics();
 
@@ -1122,12 +1707,178 @@ public class DataStatisticsService {
 
     @XxlJob("DC_RealTime_Product")
     public boolean Product() {
-        List<Map<String,Object>> res = new ArrayList<>();
+
+        List<Map<String,Object>> year = new ArrayList<>();
+
+        List<Map<String,Object>> month = new ArrayList<>();
+
+        List<Map<String,Object>> day = new ArrayList<>();
+
+        Map<String,Object> res = new LinkedHashMap<>();
+
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
         String time_now = df.format(new Date());// new Date()为获取当前系统时间
         Instant start = DataCenterUtils.string2Instant(time_now).minusSeconds(24*60*60);//减24小时
         Instant stop = DataCenterUtils.string2Instant(time_now);
 
+
+
+
+        //年的
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        calendar.add(Calendar.MONTH, -12);
+        for (int i=0; i<12; i++) {
+            String begin = DataCenterUtils.getFirstDay(calendar);
+            String end = DataCenterUtils.getLastDay(calendar);
+            Instant start_mounth = DataCenterUtils.string2Instant(begin);
+            Instant stop_mounth = DataCenterUtils.string2Instant(end);
+
+            int air=0;
+            int ecology=0;
+            int soli=0;
+            int water=0;
+            int other = 0;
+
+            try{
+                air = dataStatisticsMapper.getProductNumByTime("Air",start_mounth,stop_mounth);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                ecology =dataStatisticsMapper.getProductNumByTime("Ecology",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                soli =dataStatisticsMapper.getProductNumByTime("Soli",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                water =dataStatisticsMapper.getProductNumByTime("Water",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            try{
+                other = dataStatisticsMapper.getProductNumByTime(" ",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            Map airs = new LinkedHashMap();
+            airs.put("name","大气");
+            airs.put("number",air);
+
+            Map waters = new LinkedHashMap();
+            waters.put("name","水质");
+            waters.put("number",water);
+
+            Map solis = new LinkedHashMap();
+            solis.put("name","土壤");
+            solis.put("number",soli);
+
+            Map ecologys = new LinkedHashMap();
+            ecologys.put("name","生态");
+            ecologys.put("number",ecology);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+            Map<String,Object> tmp = new LinkedHashMap();
+            String time = start.plusSeconds(8*60*60).toString();
+            tmp.put("air",airs);
+            tmp.put("water",waters);
+            tmp.put("soli",solis);
+            tmp.put("ecology",ecologys);
+            tmp.put("other",others);
+            tmp.put("time",time.substring(0,4)+"年"+time.substring(5,7)+"月");
+            year.add(tmp);
+
+            calendar.add(Calendar.MONTH, 1);
+        }
+
+
+        //月的
+        Calendar calendar1 = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        calendar1.add(Calendar.DAY_OF_MONTH, -14);
+        for (int i=0; i<14; i++) {
+            String begin = DataCenterUtils.getFirstDay(calendar1);
+            String end = DataCenterUtils.getLastDay(calendar1);
+            Instant start_mounth = DataCenterUtils.string2Instant(begin);
+            Instant stop_mounth = DataCenterUtils.string2Instant(end);
+
+            int air=0;
+            int ecology=0;
+            int soli=0;
+            int water=0;
+            int other = 0;
+
+            try{
+                air = dataStatisticsMapper.getProductNumByTime("Air",start_mounth,stop_mounth);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                ecology =dataStatisticsMapper.getProductNumByTime("Ecology",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                soli =dataStatisticsMapper.getProductNumByTime("Soli",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                water =dataStatisticsMapper.getProductNumByTime("Water",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            try{
+                other = dataStatisticsMapper.getProductNumByTime(" ",start_mounth,stop_mounth);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            Map airs = new LinkedHashMap();
+            airs.put("name","大气");
+            airs.put("number",air);
+
+            Map waters = new LinkedHashMap();
+            waters.put("name","水质");
+            waters.put("number",water);
+
+            Map solis = new LinkedHashMap();
+            solis.put("name","土壤");
+            solis.put("number",soli);
+
+            Map ecologys = new LinkedHashMap();
+            ecologys.put("name","生态");
+            ecologys.put("number",ecology);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
+            Map<String,Object> tmp = new LinkedHashMap();
+            String time = start.plusSeconds(8*60*60).toString();
+            tmp.put("air",airs);
+            tmp.put("water",waters);
+            tmp.put("soli",solis);
+            tmp.put("ecology",ecologys);
+            tmp.put("other",others);
+            tmp.put("time",time.substring(5,7)+"月"+time.substring(8,10)+"日");
+            month.add(tmp);
+
+            calendar1.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+
+        //天的
         while(start.isBefore(stop)){
             int air=0;
             int ecology=0;
@@ -1163,17 +1914,42 @@ public class DataStatisticsService {
                 e.printStackTrace();
             }
 
+            Map airs = new LinkedHashMap();
+            airs.put("name","大气");
+            airs.put("number",air);
+
+            Map waters = new LinkedHashMap();
+            waters.put("name","水质");
+            waters.put("number",water);
+
+            Map solis = new LinkedHashMap();
+            solis.put("name","土壤");
+            solis.put("number",soli);
+
+            Map ecologys = new LinkedHashMap();
+            ecologys.put("name","生态");
+            ecologys.put("number",ecology);
+
+            Map others = new LinkedHashMap();
+            others.put("name","其他");
+            others.put("number",other);
+
             Map<String,Object> tmp = new LinkedHashMap();
             String time = start.plusSeconds(9*60*60).toString();
-            tmp.put("水质",water);
-            tmp.put("土壤",soli);
-            tmp.put("大气",air);
-            tmp.put("生态",ecology);
-            tmp.put("其他",other);
+            tmp.put("air",airs);
+            tmp.put("water",waters);
+            tmp.put("soli",solis);
+            tmp.put("ecology",ecologys);
+            tmp.put("other",others);
             tmp.put("time",time.substring(time.indexOf("T")+1,time.indexOf("Z")).substring(0,2)+"时");
-            res.add(tmp);
+            day.add(tmp);
             start = start.plusSeconds(60*60);
         }
+
+
+        res.put("year_table",year);
+        res.put("month_table",month);
+        res.put("day_table",day);
 
         dataStatistics statistics = new dataStatistics();
 
@@ -1181,6 +1957,8 @@ public class DataStatisticsService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
         Instant time= DataCenterUtils.string2Instant(formatter.format(dateTime));
         statistics.setCreateTime(time);
+
+
         statistics.setJobId("DC_RealTime_Product");
 
         JSONObject number = new JSONObject();
@@ -1217,8 +1995,6 @@ public class DataStatisticsService {
 
         String start = preTime.plusSeconds(8*60*60).toString();
         String end = nowTime.plusSeconds(8*60*60).toString();
-        System.out.println("start = " + start);
-        System.out.println("end = " + end);
         String param = "startTime="+start +"&endTime="+end;
         String document = DataCenterUtils.doGet( "http://114.55.99.71:443/getVesselNumberByTime", param);
         int  result = Integer.valueOf(document);

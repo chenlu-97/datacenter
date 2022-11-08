@@ -252,20 +252,26 @@
   </select>
 
   <select id="getInterfaceNum" resultType="java.lang.Integer" >
-    select count(*) from resource group name = #{type}
+    select count(*) from resource where type = #{type}
   </select>
 
   <select id="getFilepath" resultType="java.lang.String">
     select dir_path from data_storage where type = #{type} and storage = #{database}
   </select>
 
-  <select id="getDatabaseSize" resultType="java.lang.Integer">
+  <select id="getDatabaseSize" resultType="java.lang.Long">
     select pg_relation_size(#{table})
   </select>
-
 
   <select id="getProductNumByTime" resultType="java.lang.Integer">
     select count(*) from tmodule a left join order_file b on a.name = b.product_type where type = #{type} and create_time <![CDATA[>=]]> #{begin} AND create_time <![CDATA[<=]]> #{end}
   </select>
+    <select id="getProductNumByTime2" resultType="java.lang.Integer">
+      select count(*) from tmodule a left join order_file b on a.name = b.product_type where type = #{type} AND create_time <![CDATA[<=]]> #{end}
+    </select>
+
+    <select id="getFilepath2" resultType="java.lang.String" parameterType="java.lang.String">
+      select dir_path from data_storage where storage = #{database}
+    </select>
 
 </mapper>

@@ -227,9 +227,9 @@ public class LandsatService implements GoogleServiceConstant{
     public String downloadLandsat(String time,String baseUrl,String type) throws IOException {
         String res = null;
         boolean finalres = false;
-        for(int row = 35;row<=46;row++){
-            for(int path = 117;path<=135;path++){
-
+        for(int path = 117;path<=134;path++){
+        List<Integer> rows = landsatMapper.getRowByPath(path);
+        for(Integer row : rows){
                 Instant startTime = string2Instant(time);
                 Instant endTime = string2Instant(time).plusSeconds(24*60*60);
                 List<Landsat> landsat_exit = landsatMapper.getLandsat2(type,row,path,startTime,endTime);

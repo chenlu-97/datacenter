@@ -114,8 +114,8 @@ public class GetAirQualityHour {
         res.put("Info", info);
         res.put("num",num);
         return res;
-
     }
+
 
 
     @ApiOperation("根据id的分页查询CH_Air数据")

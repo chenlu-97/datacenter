@@ -159,6 +159,616 @@
         FROM changjiang
     </select>
 
+
+<!--            <if test="spa == 'wuhanCC'">-->
+<!--                ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true-->
+<!--            </if>-->
+<!--            <if test="spa == 'yangtzeRiverEB'">-->
+<!--                ST_Intersects(geom, (SELECT geom FROM changjiang)) = true-->
+<!--            </if>-->
+<!--            <if test="spa == 'china'">-->
+<!--                ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true-->
+<!--            </if>-->
+
+
+
+    <select id="getDataBySpa" resultType="java.lang.String">
+        SELECT station_id from station where stype = #{dataType}
+        <if test="id != null">
+            AND station_id = #{id}
+        </if>
+        <if test="spa == 'wuhanCC'">
+            AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+        </if>
+        <if test="spa == 'yangtzeRiverEB'">
+            AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+        </if>
+        <if test="spa == 'china'">
+            AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+        </if>
+    </select>
+
+
+    <select id="getDataByPage" resultType="java.util.Map">
+        <if test="dataType == 'UHD185'">
+            SELECT *
+            FROM uav_image where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            order by time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Landsat'">
+            SELECT  *   FROM landsat  where 1=1
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+            ORDER BY date DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Sentinel'">
+            SELECT  *  FROM sentinel where 1=1
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+            ORDER BY date DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Modis'">
+            SELECT * FROM entry where 1=1
+            <if test="start != null">
+                AND start_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND start_time <![CDATA[<=]]> #{end}
+            </if>
+            ORDER BY start_time DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'FY4'">
+            SELECT no,file_type,file_name,time
+            FROM satellite_image  where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            order by time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'GLDAS'">
+            SELECT gldas_id, time, bbox, product_type
+            FROM gldas where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            order by time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Himawari'">
+            SELECT * FROM himawari where 1=1
+            <if test="start != null">
+                AND h_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND h_time <![CDATA[<=]]> #{end}
+            </if>
+            ORDER BY h_time DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'GPM'">
+            SELECT *
+            FROM gpm_3imergde where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            ORDER BY time DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'HB_Air'">
+            SELECT *
+            FROM "wuhanCC_air_hourly" where 1=1
+            <if test="start != null">
+                AND querytime <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND querytime <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND uniquecode in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by querytime desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'HB_SuperAir'">
+            SELECT   "ST","ST_NA","TIMES","EPNAME","SVALUE"
+            FROM "wuhanCC_super_station_hourly" where 1=1
+            <if test="start != null">
+                AND "TIMES" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "TIMES" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND "ST" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by "TIMES" desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'HB_Water'">
+            SELECT  *
+            FROM hb_water_hourly where 1=1
+            <if test="start != null">
+                AND "dataTime" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "dataTime" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND "siteId" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by "dataTime" desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'HB_WaterPollution'">
+            SELECT  *
+            FROM hb_waterpollution where 1=1
+            <if test="start != null">
+                AND monitoring_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND monitoring_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by monitoring_time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'HB_WaterAuto'">
+            SELECT *
+            FROM wh_water_quality_auto where 1=1
+            <if test="start != null">
+                AND query_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND query_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND section_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            ORDER BY query_time DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'TW_Air'">
+            SELECT *
+            FROM taiwan_air_hourly where
+            <if test="start != null">
+                tw_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND tw_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND site_id in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by tw_time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'CH_Air'">
+            SELECT *
+            FROM china_air_hourly where 1=1
+            <if test="start != null">
+                AND time_point <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time_point <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_code in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by time_point desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'WH_Weather'">
+            SELECT *
+            FROM "wuhanCC_weather_hourly" where 1=1
+            <if test="start != null">
+                AND "QueryTime" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "QueryTime" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND "StationID" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by "QueryTime" desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+
+        </if>
+        <if test="dataType == 'HB_Weather'">
+            SELECT *
+            FROM hb_weather_station_hourly where 1=1
+            <if test="start != null">
+                AND response_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND response_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by response_time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'CH_Weather'">
+            SELECT *
+            FROM china_meteorological_network where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_id in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            order by time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'TXZ_Station'">
+            SELECT *
+            FROM tianxingzhou_station where 1=1
+            <if test="start != null">
+                AND querytime <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND querytime <![CDATA[<=]]> #{end}
+            </if>
+            order by querytime desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+    </select>
+
+    <select id="getDataNum" resultType="java.lang.Integer">
+        <if test="dataType == 'UHD185'">
+            SELECT count(*) FROM uav_image where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'Landsat'">
+            SELECT count(*) FROM landsat where 1=1
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+        </if>
+        <if test="dataType == 'Sentinel'">
+            SELECT count(*) FROM sentinel where 1=1
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+        </if>
+        <if test="dataType == 'Modis'">
+            SELECT count(*) FROM entry where 1=1
+            <if test="start != null">
+                AND start_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND start_time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'FY4'">
+            SELECT count(*)
+            FROM satellite_image where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'GLDAS'">
+            SELECT count(*)
+            FROM gldas where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            order by time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Himawari'">
+            SELECT count(*) FROM himawari where 1=1
+            <if test="start != null">
+                AND h_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND h_time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'GPM'">
+            SELECT count(*)
+            FROM gpm_3imergde where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+
+        <if test="dataType == 'HB_Air'">
+            SELECT count(*)
+            FROM "wuhanCC_air_hourly" where 1=1
+            <if test="start != null">
+                AND querytime <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND querytime <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND uniquecode in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'HB_SuperAir'">
+            SELECT  count(*)
+            FROM "wuhanCC_super_station_hourly" where 1=1
+            <if test="start != null">
+                AND "TIMES" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "TIMES" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND "ST" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+
+        </if>
+        <if test="dataType == 'HB_Water'">
+            SELECT  count(*)
+            FROM hb_water_hourly where 1=1
+            <if test="start != null">
+                AND "dataTime" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "dataTime" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0 ">
+                AND "siteId" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'HB_WaterPollution'">
+            SELECT  count(*)
+            FROM hb_waterpollution where 1=1
+            <if test="start != null">
+                AND monitoring_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND monitoring_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'HB_WaterAuto'">
+            SELECT count(*)
+            FROM wh_water_quality_auto where 1=1
+            <if test="start != null">
+                AND query_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND query_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND section_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'TW_Air'">
+            SELECT count(*)
+            FROM taiwan_air_hourly where
+            <if test="start != null">
+                tw_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND tw_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND site_id in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'CH_Air'">
+            SELECT count(*)
+            FROM china_air_hourly where 1=1
+            <if test="start != null">
+                AND time_point <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time_point <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_code in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'WH_Weather'">
+            SELECT count(*)
+            FROM "wuhanCC_weather_hourly" where 1=1
+            <if test="start != null">
+                AND "QueryTime" <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND "QueryTime" <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND "StationID" in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'HB_Weather'">
+            SELECT count(*)
+            FROM hb_weather_station_hourly where 1=1
+            <if test="start != null">
+                AND response_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND response_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_name in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'CH_Weather'">
+            SELECT count(*)
+            FROM china_meteorological_network where 1=1
+            <if test="start != null">
+                AND time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="id != null and id.size()>0">
+                AND station_id in
+                <foreach collection="id" item="id"  open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </if>
+        <if test="dataType == 'TXZ_Station'">
+            SELECT count(*)
+            FROM tianxingzhou_station where 1=1
+            <if test="start != null">
+                AND querytime <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND querytime <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+    </select>
+
+
+
     <resultMap id="observation" type="Observation">
         <id property="id" column="id"/>
         <result property="procedureId" column="proc_id"/>

@@ -127,6 +127,7 @@ public interface ObsConstant {
     * 文件地址
     * */
     String File_Path = "/data/Ai-Sensing";
+    String File_Path2 = "/data01/Ai-Sensing";
 //    String File_Path = "C:/Users/chenlu/Desktop";
 
 

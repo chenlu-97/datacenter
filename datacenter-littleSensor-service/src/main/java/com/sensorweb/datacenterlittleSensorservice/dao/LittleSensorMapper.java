@@ -18,9 +18,11 @@ public interface LittleSensorMapper {
 
     int selectNum();
 
+    int selectNum2(@Param("start") Instant start, @Param("end") Instant end);
+
     int selectNumByTime(@Param("begin") Instant begin, @Param("end") Instant end);
 
-    List<LittleSensor> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
+    List<LittleSensor> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize,@Param("start") Instant start, @Param("end") Instant end);
 
     List<LittleSensor> selectByIds(@Param("deviceid") List<String> deviceid,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
 }

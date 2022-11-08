@@ -40,22 +40,6 @@ public class MeasuringVehicleService {
     @Autowired
     MeasuringVehicleMapper  measuringVehicleMapper;
 
-    public List<MeasuringVehicle> getVocsByPage(int pageNum, int pageSize) {
-        return measuringVehicleMapper.getVocsByPage(pageNum, pageSize);
-    }
-    public List<MeasuringVehicle> getHTByPage(int pageNum, int pageSize) {
-        return measuringVehicleMapper.getHTByPage(pageNum, pageSize);
-    }
-    public List<MeasuringVehicle> getPMByPage(int pageNum, int pageSize) {
-        return measuringVehicleMapper.getPMByPage(pageNum, pageSize);
-    }
-    public List<MeasuringVehicle> getAirByPage(int pageNum, int pageSize) {
-        return measuringVehicleMapper.getAirByPage(pageNum, pageSize);
-    }
-    public List<MeasuringVehicle> getSPMSByPage(int pageNum, int pageSize) {
-        return measuringVehicleMapper.getSPMSByPage(pageNum, pageSize);
-    }
-
 
 
     public boolean insertVocsData(String data) throws IOException {

@@ -111,10 +111,14 @@
         <if test="end != null ">
             AND datatime <![CDATA[<=]]> #{end}
         </if>
+        ORDER BY datatime DESC
         <if test="pageSize != null and pageNum != null">
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
     </select>
+
+
+
     <select id="selectNumByTime" resultType="java.lang.Integer">
         SELECT count(*)
         FROM surveying_vessel

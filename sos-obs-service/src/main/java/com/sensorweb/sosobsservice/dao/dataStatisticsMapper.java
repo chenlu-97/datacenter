@@ -149,6 +149,7 @@ public interface dataStatisticsMapper {
 
     int getProductNumByTime(@Param("type") String type,@Param("begin") Instant begin, @Param("end") Instant end);
 
+    int getProductNumByTime2(@Param("type") String type,@Param("end") Instant end);
 
     int getProductTypeNum(@Param("type") String type);
 
@@ -158,5 +159,7 @@ public interface dataStatisticsMapper {
 
     List<String> getFilepath(@Param("type") String type, @Param("database") String database);
 
-    int getDatabaseSize(@Param("table") String table);
+    List<String> getFilepath2(@Param("database") String database);
+
+    long getDatabaseSize(@Param("table") String table);
 }

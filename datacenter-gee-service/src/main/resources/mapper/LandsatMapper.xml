@@ -119,4 +119,8 @@
     WHERE imagetype = #{type} AND date <![CDATA[>=]]> #{startTime} AND date <![CDATA[<]]> #{endTime} AND row = #{row} AND path = #{path}
   </select>
 
+    <select id="getRowByPath" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select row from landsat_path_row where path= #{path}
+    </select>
+
 </mapper>

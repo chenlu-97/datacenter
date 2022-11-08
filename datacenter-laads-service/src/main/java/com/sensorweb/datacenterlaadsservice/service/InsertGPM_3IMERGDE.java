@@ -54,7 +54,7 @@ public class InsertGPM_3IMERGDE {
     @Autowired
     DownloadUtil downloadUtil;
 
-    @Scheduled(cron = "00 30 12 20 * ?")//每月20号的12：30分执行一次
+    @Scheduled(cron = "00 30 12 25 * ?")//每月20号的12：30分执行一次
     public void insert_GPM_3IMERGDE_Data() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
         Calendar calendar = Calendar.getInstance();

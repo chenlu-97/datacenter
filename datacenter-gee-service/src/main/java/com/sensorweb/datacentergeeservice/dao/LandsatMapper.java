@@ -33,4 +33,7 @@ public interface LandsatMapper {
     List<Landsat> getLandsat( @Param("type")String type,@Param("startTime")Instant startTime, @Param("endTime")Instant endTime);
 
     List<Landsat> getLandsat2(@Param("type")String type, @Param("row")int row,  @Param("path")int path,  @Param("startTime")Instant startTime,@Param("endTime")Instant endTime);
+
+    List<Integer> getRowByPath(@Param("path")Integer path);
+
 }

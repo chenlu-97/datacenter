@@ -67,8 +67,26 @@
 
     <select id="selectByPage" resultMap="littleSensor">
         SELECT <include refid="selectFields"></include>
-        FROM sensors_data ORDER BY receipt_time DESC
+        FROM sensors_data where 1=1
+        <if test="start != null">
+            AND receipt_time <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND receipt_time <![CDATA[<=]]> #{end}
+        </if>
+        ORDER BY receipt_time DESC
         LIMIT  #{pageNum} ,#{pageSize}
+    </select>
+
+    <select id="selectNum2" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sensors_data where 1=1
+        <if test="start != null">
+            AND receipt_time <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND receipt_time <![CDATA[<=]]> #{end}
+        </if>
     </select>
 
 </mapper>

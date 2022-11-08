@@ -51,7 +51,6 @@ public class GetSentinelController {
         res.put("Info", info);
         res.put("num",num);
         return res;
-
     }
 
     @ApiOperation("获取getSentinel数据")
