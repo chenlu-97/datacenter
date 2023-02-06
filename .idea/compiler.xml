@@ -19,10 +19,10 @@
         <module name="datacenter-air-service" />
         <module name="datacenter-mobile-service" />
         <module name="datacenter-gateway" />
+        <module name="datacenter-move-service" />
         <module name="eureka-server03" />
         <module name="datacenter-laads-service" />
         <module name="eureka-server01" />
-        <module name="datacenter-littleSensor-service" />
         <module name="eureka-server02" />
         <module name="datacenter-himawari-service" />
         <module name="sos-obs-service" />
@@ -33,12 +33,16 @@
         <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="sensorml-core" />
-        <module name="ogc-services-sos" />
         <module name="swe-common-core" />
         <module name="swe-common-om" />
-        <module name="ogc-services-common" />
         <module name="ogc-services-swe" />
+        <module name="ogc-services-sos" />
+        <module name="datacenter-littleSensor-service" />
+        <module name="ogc-services-common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="datacenter-air-service (1)" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

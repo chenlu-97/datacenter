@@ -237,9 +237,9 @@ public class DataCenterUtils {
 
 
 
-    public static void sendMessage(String id, String type, String details) throws Exception {
+    public static void sendMessage(String id, String type, String details,Integer number) throws Exception {
         String url = "http://172.16.100.2:9999/ai-sensing-back-service/api/ws/dps";
-        String param = "id="+URLEncoder.encode(id,"utf-8")+"&type="+URLEncoder.encode(type,"utf-8")+"&details="+URLEncoder.encode(details,"utf-8")+"&progress=100";
+        String param = "id="+URLEncoder.encode(id,"utf-8")+"&type="+URLEncoder.encode(type,"utf-8")+"&details="+URLEncoder.encode(details,"utf-8")+"&progress=100"+"&total="+number;
 //       Map<String ,Object> param = new HashMap<>();
 //
 //       param.put("id",URLEncoder.encode(id,"utf-8"));
@@ -430,6 +430,33 @@ public class DataCenterUtils {
         return null;
     }
 
+
+
+
+
+    /**
+     * 获取月初时间
+     */
+    public static String getFirstTime(Calendar calendar) {
+        // 获取当月第一天和最后一天
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String firstDay;
+        // 获取前月的第一天
+        firstDay = format.format(calendar.getTime());
+        return firstDay+" "+"00:00:00";
+    }
+
+    /**
+     * 获取月初时间
+     */
+    public static String getLastTime(Calendar calendar) {
+        // 获取当月第一天和最后一天
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String firstDay;
+        // 获取前月的第一天
+        firstDay = format.format(calendar.getTime());
+        return firstDay+" "+"23:59:59";
+    }
 
 
 

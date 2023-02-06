@@ -244,8 +244,9 @@
   </select>
 
     <select id="getProductTypeNum" resultType="java.lang.Integer">
-      select count(*) from tmodule where type = #{type}
+      select count(*) from product_type where module = #{type}
     </select>
+
 
   <select id="getProductNum" resultType="java.lang.Integer">
     select count(*) from tmodule a left join order_file b on a.name = b.product_type where type = #{type}
@@ -272,6 +273,74 @@
 
     <select id="getFilepath2" resultType="java.lang.String" parameterType="java.lang.String">
       select dir_path from data_storage where storage = #{database}
+    </select>
+
+    <select id="getwaterAutoNum" resultType="java.lang.Integer">
+      SELECT count(*)
+      FROM wh_water_quality_auto
+    </select>
+  <select id="getyaEBNum" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM "yangtzeRiverEB_weather"
+  </select>
+
+  <select id="getyaMRNum" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM "yangtzeRiverMR_weather"
+  </select>
+
+  <select id="getSentinelNum" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM sentinel
+  </select>
+  <select id="getCopernicusNum" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM cams
+  </select>
+
+
+  <select id="getSentineByTime" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM sentinel
+    WHERE date <![CDATA[>=]]> #{begin} AND date <![CDATA[<=]]> #{end}
+  </select>
+
+
+  <select id="getCopernicus" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM cams
+    WHERE time <![CDATA[>=]]> #{begin} AND time <![CDATA[<=]]> #{end}
+  </select>
+
+
+    <select id="getLittleSensorNumber" resultType="java.lang.Integer">
+      SELECT count(*)
+      FROM sensors_data_copy1
+    </select>
+
+  <select id="getNumberByTime" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM sensors_data_copy1
+    WHERE sample_time <![CDATA[>=]]> #{begin} AND sample_time <![CDATA[<=]]> #{end}
+  </select>
+
+
+  <select id="getWeatherSensorNumber" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM big_sensors_data
+  </select>
+
+  <select id="getWeatherSensorByTime" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM big_sensors_data
+    WHERE sample_time <![CDATA[>=]]> #{begin} AND sample_time <![CDATA[<=]]> #{end}
+  </select>
+
+
+    <select id="getTodayNumber" resultType="java.lang.Integer" parameterType="java.time.Instant">
+      select sum(total) as total
+      from push_data
+      where create_time <![CDATA[>=]]> #{time}
     </select>
 
 </mapper>

@@ -11,7 +11,7 @@ public class ApplicationContextUtil implements ApplicationContextAware {
         private static ApplicationContext applicationContext;
 
         public void setApplicationContext(ApplicationContext context) {
-            ApplicationContextUtil.applicationContext = context;
+            com.sensorweb.datacenterairservice.util.ApplicationContextUtil.applicationContext = context;
         }
 
         public static Object getBean(String name) {

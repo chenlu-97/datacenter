@@ -23,6 +23,8 @@
     <file url="file://$PROJECT_DIR$/datacenter-littleSensor-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/datacenter-mobile-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/datacenter-mobile-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-move-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/datacenter-move-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/datacenter-offline-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/datacenter-offline-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/datacenter-product-service/src/main/java" charset="UTF-8" />

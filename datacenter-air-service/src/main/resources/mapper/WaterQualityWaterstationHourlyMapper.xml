@@ -65,9 +65,35 @@
                 #{w01024})
         ON CONFLICT ("id") DO NOTHING
     </insert>
+    <insert id="store2" parameterType="com.sensorweb.datacenterairservice.entity.WaterQualityWaterstationHourly">
+        insert into hb_water_hourly( id,areaCode, dataTime, riverId
+                                   , siteId, WPCode, mnName
+                                   , e01001, e01002, w01001, w01003, w01009, w01010, w01014, w01016
+                                   , w01022, w19011, w21001, w21003, w21011, w22008, w01019, w01023
+                                   , w02007, w02005, w01024)
+        VALUES (#{id},#{areacode}, #{datatime}, #{riverid}, #{siteid},
+                #{wpcode}, #{mnname},
+                #{e01001}, #{e01002},#{w01001},
+                #{w01003},
+                #{w01009},
+                #{w01010},
+                #{w01014},
+                #{w01016},
+                #{w01022},
+                #{w19011},
+                #{w21001},
+                #{w21003},
+                #{w21011},
+                #{w22008},
+                #{w01019},
+                #{w01023},
+                #{w02007},
+                #{w02005},
+                #{w01024}) ON DUPLICATE KEY UPDATE id = #{id};
+    </insert>
 
     <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterairservice.entity.WaterQualityWaterstationHourly">
-        select "siteId"
+        select *
         from hb_water_hourly where "dataTime" = (select max("dataTime") from hb_water_hourly);
     </select>
 

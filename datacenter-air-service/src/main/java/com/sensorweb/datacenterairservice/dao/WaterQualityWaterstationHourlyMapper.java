@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -16,9 +15,11 @@ import java.util.List;
 * @createDate 2022-06-21 16:26:58
 * @Entity boot.bean.WaterQualityWaterstationHourly 
 */
+
 @Repository
 @Mapper
 public interface WaterQualityWaterstationHourlyMapper {
+
     int store(WaterQualityWaterstationHourly waterQualityWaterstationHourly);
 
     List<WaterQualityWaterstationHourly> selectMaxTimeData();
@@ -26,4 +27,6 @@ public interface WaterQualityWaterstationHourlyMapper {
     int selectNum();
 
     int selectByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int store2(WaterQualityWaterstationHourly waterQualityWaterstationHourly);
 }

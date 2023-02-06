@@ -1,6 +1,9 @@
 package com.sensorweb.datacenterairservice.thread;
 
 
+import com.sensorweb.datacenterairservice.dao.RawDataSuperStationHourlyMapper;
+import com.sensorweb.datacenterairservice.entity.RawDataSuperStationHourly;
+import com.sensorweb.datacenterairservice.feign.moveClient;
 import com.sensorweb.datacenterairservice.service.RawDataSuperStationHourlyService;
 import com.sensorweb.datacenterairservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
@@ -8,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class downloadSuperAirStation1 implements Runnable{
@@ -16,11 +22,12 @@ public class downloadSuperAirStation1 implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str="2021-12-01 00:00:00";
+            String str = "2022-12-07 00:00:00";
             //结束时间
-            String str1="2022-01-01 00:00:00";
+            String str1 = "2022-12-28 00:00:00";
             //2022-07-07 10:00:00 之前的没有接入
-            RawDataSuperStationHourlyService rawDataSuperStationHourlyService = (RawDataSuperStationHourlyService) ApplicationContextUtil.getBean("rawDataSuperStationHourlyService");
+            RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper = (RawDataSuperStationHourlyMapper) ApplicationContextUtil.getBean("rawDataSuperStationHourlyMapper");
+            moveClient moveclient = (moveClient) ApplicationContextUtil.getBean("moveclient");
             log.info("------ 开始下载" + str + "到" + str1 + "的空气超级站-----");
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:ss:00");
             Calendar start = Calendar.getInstance();
@@ -32,22 +39,47 @@ public class downloadSuperAirStation1 implements Runnable{
                 e.printStackTrace();
             }
             while (start.before(end)) {
-                Instant startTime = DataCenterUtils.string2Instant(format.format(start.getTime())).plusSeconds(8 * 60 * 60);
-                Instant endTime = DataCenterUtils.string2Instant(format.format(start.getTime())).plusSeconds(32 * 60 * 60).minusSeconds(1);
-                String begin = startTime.toString().replace("T", " ").replace("Z", "");
-                String stop = endTime.toString().replace("T", " ").replace("Z", "");
-                boolean flag = rawDataSuperStationHourlyService.accessinforming(begin, stop);
-                if (flag) {
-                    System.out.println("空气超级站接入时间: " + begin + "Status: Success");
-                } else {
-                    System.out.println("空气超级站接入时间: " + begin + "Status: Fail");
+                int flag = 0;
+                try {
+                    System.out.println("开始同步！！");
+                    List<Map> superstations = moveclient.getSuperStationByTime(format.format(start.getTime()), format.format(end.getTime()));
+                    System.out.println("start = " + start);
+                    System.out.println("end = " + end);
+                    List<RawDataSuperStationHourly> rawDataSuperStations = new ArrayList<>();
+                    System.out.println("superstations.size() = " + superstations.size());
+                    if (superstations != null && superstations.size() > 0) {
+                        for (int j = 0; j < superstations.size(); j++) {
+                            try {
+                                Map access = superstations.get(j);
+                                RawDataSuperStationHourly rawDataSuperStationHourly = new RawDataSuperStationHourly();
+                                rawDataSuperStationHourly.setSt((String) access.get("ST"));
+                                rawDataSuperStationHourly.setSvalue((String) access.get("SVALUE"));
+                                rawDataSuperStationHourly.setTimes(DataCenterUtils.string2Instant(access.get("TIMES").toString()));
+                                rawDataSuperStationHourly.setStNa((String) access.get("ST_NA"));
+                                rawDataSuperStationHourly.setEpname((String) access.get("EPNAME"));
+                                rawDataSuperStationHourly.setCategpry((String) access.get("CATEGPRY"));
+                                rawDataSuperStationHourly.setId((String) access.get("id"));
+                                flag = rawDataSuperStationHourlyMapper.store(rawDataSuperStationHourly);
+                                rawDataSuperStations.add(rawDataSuperStationHourly);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+//
+                        if (flag > 0) {
+                            System.out.println("空气超级站同步时间: " + start + "Status: Success");
+                            log.info("空气超级站同步时间: " + start + "Status: Success");
+                            DataCenterUtils.sendMessage("WhCC_SuperAir" + start, "站网-武汉城市群超级空气站", "这是一条获取的武汉城市群超级空气站数据",superstations.size());
+                        } else {
+                            System.out.println("空气超级站同步失败时间: " + start + "Status: Fail");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                start.add(Calendar.DAY_OF_MONTH,1);
-//                start.add(Calendar.DAY_OF_MONTH, 1);
-                Thread.sleep(2 * 1000); //下载太快会断开连接，这里休息2秒
-            }
 
-        } catch (Exception e) {
+            }
+        }catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
             log.info("空气超级站接入: " + "Status: Fail");

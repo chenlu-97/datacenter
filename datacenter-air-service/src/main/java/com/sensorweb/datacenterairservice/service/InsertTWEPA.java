@@ -13,7 +13,6 @@ import com.sensorweb.datacenterairservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterairservice.util.AirConstant;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import com.sensorweb.datacenterutil.utils.DownloadFile;
-import com.sensorweb.datacenterutil.utils.SendMail;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -83,10 +82,10 @@ public class InsertTWEPA implements AirConstant {
                     String document = getDocumentByGZip(path);
                     flag = insertTwEPAInfoBatch(getEPAInfo(document));
                     if (flag) {
-                        log.info("台湾EPA接入时间: " + date + "Status: Success");
-                        DataCenterUtils.sendMessage("TW_AIR"+ date, "站网-台湾空气质量","这是一条获取的台湾省空气质量数据");
-                        System.out.println("台湾EPA接入时间: " + date + "Status: Success");
                         int num = twepaMapper.selectMaxTimeData().size();
+                        log.info("台湾EPA接入时间: " + date + "Status: Success");
+                        DataCenterUtils.sendMessage("TW_AIR"+ date, "站网-台湾空气质量","这是一条获取的台湾省空气质量数据",num);
+                        System.out.println("台湾EPA接入时间: " + date + "Status: Success");
                         if(num!=85){
                             int gap = 85-num;
                             String mes = "接入时间 ："+ date+ "-----台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap;

@@ -194,16 +194,16 @@
             SELECT *
             FROM uav_image where 1=1
             <if test="start != null">
-                AND time <![CDATA[>=]]> #{start}
+                AND create_time <![CDATA[>=]]> #{start}
             </if>
             <if test="end != null ">
-                AND time <![CDATA[<=]]> #{end}
+                AND create_time <![CDATA[<=]]> #{end}
             </if>
-            order by time desc
+            order by create_time desc
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
         <if test="dataType == 'Landsat'">
-            SELECT  *   FROM landsat  where 1=1
+            SELECT  *  FROM landsat  where 1=1
             <if test="start != null">
                 AND date <![CDATA[>=]]> #{start}
             </if>
@@ -231,7 +231,6 @@
             <if test="end != null ">
                 AND date <![CDATA[<=]]> #{end}
             </if>
-
             <if test="spa == 'wuhanCC'">
                 AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
             </if>
@@ -256,7 +255,7 @@
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
         <if test="dataType == 'FY4'">
-            SELECT no,file_type,file_name,time
+            SELECT *
             FROM satellite_image  where 1=1
             <if test="start != null">
                 AND time <![CDATA[>=]]> #{start}
@@ -268,7 +267,7 @@
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
         <if test="dataType == 'GLDAS'">
-            SELECT gldas_id, time, bbox, product_type
+            SELECT *
             FROM gldas where 1=1
             <if test="start != null">
                 AND time <![CDATA[>=]]> #{start}
@@ -495,16 +494,42 @@
             order by querytime desc
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
+        <if test="dataType == 'Air_Sensor'">
+            SELECT *
+            FROM sensors_data_copy1 where 1=1
+            <if test="start != null">
+                AND sample_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND sample_time <![CDATA[<=]]> #{end}
+            </if>
+            order by sample_time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Weather_Sensor'">
+            SELECT *
+            FROM big_sensors_data where 1=1
+            <if test="start != null">
+                AND sample_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND sample_time <![CDATA[<=]]> #{end}
+            </if>
+            order by sample_time desc
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
     </select>
+
+
 
     <select id="getDataNum" resultType="java.lang.Integer">
         <if test="dataType == 'UHD185'">
             SELECT count(*) FROM uav_image where 1=1
             <if test="start != null">
-                AND time <![CDATA[>=]]> #{start}
+                AND create_time <![CDATA[>=]]> #{start}
             </if>
             <if test="end != null ">
-                AND time <![CDATA[<=]]> #{end}
+                AND create_time <![CDATA[<=]]> #{end}
             </if>
         </if>
         <if test="dataType == 'Landsat'">
@@ -571,8 +596,6 @@
             <if test="end != null ">
                 AND time <![CDATA[<=]]> #{end}
             </if>
-            order by time desc
-            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
         <if test="dataType == 'Himawari'">
             SELECT count(*) FROM himawari where 1=1
@@ -593,7 +616,6 @@
                 AND time <![CDATA[<=]]> #{end}
             </if>
         </if>
-
         <if test="dataType == 'HB_Air'">
             SELECT count(*)
             FROM "wuhanCC_air_hourly" where 1=1
@@ -763,6 +785,26 @@
             </if>
             <if test="end != null ">
                 AND querytime <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'Air_Sensor'">
+            SELECT count(*)
+            FROM sensors_data_copy1 where 1=1
+            <if test="start != null">
+                AND sample_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND sample_time <![CDATA[<=]]> #{end}
+            </if>
+        </if>
+        <if test="dataType == 'Weather_Sensor'">
+            SELECT count(*)
+            FROM big_sensors_data where 1=1
+            <if test="start != null">
+                AND sample_time <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND sample_time <![CDATA[<=]]> #{end}
             </if>
         </if>
     </select>

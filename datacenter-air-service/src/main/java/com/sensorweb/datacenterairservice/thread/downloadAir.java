@@ -3,7 +3,6 @@ package com.sensorweb.datacenterairservice.thread;
 
 import com.alibaba.fastjson.JSONArray;
 import com.sensorweb.datacenterairservice.service.InsertAirService;
-import com.sensorweb.datacenterairservice.service.WaterQualityWaterstationHourlyService;
 import com.sensorweb.datacenterairservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;

@@ -120,7 +120,10 @@ public class MeasuringVehicleController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
-        List<MeasuringVehicle> info = measuringVehicleMapper.getVocsByPage(pageNum, pageSize,start,end);
+        List<Map> info = measuringVehicleMapper.getVocsByPage(pageNum, pageSize,start,end);
+        int count = measuringVehicleMapper.getDataNum1(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         res.put("Info", info);
         return res;
     }
@@ -139,7 +142,10 @@ public class MeasuringVehicleController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
-        List<MeasuringVehicle> info = measuringVehicleMapper.getHTByPage(pageNum, pageSize,start,end);
+        List<Map> info = measuringVehicleMapper.getHTByPage(pageNum, pageSize,start,end);
+        int count = measuringVehicleMapper.getDataNum2(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         res.put("Info", info);
         return res;
     }
@@ -158,7 +164,10 @@ public class MeasuringVehicleController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
-        List<MeasuringVehicle> info = measuringVehicleMapper.getPMByPage(pageNum, pageSize,start,end);
+        List<Map> info = measuringVehicleMapper.getPMByPage(pageNum, pageSize,start,end);
+        int count = measuringVehicleMapper.getDataNum3(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         res.put("Info", info);
         return res;
     }
@@ -177,7 +186,10 @@ public class MeasuringVehicleController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
-        List<MeasuringVehicle> info = measuringVehicleMapper.getAirByPage(pageNum, pageSize,start,end);
+        List<Map> info = measuringVehicleMapper.getAirByPage(pageNum, pageSize,start,end);
+        int count = measuringVehicleMapper.getDataNum4(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         res.put("Info", info);
         return res;
     }
@@ -197,7 +209,10 @@ public class MeasuringVehicleController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
-        List<MeasuringVehicle> info = measuringVehicleMapper.getSPMSByPage(pageNum, pageSize,start,end);
+        List<Map> info = measuringVehicleMapper.getSPMSByPage(pageNum, pageSize,start,end);
+        int count = measuringVehicleMapper.getDataNum5(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         res.put("Info", info);
         return res;
     }

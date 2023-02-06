@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
@@ -25,4 +26,8 @@ public interface LittleSensorMapper {
     List<LittleSensor> selectByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize,@Param("start") Instant start, @Param("end") Instant end);
 
     List<LittleSensor> selectByIds(@Param("deviceid") List<String> deviceid,@Param("pageNum") int pageNum, @Param("pageSize") int pageSize);
+
+    List<Map> getSuperStationByTime(@Param("start") Instant start, @Param("end") Instant end);
+
+    List<Map> getWaterStationByTime(@Param("start") Instant start, @Param("end") Instant end);
 }

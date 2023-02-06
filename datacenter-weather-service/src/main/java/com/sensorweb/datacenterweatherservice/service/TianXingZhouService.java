@@ -29,7 +29,7 @@ public class TianXingZhouService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 */1 * * * ?") //每分钟接入
+//    @Scheduled(cron = "0 */1 * * * ?") //每分钟接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
@@ -41,7 +41,7 @@ public class TianXingZhouService {
                     if (flag.equals("接入成功")) {
                         log.info("天兴洲综合站接入时间: " + date + "Status: Success");
                         System.out.println("天兴洲综合站接入时间: " +date + "Status: Success");
-                        DataCenterUtils.sendMessage("TianXingZhou_Weather_"+date, "站网-天兴洲综合站","这是一条武汉天兴洲综合站气象数据的");
+                        DataCenterUtils.sendMessage("TianXingZhou_Weather_"+date, "站网-天兴洲综合站","这是一条武汉天兴洲综合站气象数据的",1);
                     }else if(flag.equals("接入失败")){
                         log.info("天兴洲综合站接入时间: " + date + "Status: fail");
                         System.out.println("天兴洲综合站接入时间: " + date + "Status: fail");

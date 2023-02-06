@@ -58,12 +58,14 @@ public class InsertLAADSService implements LAADSConstant {
     @Value("${datacenter.path.laads}")
     private String filePath;
 
+    @Value("${datacenter.path.laadsnew}")
+    private String filePath2;
+
     @Autowired
     OkHttpUtil okHttpUtil;
 
     @Autowired
     DownloadUtil downloadUtil;
-
 
 
     /**
@@ -76,7 +78,8 @@ public class InsertLAADSService implements LAADSConstant {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2","MOD13A3","MOD09A1"};
+//                ,"MOD09A1","MOD09GA"
+                String[] products = new String[]{"MOD11A1", "MOD11A2", "MYD11A1", "MOD13A2", "MCD19A2", "MOD13A3"};
                 LocalDateTime dateTime = LocalDateTime.now();
                 DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
                 String strDate3 = dtf3.format(dateTime);
@@ -94,13 +97,13 @@ public class InsertLAADSService implements LAADSConstant {
                             String stop = timeNow.plusSeconds(24 * 60 * 60).toString();
                             stop = stop.substring(0, stop.indexOf("T")) + " 00:00:00";
                             code = insertData2(start, stop, bbox, product);
-                            log.info(product+"----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
+                            log.info(product + "----LAADS接入时间: " + timeNew + "-----Status: -----" + code);
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
-                            log.info(product+"----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
-                            SendException("Modis--"+product,timeNew.plusSeconds(8 * 60 * 60).toString(),timeNow.plusSeconds(8 * 60 * 60)+"Modis--"+product+"接入数据失败");
+                            log.info(product + "----LAADS接入时间----: " + timeNew + "-----Status: Fail----" + code);
+                            SendException("Modis--" + product, timeNew.plusSeconds(8 * 60 * 60).toString(), timeNow.plusSeconds(8 * 60 * 60) + "Modis--" + product + "接入数据失败");
                         }
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                 }
@@ -325,7 +328,7 @@ public class InsertLAADSService implements LAADSConstant {
      * @param fileName
      * @param savePath
      */
-    public String downloadFromUrl(String url, String fileName, String savePath) {
+    public String downloadFromUrl(String url, String fileName, String savePath, String token) {
         String res = null;
         try {
 //            HttpsUrlValidator.retrieveResponseFromServer(url);
@@ -333,7 +336,7 @@ public class InsertLAADSService implements LAADSConstant {
 //            SSLUtil.ignoreSsl();
             HttpURLConnection connection = (HttpURLConnection) httpUrl.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36");
-            connection.setRequestProperty("Authorization", LAADSConstant.LAADS_DOWNLOAD_TOKEN);
+            connection.setRequestProperty("Authorization", token);
             //设置https协议访问
             System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2,SSLv3");
             InputStream inputStream = connection.getInputStream();
@@ -360,6 +363,7 @@ public class InsertLAADSService implements LAADSConstant {
         return res;
     }
 
+
     /**
      * 通过url下载LAADS文件，需要Token授权的情况下，这个方法加入了代理，目前用这个方法
      *
@@ -374,7 +378,7 @@ public class InsertLAADSService implements LAADSConstant {
             URL httpUrl = new URL(url);
 //            SSLUtil.ignoreSsl();
             //创建代理服务器
-            InetSocketAddress addr = new InetSocketAddress("127.0.0.1",5210);
+            InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 5210);
             //Proxy proxy = new Proxy(Proxy.Type.SOCKS, addr); //SOCKS代理
             Proxy proxy = new Proxy(Proxy.Type.HTTP, addr); //HTTP代理
             //其他方式可以见Proxy.Type属性
@@ -382,7 +386,7 @@ public class InsertLAADSService implements LAADSConstant {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36");
             connection.setRequestProperty("Authorization", LAADSConstant.LAADS_DOWNLOAD_TOKEN);
             String cookie = getCookie();
-            if(cookie!=null){
+            if (cookie != null) {
                 connection.setRequestProperty("Cookie", cookie);
             }
             //设置https协议访问
@@ -410,7 +414,6 @@ public class InsertLAADSService implements LAADSConstant {
         }
         return res;
     }
-
 
 
     public static byte[] readInputStream(InputStream inputStream) throws IOException {
@@ -568,7 +571,7 @@ public class InsertLAADSService implements LAADSConstant {
                                         if (!file.exists()) {
                                             boolean flag = file.mkdirs();
                                         }
-                                        String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                        String localPath = downloadFromUrl(entry.getLink(), fileName, filePath, LAADSConstant.LAADS_DOWNLOAD_TOKEN3);
                                         entry.setFilePath(localPath);
                                         entry.setSatellite(satellite);
                                         entry.setProductType(product);
@@ -618,7 +621,7 @@ public class InsertLAADSService implements LAADSConstant {
                                         if (!file.exists()) {
                                             boolean flag = file.mkdirs();
                                         }
-                                        String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                        String localPath = downloadFromUrl(entry.getLink(), fileName, filePath, LAADSConstant.LAADS_DOWNLOAD_TOKEN3);
                                         entry.setFilePath(localPath);
                                         entry.setSatellite(satellite);
                                         entry.setProductType(product);
@@ -677,12 +680,12 @@ public class InsertLAADSService implements LAADSConstant {
      * @param bbox      "95,24,123,35"-->长江经济带
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public String insertData2( String startTime, String endTime, String bbox, String productName) throws Exception {
+    public String insertData2(String startTime, String endTime, String bbox, String productName) throws Exception {
         List<Entry> entryList = new ArrayList<>();
         int j = 0;
         List<LAADSCollection> collections = new ArrayList<>();
         try {
-         collections = getCollectionsByProduct(productName);
+            collections = getCollectionsByProduct(productName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -695,10 +698,10 @@ public class InsertLAADSService implements LAADSConstant {
                         if (!StringUtils.isBlank(entry.getLink())) {
                             String fileName = entry.getLink().substring(entry.getLink().lastIndexOf("/") + 1);
                             List<Entry> entrys = entryMapper.getByFileName(fileName);
-                            if(entrys.size()>0){
-            //                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
-            //                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
-                            }else {
+                            if (entrys.size() > 0) {
+                                //                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
+                                //                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
+                            } else {
                                 File file = new File(filePath);
                                 if (!file.exists()) {
                                     boolean flag = file.mkdirs();
@@ -707,14 +710,14 @@ public class InsertLAADSService implements LAADSConstant {
 //                                headers[0] = "Authorization";
 //                                headers[1] = LAADS_DOWNLOAD_TOKEN;
 //                                String localPath = downloadUtil.downloadBySysc(entry.getLink(), headers, filePath, fileName);
-                                String localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                String localPath = downloadFromUrl(entry.getLink(), fileName, filePath, LAADSConstant.LAADS_DOWNLOAD_TOKEN3);
                                 int i = 0;
                                 while (localPath.equals("fail")) {
                                     if (i > 2) {
                                         break;
                                     }
 //                                    localPath = downloadUtil.downloadBySysc(entry.getLink(), headers, filePath, fileName);
-                                    localPath = downloadFromUrl(entry.getLink(), fileName, filePath);
+                                    localPath = downloadFromUrl(entry.getLink(), fileName, filePath, LAADSConstant.LAADS_DOWNLOAD_TOKEN3);
                                     i++;
                                 }
                                 if (localPath != "fail" && localPath != null && localPath != "none") {
@@ -727,12 +730,12 @@ public class InsertLAADSService implements LAADSConstant {
                             }
                         }
                     }
-                    if(j>0) {
+                    if (j > 0) {
                         return "下载成功";
-                    }else{
+                    } else {
                         return "下载失败";
                     }
-                }else{
+                } else {
                     log.info("MODIS暂无数据！！！");
                     return "暂无数据";
                 }
@@ -740,6 +743,99 @@ public class InsertLAADSService implements LAADSConstant {
         }
         return "无该数据集";
     }
+
+
+    /**
+     * 数据接入，将数据存储到本地数据库，并将数据文件存储到本地，（由于有些卫星和产品的页面访问会卡住，这个方法直接从产品的数据集页面下载数据）
+     *
+     * @param start "2020-11-08 00:00:00"
+     * @param bbox      "95,24,123,35"-->长江经济带
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public String insertData4(Instant start, Instant end, String bbox, String productName, String token) throws Exception {
+        List<Entry> entryList = new ArrayList<>();
+
+        String  startTime =  start.plusSeconds(8 * 60 * 60).toString().replace("T", " ").replace("Z", "");
+        String endTime =  end.plusSeconds(8 * 60 * 60).toString().replace("T", " ").replace("Z", "");
+
+        List<Entry> entry_query = entryMapper.getFilePath(productName,start,end);
+        if(entry_query.size()==7){
+
+        }else {
+
+            int j = 0;
+            List<LAADSCollection> collections = new ArrayList<>();
+            try {
+                collections = getCollectionsByProduct(productName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (collections != null && collections.size() > 0) {
+                for (LAADSCollection collection : collections) {
+                    String response = getInfoByOpenSearch(productName, Integer.parseInt(collection.getName()), startTime, endTime, bbox);
+                    List<Entry> entries = getEntryInfo(response);
+                    String time = startTime.substring(0, 10);
+                    String year = startTime.substring(0, 4);
+                    String files = filePath2 + File.separator + productName + File.separator + year + File.separator + time;
+                    if (entries.size() > 0) {
+                        for (Entry entry : entries) {
+                            if (!StringUtils.isBlank(entry.getLink())) {
+                                String fileName = entry.getLink().substring(entry.getLink().lastIndexOf("/") + 1);
+                                String need_filename = fileName.substring(17, 23);
+                                if (need_filename.equals("h25v05") || need_filename.equals("h26v05") || need_filename.equals("h27v05") || need_filename.equals("h28v05")
+                                        || need_filename.equals("h26v06") || need_filename.equals("h27v06") || need_filename.equals("h28v06")) {
+                                    List<Entry> entrys = entryMapper.getByFileName(fileName);
+                                    if (entrys.size() > 0) {
+                                        //                        System.out.println(product+start.toString()+"已存在该数据，无需下载！！！");
+                                        //                        log.info(product+start.toString()+"已存在该数据，无需下载！！！");
+
+                                    } else {
+                                        File file = new File(files);
+                                        if (!file.exists()) {
+                                            boolean flag = file.mkdirs();
+                                        }
+                                        //
+                                        String localPath = downloadFromUrl(entry.getLink(), fileName, files, token);
+                                        int i = 0;
+                                        while (localPath.equals("fail")) {
+                                            if (i > 2) {
+                                                break;
+                                            }
+                                            localPath = downloadFromUrl(entry.getLink(), fileName, files, token);
+                                            i++;
+                                        }
+                                        if (localPath != "fail" && localPath != null && localPath != "none") {
+                                            entry.setFilePath(localPath);
+                                            entry.setSatellite("Modis");
+                                            entry.setProductType(productName);
+                                            j = entryMapper.insertData(entry);
+                                            //                                changeAuthority(localPath);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Thread.sleep(10 * 1000);
+                        return "该日期无数据";
+                    }
+                    if (j > 0) {
+                        Thread.sleep(10 * 1000);
+                        return "下载成功";
+                    } else {
+                        Thread.sleep(10 * 1000);
+                        return "下载失败";
+                    }
+                }
+            }
+            Thread.sleep(10 * 1000);
+            return "无该数据集";
+        }
+        return "该日期所有影像已下载完成";
+    }
+
+
+
 
 
     /**

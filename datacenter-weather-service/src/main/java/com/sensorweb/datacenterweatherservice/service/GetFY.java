@@ -18,7 +18,7 @@ public class GetFY {
 
 
 
-    @PostConstruct
+//    @PostConstruct
     public void getApiDocument() throws IOException {
         String param =  "userId=BCWH_QXT_WHUZHY&pwd=whuzhy_210323&interfaceId=getSateFileByTimeRange&elements=Datetime,FILE_SIZE,File_URL,SATE_Sensor_Chanl&dataCode=SATE_GEO_RAW_DMZ_FY4A&timeRange=[20220914000000,20220914200000]&limitCnt=30&dataFormat=json";
         String document = DataCenterUtils.doGet("http://61.183.207.181:8008/cimiss-web/api", param);
@@ -27,7 +27,7 @@ public class GetFY {
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     public void getApi() throws IOException {
         String param =  "userId=BCWH_QXT_WHUZHY&pwd=whuzhy_210323&interfaceId=getSurfSixEle&times=20220908000000&dataCode=SURF_CHN_MUL_HOR&dataFormat=json&limitCnt=30";
         String document = DataCenterUtils.doGet("http://61.183.207.181:8008/cimiss-web/api", param);

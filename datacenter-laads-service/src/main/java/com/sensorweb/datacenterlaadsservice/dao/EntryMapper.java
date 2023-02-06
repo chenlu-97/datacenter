@@ -30,4 +30,6 @@ public interface EntryMapper {
     List<Entry> selectMaxTimeData(String product);
 
     List<Entry> getByFileName(@Param("fileName") String fileName);
+
+    List<Entry> queryByTimeAnd(@Param("start")Instant start, @Param("end")Instant end, @Param("name")String name);
 }

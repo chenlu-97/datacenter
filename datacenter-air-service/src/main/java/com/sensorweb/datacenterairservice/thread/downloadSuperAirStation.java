@@ -2,7 +2,6 @@ package com.sensorweb.datacenterairservice.thread;
 
 
 import com.sensorweb.datacenterairservice.service.RawDataSuperStationHourlyService;
-import com.sensorweb.datacenterairservice.service.WaterQualityWaterstationHourlyService;
 import com.sensorweb.datacenterairservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +16,9 @@ public class downloadSuperAirStation implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str="2022-04-01 00:00:00";
+            String str="2022-11-11 15:00:00";
             //结束时间
-            String str1="2022-05-01 00:00:00";
+            String str1="2022-11-16 13:00:00";
             //2022-07-07 10:00:00 之前的没有接入
             RawDataSuperStationHourlyService rawDataSuperStationHourlyService = (RawDataSuperStationHourlyService) ApplicationContextUtil.getBean("rawDataSuperStationHourlyService");
             log.info("------ 开始下载" + str + "到" + str1 + "的空气超级站-----");

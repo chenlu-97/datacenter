@@ -183,7 +183,6 @@
 
 
 
-
     <select id="getVocsByPage" resultMap="measuringVehicle">
         SELECT datatime,lon,lat, air_temperature, air_humidity, air_pressure ,wind_speed , wind_direction,tvocs
         FROM measuring_vehicle_vocs where 1=1
@@ -194,7 +193,7 @@
             AND datatime <![CDATA[<=]]> #{end}
         </if>
         order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        limit #{pageNum},#{pageSize}
     </select>
 
     <select id="getHTByPage" resultMap="measuringVehicle">
@@ -208,7 +207,7 @@
             AND datatime <![CDATA[<=]]> #{end}
         </if>
         order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        limit #{pageNum},#{pageSize}
     </select>
 
     <select id="getPMByPage" resultMap="measuringVehicle">
@@ -222,7 +221,7 @@
             AND datatime <![CDATA[<=]]> #{end}
         </if>
         order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        limit #{pageNum},#{pageSize}
     </select>
 
     <select id="getAirByPage" resultMap="measuringVehicle">
@@ -236,7 +235,7 @@
             AND datatime <![CDATA[<=]]> #{end}
         </if>
         order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        limit #{pageNum},#{pageSize}
     </select>
 
     <select id="getSPMSByPage" resultMap="measuringVehicle">
@@ -250,7 +249,61 @@
             AND datatime <![CDATA[<=]]> #{end}
         </if>
         order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="getDataNum1" resultType="java.lang.Integer">
+        SELECT count(*) FROM measuring_vehicle_vocs where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+
+    <select id="getDataNum2" resultType="java.lang.Integer">
+        SELECT count(*) FROM measuring_vehicle_ht where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+
+    <select id="getDataNum3" resultType="java.lang.Integer">
+        SELECT count(*) FROM measuring_vehicle_pm where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+
+    <select id="getDataNum4" resultType="java.lang.Integer">
+        SELECT count(*) FROM measuring_vehicle_air where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+
+    <select id="getDataNum5" resultType="java.lang.Integer">
+        SELECT count(*) FROM measuring_vehicle_spms where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
     </select>
 
 </mapper>

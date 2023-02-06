@@ -49,6 +49,9 @@ public class SurveyingVesselController {
             start = DataCenterUtils.string2Instant(startTime);
             end = DataCenterUtils.string2Instant(endTime);
         }
+        int count = surveyingVesselMapper.getDataNum(start,end,region,id);
+        Object num = new Integer(count);
+        res.put("num",num);
         info =  surveyingVesselMapper.selectByPage2(pageNum,pageSize,start,end);
         res.put("Info", info);
         return res;

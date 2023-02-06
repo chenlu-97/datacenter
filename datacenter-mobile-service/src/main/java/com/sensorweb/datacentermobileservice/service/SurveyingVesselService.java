@@ -39,6 +39,7 @@ public class SurveyingVesselService {
         return surveyingVesselMapper.selectByPage(pageNum, pageSize);
     }
 
+
     public SurveyingVessel ParseTemplateHourly(String data){
         SurveyingVessel surveyingVessel = new SurveyingVessel();
         try {

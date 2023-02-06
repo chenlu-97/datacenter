@@ -19,19 +19,29 @@
 <!--        CATEGPRY,ST_NA,EPNAME-->
 <!--    </sql>-->
 
-    <insert id="store">
-        insert into "wuhanCC_super_station_hourly"("id","ST", "SVALUE", "TIMES", "CATEGPRY", "ST_NA", "EPNAME")
-        VALUES (#{id},
-                #{st},
-                #{svalue},
-                #{times},
-                #{categpry},
-                #{stNa},
-                #{epname})
-        ON CONFLICT ("id") DO NOTHING
+<!--    <insert id="store">-->
+<!--        insert into `wuhanCC_super_station_hourly` (`id`,`ST`, `SVALUE`, `TIMES`, `CATEGPRY`, `ST_NA`, `EPNAME`) VALUES (#{id},#{st},#{svalue},#{times},#{categpry},#{stNa},#{epname});-->
+<!--    </insert>-->
+
+    <insert id="insertDataBatch" parameterType="java.util.List">
+        INSERT INTO wuhanCC_super_station_hourly (id,ST, SVALUE, TIMES, CATEGPRY, ST_NA, EPNAME)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.st},#{item.svalue},#{item.times},#{item.categpry},#{item.stNa},#{item.epname})
+        </foreach>
     </insert>
+
+
+    <insert id="store">
+        insert into "wuhanCC_super_station_hourly" ("id","ST", "SVALUE", "TIMES", "CATEGPRY", "ST_NA", "EPNAME") VALUES (#{id},#{st},#{svalue},#{times},#{categpry},#{stNa},#{epname}) ON CONFLICT ("id") DO NOTHING;
+    </insert>
+
+    <insert id="store2">
+        insert into wuhanCC_super_station_hourly (id,ST, SVALUE, TIMES, CATEGPRY, ST_NA, EPNAME) VALUES (#{id},#{st},#{svalue},#{times},#{categpry},#{stNa},#{epname}) ON DUPLICATE KEY UPDATE id = #{id} ;
+    </insert>
+
     <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterairservice.entity.RawDataSuperStationHourly">
-        select "ST"
+        select *
         from "wuhanCC_super_station_hourly" where "TIMES" = (select max("TIMES") from "wuhanCC_super_station_hourly");
     </select>
 

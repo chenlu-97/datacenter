@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 
 @Repository

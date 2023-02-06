@@ -173,8 +173,10 @@ public class NewInsertHimawariService implements HimawariConstant {
             log.error("parameter is not right");
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("H08_").append(year).append(month).append(day).append("_").append(hour).append("00_1HARP031_FLDK.02401_02401.nc");
+//        sb.append("H08_").append(year).append(month).append(day).append("_").append(hour).append("00_1HARP031_FLDK.02401_02401.nc");  2022.12.13 14:00:00 开始更换为了卫星9号
+        sb.append("H09_").append(year).append(month).append(day).append("_").append(hour).append("00_1HARP031_FLDK.02401_02401.nc");
         return sb.toString();
+
     }
 
     public void SendException(String type, String time, String details) throws IOException {

@@ -9,14 +9,12 @@ import com.sensorweb.datacenterairservice.dao.AirStationMapper;
 import com.sensorweb.datacenterairservice.entity.AirQualityDay;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.AirStationModel;
-import com.sensorweb.datacenterairservice.entity.WaterStation;
 import com.sensorweb.datacenterairservice.feign.ObsFeignClient;
 import com.sensorweb.datacenterairservice.feign.SensorFeignClient;
 import com.sensorweb.datacenterairservice.util.AirConstant;
 import com.sensorweb.datacenterairservice.util.OkHttpUtils.OkHttpRequest;
 import com.sensorweb.datacenterairservice.util.timeTransfer.SecondAndDate;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
-import com.sensorweb.datacenterutil.utils.SendMail;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,15 +31,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -90,10 +81,10 @@ public class InsertAirService extends Thread implements AirConstant {
                     try {
                         flag = !insertHourDataByHour(time);
                         if (!flag) {
-                            log.info("湖北省监测站接入时间: " + time + "Status: Success");
-                            DataCenterUtils.sendMessage("HB_AIR"+ time, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据");
-                            System.out.println("湖北省监测站接入时间: " + time + "Status: Success");
                             int num = airQualityHourMapper.selectMaxTimeData().size();
+                            log.info("湖北省监测站接入时间: " + time + "Status: Success");
+                            DataCenterUtils.sendMessage("HB_AIR"+ time, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据",num);
+                            System.out.println("湖北省监测站接入时间: " + time + "Status: Success");
                             if(num!=273){
                                 int gap = 273-num;
                                 String mes = "接入时间 ："+ time+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;

@@ -3,6 +3,7 @@ package com.sensorweb.datacenterairservice.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -22,7 +23,7 @@ public class WaterQualityWaterstationHourly implements Serializable {
     /**
      *
      */
-    private Date datatime;
+    private Instant datatime;
 
     /**
      *

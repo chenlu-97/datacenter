@@ -3,6 +3,7 @@ package com.sensorweb.datacenterairservice.util.OkHttpUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sensorweb.datacenterairservice.util.OkHttpUtils.Url;
 import lombok.Data;
 import okhttp3.*;
 

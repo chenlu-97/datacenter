@@ -34,4 +34,6 @@ public interface SurveyingVesselMapper {
     int updateDataByTime(SurveyingVessel surveyingVessel);
 
     int selectNumByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int getDataNum(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
 }

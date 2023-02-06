@@ -3,6 +3,7 @@ package com.sensorweb.datacenterairservice.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -28,7 +29,7 @@ public class RawDataSuperStationHourly implements Serializable {
     /**
      * 
      */
-    private Date times;
+    private Instant times;
 
     /**
      * 

@@ -1,26 +1,22 @@
 package com.sensorweb.datacenterairservice.service;
 
-import com.sensorweb.datacenterairservice.dao.*;
+import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.AirStationModel;
 import com.sensorweb.datacenterairservice.entity.ChinaAirQualityHour;
 import com.sensorweb.datacenterairservice.entity.TWEPA;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.*;
 
 @Slf4j
@@ -35,20 +31,20 @@ public class GetAirService {
     private String exportDir;
 
     @Autowired
-    private AirStationMapper airStationMapper;
+    private com.sensorweb.datacenterairservice.dao.AirStationMapper airStationMapper;
 
 
     @Autowired
-    private TWEPAMapper twepaMapper;
+    private com.sensorweb.datacenterairservice.dao.TWEPAMapper twepaMapper;
 
     @Autowired
-    private ChinaAirQualityHourMapper chinaAirQualityHourMapper;
+    private com.sensorweb.datacenterairservice.dao.ChinaAirQualityHourMapper chinaAirQualityHourMapper;
 
     @Autowired
-    RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
+    com.sensorweb.datacenterairservice.dao.RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
 
     @Autowired
-    WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
+    com.sensorweb.datacenterairservice.dao.WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
 
 
 

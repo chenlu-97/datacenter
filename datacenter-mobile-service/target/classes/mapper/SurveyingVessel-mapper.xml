@@ -83,8 +83,9 @@
 
     <select id="selectByPage" resultMap="surveyingVessel">
         SELECT <include refid="selectFields"></include>
-        FROM surveying_vessel order by datatime desc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        FROM surveying_vessel
+        order by datatime desc
+        limit #{pageNum},#{pageSize}
     </select>
 
 
@@ -113,7 +114,7 @@
         </if>
         ORDER BY datatime DESC
         <if test="pageSize != null and pageNum != null">
-            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+            limit #{pageNum},#{pageSize}
         </if>
     </select>
 
@@ -123,6 +124,17 @@
         SELECT count(*)
         FROM surveying_vessel
         WHERE datatime <![CDATA[>=]]> #{begin} AND datatime <![CDATA[<=]]> #{end}
+    </select>
+
+
+    <select id="getDataNum" resultType="java.lang.Integer">
+        SELECT count(*) FROM surveying_vessel where 1=1
+        <if test="start != null">
+            AND datatime <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND datatime <![CDATA[<=]]> #{end}
+        </if>
     </select>
 
 

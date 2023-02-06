@@ -147,6 +147,7 @@ public interface dataStatisticsMapper {
     int getTXZNum();
 
 
+
     int getProductNumByTime(@Param("type") String type,@Param("begin") Instant begin, @Param("end") Instant end);
 
     int getProductNumByTime2(@Param("type") String type,@Param("end") Instant end);
@@ -162,4 +163,29 @@ public interface dataStatisticsMapper {
     List<String> getFilepath2(@Param("database") String database);
 
     long getDatabaseSize(@Param("table") String table);
+
+
+    int getwaterAutoNum();
+
+    int getyaEBNum();
+
+    int getyaMRNum();
+
+    int getSentinelNum();
+
+    int getCopernicusNum();
+
+    int getSentineByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int getCopernicus(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int getLittleSensorNumber();
+
+    int getNumberByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int getWeatherSensorNumber();
+
+    int getWeatherSensorByTime(@Param("begin") Instant begin, @Param("end") Instant end);
+
+    int getTodayNumber(@Param("time")Instant time);
 }

@@ -100,4 +100,29 @@ public class LittleSensorController {
     }
 
 
+    @ApiOperation("所有超级站点")
+    @GetMapping(path = "getSuperStationByTime")
+    @ResponseBody
+    public List<Map> getSuperStationByTime(@Param("startTime") String startTime, @Param("endTime") String endTime) {
+        Instant start = DataCenterUtils.string2Instant(startTime.replace("T", " ").replace("Z", ""));
+        Instant stop = DataCenterUtils.string2Instant(endTime.replace("T", " ").replace("Z", ""));
+        List<Map> res = littleSensorMapper.getSuperStationByTime(start,stop);
+        return res;
+    }
+
+
+
+
+    @ApiOperation("所有水站点")
+    @GetMapping(path = "getWaterStationByTime")
+    @ResponseBody
+    public List<Map> getWaterStationByTime(@Param("startTime") String startTime, @Param("endTime") String endTime) {
+        Instant start = DataCenterUtils.string2Instant(startTime.replace("T", " ").replace("Z", ""));
+        Instant stop = DataCenterUtils.string2Instant(endTime.replace("T", " ").replace("Z", ""));
+        List<Map> res = littleSensorMapper.getWaterStationByTime(start,stop);
+        return res;
+    }
+
+
+
 }

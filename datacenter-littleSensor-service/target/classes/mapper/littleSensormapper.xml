@@ -62,7 +62,8 @@
         <foreach collection="deviceid" item="deviceId" open="(" close=")" separator=",">
             #{deviceId}
         </foreach>
-        LIMIT #{pageNum},#{pageSize}
+        #{pageNum},#{pageSize}
+--         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
     <select id="selectByPage" resultMap="littleSensor">
@@ -75,7 +76,8 @@
             AND receipt_time <![CDATA[<=]]> #{end}
         </if>
         ORDER BY receipt_time DESC
-        LIMIT  #{pageNum} ,#{pageSize}
+        #{pageNum},#{pageSize}
+--         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
     <select id="selectNum2" resultType="java.lang.Integer">
@@ -89,4 +91,22 @@
         </if>
     </select>
 
+
+    <select id="getSuperStationByTime" resultType="java.util.Map">
+        SELECT *
+        FROM wuhanCC_super_station_hourly
+        WHERE 1=1
+        <if test="start != null">
+            AND TIMES <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND TIMES <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+    <select id="getWaterStationByTime" resultType="java.util.Map">
+        SELECT *
+        FROM  hb_water_hourly
+        WHERE dataTime <![CDATA[>=]]> #{start} AND dataTime <![CDATA[<=]]> #{end}
+    </select>
 </mapper>

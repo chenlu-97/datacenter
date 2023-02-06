@@ -1,7 +1,6 @@
 package com.sensorweb.datacenterairservice.thread;
 
 
-import com.alibaba.fastjson.JSONArray;
 import com.sensorweb.datacenterairservice.service.InsertAirService;
 import com.sensorweb.datacenterairservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;

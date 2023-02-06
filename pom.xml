@@ -43,6 +43,7 @@
         <module>datacenter-weather-service</module>
         <module>datacenter-littleSensor-service</module>
         <module>datacenter-mobile-service</module>
+        <module>datacenter-move-service</module>
     </modules>
 
     <dependencies>

@@ -63,6 +63,7 @@ public class InsertWeatherInfo {
 //    @PostConstruct
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        System.out.println("dateTime = " + dateTime);
         String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
         new Thread(new Runnable() {
             @SneakyThrows
@@ -72,19 +73,19 @@ public class InsertWeatherInfo {
                 try {
                     flag = insertWeatherInfoBatch(getWeatherInfo());
                     if (flag) {
-                        log.info("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Success");
-                        System.out.println("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Success");
-                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+date, "站网-武汉城市圈气象","这是一条武汉1+8城市圈气象数据的");
+                        log.info("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Success");
+                        System.out.println("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Success");
+//                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+date, "站网-武汉城市圈气象","这是武汉1+8城市圈气象数据的",getWeatherInfo().size());
                     }
                     Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
-                    log.info("中国气象局接入武汉1+8城市圈时间: " + date + "Status: Fail");
-                    String mes = "中国气象局接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
+                    log.info("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Fail");
+//                    String mes = "中国气象网接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
                     // 发送邮件
 //                    SendMail.sendemail(mes);
-                    SendException("WH_1+8_Weather",date,mes);
+//                    SendException("WH_1+8_Weather",date,mes);
                 }
             }
         }).start();
@@ -101,7 +102,6 @@ public class InsertWeatherInfo {
                 int status = weatherMapper.insertData(chinaWeather);
             }
             catch (Exception e){
-//                System.out.println("重复数据，不插入");
                 e.printStackTrace();
             }
 //            if (status>0) {
@@ -185,7 +185,7 @@ public class InsertWeatherInfo {
                 for (String key:keys) {
                     JSONObject result = observes.getJSONObject(key).getJSONObject("1001002");
                     if (key.equals("101200406003")) {
-                        System.out.println(getNowTime(result.getString("000")));
+//                        System.out.println(getNowTime(result.getString("000")));
                     }
                     ChinaWeather chinaWeather = new ChinaWeather();
                     chinaWeather.setStationId(key);

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sensorweb.datacentermoveservice.dao.LittleSensorMapper">
+
+    <sql id="insertFields">
+        id, receipt_time, sample_time, humidity, temperature, pressure, lat, lon, power, device_id
+    </sql>
+
+    <sql id="selectFields">
+        id, receipt_time, sample_time, humidity, temperature, pressure, lat, lon, power, device_id
+    </sql>
+
+    <insert id="insertData" parameterType="littleSensor" >
+        INSERT INTO sensors_data (<include refid="insertFields"></include>)
+        VALUES (#{id},#{receiptTime}, #{sampleTime}, #{humidity}, #{temperature}, #{pressure}, #{lat}, #{lon}, #{power}, #{deviceId})
+    </insert>
+
+    <insert id="insertDataBatch" parameterType="java.util.List">
+        INSERT INTO sensors_data (<include refid="insertFields"></include>)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.receiptTime}, #{item.sampleTime}, #{item.humidity}, #{item.temperature}, #{item.pressure}, #{item.lat}, #{item.lon}, #{item.power}, #{item.deviceId})
+        </foreach>
+    </insert>
+
+    <select id="selectById" resultMap="littleSensor">
+        SELECT <include refid="selectFields"></include>
+        FROM sensors_data
+        WHERE id = #{id}
+    </select>
+
+    <resultMap id="littleSensor" type="LittleSensor">
+        <result column="id" property="id"/>
+        <result column="receipt_time" property="receiptTime"/>
+        <result column="sample_time" property="sampleTime"/>
+        <result column="humidity" property="humidity"/>
+        <result column="temperature" property="temperature"/>
+        <result column="pressure" property="pressure"/>
+        <result column="lat" property="lat"/>
+        <result column="lon" property="lon"/>
+        <result column="power" property="power"/>
+        <result column="device_id" property="deviceId"/>
+    </resultMap>
+
+    <select id="selectNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sensors_data
+    </select>
+
+    <select id="selectNumByTime" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sensors_data
+        WHERE sample_time <![CDATA[>=]]> #{begin} AND sample_time <![CDATA[<=]]> #{end}
+    </select>
+
+    <select id="selectByIds" resultMap="littleSensor" >
+        SELECT <include refid="selectFields"></include>
+        FROM sensors_data
+        WHERE device_id in
+        <foreach collection="deviceid" item="deviceId" open="(" close=")" separator=",">
+            #{deviceId}
+        </foreach>
+        #{pageNum},#{pageSize}
+--         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+    <select id="selectByPage" resultMap="littleSensor">
+        SELECT <include refid="selectFields"></include>
+        FROM sensors_data where 1=1
+        <if test="start != null">
+            AND receipt_time <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND receipt_time <![CDATA[<=]]> #{end}
+        </if>
+        ORDER BY receipt_time DESC
+        #{pageNum},#{pageSize}
+--         LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+    <select id="selectNum2" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sensors_data where 1=1
+        <if test="start != null">
+            AND receipt_time <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND receipt_time <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+
+    <select id="getSuperStationByTime" resultType="java.util.Map">
+        SELECT *
+        FROM wuhanCC_super_station_hourly
+        WHERE 1=1
+        <if test="start != null">
+            AND TIMES <![CDATA[>=]]> #{start}
+        </if>
+        <if test="end != null ">
+            AND TIMES <![CDATA[<=]]> #{end}
+        </if>
+    </select>
+
+    <select id="getWaterStationByTime" resultType="java.util.Map">
+        SELECT *
+        FROM  hb_water_hourly
+        WHERE dataTime <![CDATA[>=]]> #{start} AND dataTime <![CDATA[<=]]> #{end}
+    </select>
+</mapper>

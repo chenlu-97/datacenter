@@ -46,7 +46,7 @@ public class HBWeatherStationService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
+//    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
     public void insertDataByHour() {
 //        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHH0000");
@@ -65,10 +65,10 @@ public class HBWeatherStationService {
                     flag= getIOTInfo(document);
 //                    flag= getIOTInfo2(document);
                     if (flag) {
+                        int num = hbWeatherStationMapper.selectMaxTimeData().size();
                         log.info("湖北气象接入时间: " + date + "         Status: Success");
                         System.out.println("湖北气象接入时间: " + date+ "         Status: Success");
-                        DataCenterUtils.sendMessage("HB_Weather_"+date, "站网-湖北省气象","这是一条湖北省气象数据的");
-                        int num = hbWeatherStationMapper.selectMaxTimeData().size();
+                        DataCenterUtils.sendMessage("HB_Weather_"+date, "站网-湖北省气象","这是一条湖北省气象数据的",num);
                         if(num<2509){
                             int gap = 2509-num;
                             String mes = "接入时间 ："+ date+"-----湖北气象站接入部分缺失（站点数据应为2509个），现在接入为：" + num +"差值为"+ gap;

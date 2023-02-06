@@ -2,7 +2,6 @@ package com.sensorweb.datacenterairservice.thread;
 
 
 import com.alibaba.fastjson.JSONArray;
-import com.sensorweb.datacenterairservice.entity.WaterStation;
 import com.sensorweb.datacenterairservice.service.WaterQualityWaterstationHourlyService;
 import com.sensorweb.datacenterairservice.util.ApplicationContextUtil;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
-import java.util.List;
 
 @Slf4j
 public class downloadWater implements Runnable{
@@ -19,9 +17,9 @@ public class downloadWater implements Runnable{
     public void run() {
         try {
             //起始时间
-            String str="2022-09-13 15:00:00";
+            String str="2022-11-11 15:00:00";
             //结束时间
-            String str1="2022-09-14 12:00:00";
+            String str1="2022-11-16 13:00:00";
             System.out.println("-----------"+str+"-----------"+str1+"------------湖北省水质站点---------");
             //2022-07-07 10:00:00 之前的没有接入
             WaterQualityWaterstationHourlyService waterQualityWaterstationHourlyService = (WaterQualityWaterstationHourlyService) ApplicationContextUtil.getBean("waterQualityWaterstationHourlyService");

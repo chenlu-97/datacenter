@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
@@ -49,14 +50,25 @@ public interface MeasuringVehicleMapper {
 
     List<MeasuringVehicle> selectByTime(@Param("begin")Instant begin, @Param("end") Instant end);
 
-    List<MeasuringVehicle> getVocsByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
 
-    List<MeasuringVehicle> getHTByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
 
-    List<MeasuringVehicle> getPMByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
+    List<Map> getVocsByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start, @Param("end")Instant end);
 
-    List<MeasuringVehicle> getAirByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
+    List<Map> getHTByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
 
-    List<MeasuringVehicle> getSPMSByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
+    List<Map> getPMByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
 
+    List<Map> getAirByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
+
+    List<Map> getSPMSByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("start")Instant start,  @Param("end")Instant end);
+
+    int getDataNum1(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
+
+    int getDataNum2(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
+
+    int getDataNum3(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
+
+    int getDataNum4(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
+
+    int getDataNum5(@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa,@Param("id") String id);
 }

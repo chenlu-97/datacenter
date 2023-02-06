@@ -78,7 +78,6 @@
         SELECT <include refid="selectFields"></include>
         FROM entry
         WHERE product_type = #{product} AND start_time <![CDATA[>=]]> #{startTime} AND start_time <![CDATA[<]]> #{endTime}
-
     </select>
 
     <select id="selectMaxTimeData" resultMap="entry">
@@ -90,6 +89,5 @@
         select <include refid="selectFields"></include>
         from entry where title = #{fileName};
     </select>
-
 
 </mapper>

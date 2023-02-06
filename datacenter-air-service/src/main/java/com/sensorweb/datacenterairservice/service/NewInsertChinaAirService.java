@@ -20,7 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -72,7 +71,7 @@ public class NewInsertChinaAirService extends Thread implements AirConstant {
                     flag =  getFromCSV2();
                     if (flag) {
                         log.info("全国空气质量监测站接入时间: " + dateTime.toString() + "Status: Success");
-                        DataCenterUtils.sendMessage("CH_AIR"+ time, "站网-全国空气质量","这是一条获取的全国空气质量数据");
+//                        DataCenterUtils.sendMessage("CH_AIR"+ time, "站网-全国空气质量","这是一条获取的全国空气质量数据");
                         System.out.println("全国空气质量监测站接入时间: " + dateTime.toString() + "Status: Success");
                     }
                 } catch (Exception e) {

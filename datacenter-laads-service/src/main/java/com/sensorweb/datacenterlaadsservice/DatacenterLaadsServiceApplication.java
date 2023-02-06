@@ -23,7 +23,23 @@ public class DatacenterLaadsServiceApplication {
 //        new Thread(new downloadmodis7()).start();
 //        new Thread(new downloadmodis8()).start();
 //        new Thread(new downloadmodis9()).start();
-        new Thread(new downloadmodis10()).start();
+//        new Thread(new downloadmodis10()).start();
+//        new Thread(new downloadmodis11()).start();
+//        new Thread(new downloadmodis12()).start();
+
+
+        new Thread(new downloadMOD09GA1()).start();
+//        new Thread(new downloadMOD09GA2()).start();
+//        new Thread(new downloadMOD09GA3()).start();
+//        new Thread(new downloadMOD09GA4()).start();
+//        new Thread(new downloadMOD09GA5()).start();
+//        new Thread(new downloadMOD09GA6()).start();
+//        new Thread(new downloadMOD09GA7()).start();
+//        new Thread(new downloadMOD09GA8()).start();
+//        new Thread(new downloadMOD09GA9()).start();
+//        new Thread(new downloadMOD09GA10()).start();
+//        new Thread(new downloadMOD09GA11()).start();
+
     }
 
 }

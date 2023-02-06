@@ -4,10 +4,8 @@ import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 
 @Repository

@@ -19,17 +19,7 @@ class DatacenterInsertAirServiceApplicationTests {
 //    private AirQualityHourMapper airQualityHourMapper;
 //    @Autowired
 //    private AirStationMapper airStationMapper;
-    @Autowired
-    private NewInsertChinaAirService newInsertChinaAirService;
 
-    @Autowired
-    private InsertAirService insertAirService;
-    @Autowired
-    private WaterQualityWaterstationHourlyService waterQualityWaterstationHourlyService;
-
-
-    @Autowired
-    private SuperStationService superStationService;
     @Test
     void contextLoads() throws Exception {
 //        String bbox = "180 0,180 0";

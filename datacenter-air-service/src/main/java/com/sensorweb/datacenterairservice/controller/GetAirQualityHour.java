@@ -1,5 +1,5 @@
 package com.sensorweb.datacenterairservice.controller;
-import com.sensorweb.datacenterairservice.dao.*;
+import com.sensorweb.datacenterairservice.dao.AirQualityHourMapper;
 import com.sensorweb.datacenterairservice.entity.AirQualityHour;
 import com.sensorweb.datacenterairservice.entity.ChinaAirQualityHour;
 import com.sensorweb.datacenterairservice.entity.TWEPA;
@@ -31,19 +31,19 @@ public class GetAirQualityHour {
     private AirQualityHourMapper airQualityHourMapper;
 
     @Autowired
-    private TWEPAMapper twepaMapper;
+    private com.sensorweb.datacenterairservice.dao.TWEPAMapper twepaMapper;
 
     @Autowired
-    private ChinaAirQualityHourMapper chinaAirQualityHourMapper;
+    private com.sensorweb.datacenterairservice.dao.ChinaAirQualityHourMapper chinaAirQualityHourMapper;
 
     @Autowired
     private InsertTWEPA insertTWEPA;
 
     @Autowired
-    private RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
+    private com.sensorweb.datacenterairservice.dao.RawDataSuperStationHourlyMapper rawDataSuperStationHourlyMapper;
 
     @Autowired
-    private WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
+    private com.sensorweb.datacenterairservice.dao.WaterQualityWaterstationHourlyMapper waterQualityWaterstationHourlyMapper;
 
 
 

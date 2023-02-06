@@ -21,12 +21,12 @@ import java.util.List;
 public class downloadHimawari implements Runnable{
     @Override
     public void run() {
-        System.out.println("-----2019-01-01 00:00:00---------2020-01-01 00:00:00--------Himawari----");
+        System.out.println("-----2022-12-13 00:00:00---------2022-12-25 00:00:00--------Himawari----");
         HimawariMapper himawariMapper = (HimawariMapper) ApplicationContextUtil.getBean("himawariMapper");
         NewInsertHimawariService newInsertHimawariService = (NewInsertHimawariService) ApplicationContextUtil.getBean("newInsertHimawariService");
         boolean flag ;
-        String startTime = "2019-01-01 00:00:00";
-        String endTime = "2020-01-01 00:00:00";
+        String startTime = "2022-12-13 14:00:00";
+        String endTime = "2022-12-25 00:00:00";
         Instant timeNew = DataCenterUtils.string2Instant(startTime);
         Instant timeNow = DataCenterUtils.string2Instant(endTime);
         while(timeNew.isBefore(timeNow)){
