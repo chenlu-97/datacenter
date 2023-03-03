@@ -67,6 +67,6 @@ public class GetSentinelController {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
         String time = formatter.format(dateTime);
-        DataCenterUtils.sendMessage("Sentinel-2A" + time, "Sentinel-2A", "GEE获取的Sentinel-2A影像成功");
+        DataCenterUtils.sendMessage("Sentinel-2A" + time, "Sentinel-2A", "GEE获取的Sentinel-2A影像成功",1);
     }
 }

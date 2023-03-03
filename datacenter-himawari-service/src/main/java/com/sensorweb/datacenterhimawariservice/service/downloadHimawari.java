@@ -47,7 +47,7 @@ public class downloadHimawari implements Runnable{
                     flag = !newInsertHimawariService.insertData(time);
                     if (!flag) {
                         log.info("Himawari接入时间: " + time + "Status: Success");
-                        DataCenterUtils.sendMessage("Himawari-8" + timeNew.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据");
+                        DataCenterUtils.sendMessage("Himawari-8" + timeNew.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据",1);
                     } else {
                         log.info("Himawari接入时间: ----" + time + "下载失败！！");
                     }

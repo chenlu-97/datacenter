@@ -3,67 +3,67 @@
 <mapper namespace="com.sensorweb.datacentergeeservice.dao.ModisMapper" >
 
 
-  <resultMap id="BaseResultMap" type="Modis" >
-    <result column="imageid" property="imageID"/>
-    <result column="spacecraftid" property="spacecraftID"/>
-    <result column="coordinates" property="Coordinates"/>
-    <result column="imagesize" property="imageSize"/>
-    <result column="date" property="Date"/>
-    <result column="imagetype" property="imageType"/>
-    <result column="filepath" property="filePath"/>
-  </resultMap>
+<!--  <resultMap id="BaseResultMap" type="Modis" >-->
+<!--    <result column="imageid" property="imageID"/>-->
+<!--    <result column="spacecraftid" property="spacecraftID"/>-->
+<!--    <result column="coordinates" property="Coordinates"/>-->
+<!--    <result column="imagesize" property="imageSize"/>-->
+<!--    <result column="date" property="Date"/>-->
+<!--    <result column="imagetype" property="imageType"/>-->
+<!--    <result column="filepath" property="filePath"/>-->
+<!--  </resultMap>-->
 
-  <sql id="selectFields" >
-        imageid, imagetype ,spacecraftid, coordinates,date, imagesize,filepath
-  </sql>
+<!--  <sql id="selectFields" >-->
+<!--        imageid, imagetype ,spacecraftid, coordinates,date, imagesize,filepath-->
+<!--  </sql>-->
 
-  <select id="selectAll" resultMap="BaseResultMap">
-    select <include refid="selectFields"></include>
-    from modis
-    where 1=1
-    ORDER BY date DESC
-    LIMIT 100;
-  </select>
+<!--  <select id="selectAll" resultMap="BaseResultMap">-->
+<!--    select <include refid="selectFields"></include>-->
+<!--    from modis-->
+<!--    where 1=1-->
+<!--    ORDER BY date DESC-->
+<!--    LIMIT 100;-->
+<!--  </select>-->
 
-  <select id="selectByattribute" resultMap="BaseResultMap">
-    <if test="spacecraftID != null  or Date != null or Cloudcover != null or imageType != null "  >
-    select * from modis where 1=1
-    <if test="spacecraftID != null and spacecraftID != '' "  >
-      AND spacecraftid = #{spacecraftID}
-    </if>
-    <if test="Date != null and Date != ''">
-      AND dates &lt;= #{Date}
-    </if>
-    <if test="Cloudcover != null and Cloudcover != ''">
-      AND cloudcover &lt;= #{Cloudcover}
-    </if>
-    <if test="imageType != '' and imageType != null ">
-      AND imagetype = #{imageType}
-    </if>
-    </if>
-  </select>
-
-
-  <select id="selectNum" resultType="java.lang.Integer">
-    SELECT count(*)
-    FROM modis
-  </select>
-
-  <select id="selectByIds" resultMap="BaseResultMap" >
-    SELECT <include refid="selectFields"></include>
-    FROM modis ORDER BY date DESC
-    WHERE imageid in
-    <foreach collection ="imageid" item="imageID" open="(" close=")" separator=",">
-      #{imageID}
-    </foreach>
-    LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
-  </select>
+<!--  <select id="selectByattribute" resultMap="BaseResultMap">-->
+<!--    <if test="spacecraftID != null  or Date != null or Cloudcover != null or imageType != null "  >-->
+<!--    select * from modis where 1=1-->
+<!--    <if test="spacecraftID != null and spacecraftID != '' "  >-->
+<!--      AND spacecraftid = #{spacecraftID}-->
+<!--    </if>-->
+<!--    <if test="Date != null and Date != ''">-->
+<!--      AND dates &lt;= #{Date}-->
+<!--    </if>-->
+<!--    <if test="Cloudcover != null and Cloudcover != ''">-->
+<!--      AND cloudcover &lt;= #{Cloudcover}-->
+<!--    </if>-->
+<!--    <if test="imageType != '' and imageType != null ">-->
+<!--      AND imagetype = #{imageType}-->
+<!--    </if>-->
+<!--    </if>-->
+<!--  </select>-->
 
 
-  <select id="selectByPage" resultMap="BaseResultMap">
-    SELECT <include refid="selectFields"></include>
-    FROM modis ORDER BY date DESC
-    LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
-  </select>
+<!--  <select id="selectNum" resultType="java.lang.Integer">-->
+<!--    SELECT count(*)-->
+<!--    FROM modis-->
+<!--  </select>-->
+
+<!--  <select id="selectByIds" resultMap="BaseResultMap" >-->
+<!--    SELECT <include refid="selectFields"></include>-->
+<!--    FROM modis ORDER BY date DESC-->
+<!--    WHERE imageid in-->
+<!--    <foreach collection ="imageid" item="imageID" open="(" close=")" separator=",">-->
+<!--      #{imageID}-->
+<!--    </foreach>-->
+<!--    LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})-->
+<!--  </select>-->
+
+
+<!--  <select id="selectByPage" resultMap="BaseResultMap">-->
+<!--    SELECT <include refid="selectFields"></include>-->
+<!--    FROM modis ORDER BY date DESC-->
+<!--    LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})-->
+<!--  </select>-->
 
 </mapper>

@@ -90,7 +90,7 @@ public class NewInsertHimawariService implements HimawariConstant {
                                 flag = !insertData(time);
                                 if (!flag) {
                                     log.info("Himawari接入时间: " + time + "Status: Success");
-                                    DataCenterUtils.sendMessage("Himawari-8" + dateTime.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据");
+                                    DataCenterUtils.sendMessage("Himawari-8" + dateTime.toString(), "卫星-葵花8号", "这是一条获取的葵花8号卫星的数据",1);
                                 } else {
                                     log.info("Himawari接入时间: ----" + time + "---暂无最新的数据！！等下个小时再试");
                                     SendException("Himawari", timeNew.toString(), timeNow + "当前接入Himawari的数据失败");

@@ -16,9 +16,9 @@ import java.util.List;
 public class ModisService {
 
 
-    @Autowired
-    ModisMapper modisMapper;
-    public List<Modis> getModisByPage(int pageNum, int pageSize) {
-        return modisMapper.selectByPage(pageNum,pageSize);
-    }
+//    @Autowired
+//    ModisMapper modisMapper;
+//    public List<Modis> getModisByPage(int pageNum, int pageSize) {
+//        return modisMapper.selectByPage(pageNum,pageSize);
+//    }
 }

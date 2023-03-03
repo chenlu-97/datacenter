@@ -29,8 +29,8 @@ public class GetGF {
     @ApiOperation("启动GF的离线数据的入库")
     @PostMapping(value = "GFdata2DB")
     @ResponseBody
-    public String GFdata2DB() throws Exception {
-        int status = getGFService.insertGF();
+    public String GFdata2DB(@Param("path") String path) throws Exception {
+        int status = getGFService.insertGF(path);
         String res ;
         if (status > 0) {
             res = "SUCESS!!!";

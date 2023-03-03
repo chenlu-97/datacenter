@@ -108,7 +108,6 @@ public class WaterQualityWaterstationHourlyService {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
-//        LocalDateTime endDate = dateTime.plusMinutes(14);
         String start = formatter.format(dateTime.minusHours(1));
         String end = formatter1.format(dateTime.minusMinutes(13));
         new Thread(new Runnable() {
@@ -121,7 +120,7 @@ public class WaterQualityWaterstationHourlyService {
                     List<WaterQualityWaterstationHourly> water_exit = waterQualityWaterstationHourlyMapper.selectMaxTimeData();
                     Instant begin = water_exit.get(0).getDatatime();
                     String begin_time = begin.plusSeconds(8*60*60).toString().replace("T"," ").replace("Z","");
-                    System.out.println("begin_time = " + begin_time);
+//                    System.out.println("begin_time = " + begin_time);
                     List<Map> waterstations = moveclient.getWaterStationByTime(begin_time,end);
                     System.out.println("更新的水站从"+begin_time+"到"+end +",共有"+waterstations.size()+"个数据更新了");
                     if (waterstations != null && waterstations.size() > 0) {
@@ -177,8 +176,6 @@ public class WaterQualityWaterstationHourlyService {
     }
 
 
-
-
     public boolean accessinforming(JSONArray access_res) throws Exception {
         int flag = 0;
         List<WaterStation> res = waterStationMapper.quaryMnId();
@@ -226,7 +223,6 @@ public class WaterQualityWaterstationHourlyService {
             }
         return flag > 0;
         }
-
 
 
     /**

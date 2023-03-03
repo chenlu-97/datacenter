@@ -15,12 +15,13 @@ import java.util.List;
 public class downloadlandsat2 implements Runnable{
     @Override
     public void run() {
-        System.out.println("-----20200701----------20201231--------------Landsat8 L1/L2影像");
+
         try {
             //起始时间
-            String str="20200701";
+            String str="20221105";
             //结束时间
-            String str1="20201231";
+            String str1="20221119";
+            System.out.println("-----"+str+"----------"+str1+"--------------Landsat8 L1/L2影像");
             LandsatService landsatService = (LandsatService) ApplicationContextUtil.getBean("landsatService");
             SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");
             SimpleDateFormat format1= new  SimpleDateFormat("yyyy-MM-dd 00:00:00");
@@ -50,14 +51,12 @@ public class downloadlandsat2 implements Runnable{
                         log.info("------ landsat8下载失败-----");
                     } else if (statue2.equals("success")) {
                         log.info(format.format(start.getTime()) + "-------获取影像成功！！！！！！！----");
-                        DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功");
+                        DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功",1);
 //                    }
                 }
-//                if(L1TP.size()>0){
-//                    log.info(startTime.plusSeconds(8*60*60)+"的 TPL1已存在该数据，无需下载！！！");
-//                }else {
+
                     log.info("------ 开始下载" + format.format(start.getTime()) + "的影像-----");
-//                    String statue1 = "success";
+                    //                    String statue1 = "success";
                     String statue1 = landsatService.downloadLandsat(format.format(start.getTime()),"https://earthexplorer.usgs.gov/download/5e81f14f92acf9ef/","L1TP");
                     if (statue1.equals("cookie error")) {
                         log.info("------ cookie error 过期了，要更换cookie-----");
@@ -65,9 +64,9 @@ public class downloadlandsat2 implements Runnable{
                         log.info("------ landsat8下载失败-----");
                     } else if (statue1.equals("success")) {
                         log.info(format.format(start.getTime()) + "-------获取影像成功！！！！！！！----");
-                        DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功");
-//                    }
-                }
+                        DataCenterUtils.sendMessage("Landsat-8" + format.format(start.getTime()), "Landsat-8", "USGS获取的Landsat-8影像成功",1);
+                    }
+
                 start.add(Calendar.DAY_OF_MONTH,1);
             }
         } catch (Exception e) {

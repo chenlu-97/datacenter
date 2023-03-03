@@ -224,7 +224,27 @@
             LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
         </if>
         <if test="dataType == 'Sentinel'">
-            SELECT  *  FROM sentinel where 1=1
+            SELECT  *  FROM sentinel where imagetype = 'S2MSI1C'
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+            ORDER BY date DESC
+            LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+        </if>
+        <if test="dataType == 'Sentinel5'">
+            SELECT  *  FROM sentinel where imagetype = 'L2__NO2___'
             <if test="start != null">
                 AND date <![CDATA[>=]]> #{start}
             </if>
@@ -551,7 +571,25 @@
             </if>
         </if>
         <if test="dataType == 'Sentinel'">
-            SELECT count(*) FROM sentinel where 1=1
+            SELECT count(*) FROM sentinel where imagetype = 'S2MSI1C'
+            <if test="start != null">
+                AND date <![CDATA[>=]]> #{start}
+            </if>
+            <if test="end != null ">
+                AND date <![CDATA[<=]]> #{end}
+            </if>
+            <if test="spa == 'wuhanCC'">
+                AND ST_Intersects(geom, (SELECT geom FROM wuhancitycircle)) = true
+            </if>
+            <if test="spa == 'yangtzeRiverEB'">
+                AND ST_Intersects(geom, (SELECT geom FROM changjiang)) = true
+            </if>
+            <if test="spa == 'china'">
+                AND ST_Intersects(geom, (SELECT geom FROM china_1984_mian)) = true
+            </if>
+        </if>
+        <if test="dataType == 'Sentinel5'">
+            SELECT count(*) FROM sentinel where imagetype = 'L2__NO2___'
             <if test="start != null">
                 AND date <![CDATA[>=]]> #{start}
             </if>
@@ -809,6 +847,43 @@
         </if>
     </select>
 
+
+    <select id="getStatisticsByPage" resultType="java.util.Map">
+        select a.id,
+               a.monitoring_type,
+               a.data_type,
+               a.sensor_platform,
+               a.protocol,
+               a.monitoring_info,
+               a.area,
+               a.station_total,
+               b.data_total,
+               b.start_time,
+               b.end_time,
+               a.update_frequency,
+               a."table"
+        from data_download_type a
+                 left join (select *
+                            from data_download_statistics d
+                            where d.id in (
+                                select max(dd.id)
+                                from data_download_statistics dd
+                                group by dd.did
+                            )) b on a.id = b.did order by a.id asc
+        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+    </select>
+
+    <select id="getStatisticsNum" resultType="java.lang.Integer">
+        select count(*)
+        from data_download_type a
+                 left join (select *
+                            from data_download_statistics d
+                            where d.id in (
+                                select max(dd.id)
+                                from data_download_statistics dd
+                                group by dd.did
+                            )) b on a.id = b.did
+    </select>
 
 
     <resultMap id="observation" type="Observation">

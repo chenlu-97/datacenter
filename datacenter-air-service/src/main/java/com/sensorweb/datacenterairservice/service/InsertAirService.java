@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,7 +68,7 @@ public class InsertAirService extends Thread implements AirConstant {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
+    @Scheduled(cron = "0 50 0/1 * * ?") //每个小时的25分开始接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00").withZone(ZoneId.of("Asia/Shanghai"));
@@ -77,25 +78,48 @@ public class InsertAirService extends Thread implements AirConstant {
             @Override
             public void run() {
                 boolean flag = true;
-                while (flag) {
                     try {
-                        flag = !insertHourDataByHour(time);
-                        if (!flag) {
-                            int num = airQualityHourMapper.selectMaxTimeData().size();
-                            log.info("湖北省监测站接入时间: " + time + "Status: Success");
-                            DataCenterUtils.sendMessage("HB_AIR"+ time, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据",num);
-                            System.out.println("湖北省监测站接入时间: " + time + "Status: Success");
-                            if(num!=273){
-                                int gap = 273-num;
-                                String mes = "接入时间 ："+ time+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;
-                                // 发送邮件
-//                                SendMail.sendemail(mes);
-                                SendException("HB_AIR",time,mes);
-                            }
-                        } else {
-                            System.out.println("湖北省监测站，等待中...");
+                        String maxTime = formatter.format(dateTime);
+                        try{
+                            maxTime = airQualityHourMapper.selectMaxTimeData().get(0).getQueryTime().plusSeconds(9*60*60).toString().replace("T"," ").replace("Z","");
+                        }catch(Exception e){
+
                         }
-                        Thread.sleep(2 * 60 * 1000);
+                        String startTime = maxTime;
+                        String endTime = time;
+                        SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+                        Calendar startloop = Calendar.getInstance();
+                        Calendar endloop = Calendar.getInstance();
+                        try {
+                            startloop.setTime(format.parse(startTime));
+                            endloop.setTime(format.parse(endTime));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        endloop.add(Calendar.HOUR_OF_DAY,1);
+                        while(startloop.before(endloop))
+                        {
+                            String getTime = format.format(startloop.getTime());
+//                            System.out.println("getTime = " + getTime);
+                            flag = !insertHourDataByHour(getTime);
+                            if (!flag) {
+                                int num = airQualityHourMapper.selectMaxTimeData().size();
+                                log.info("湖北省监测站接入时间: " + getTime + "Status: Success");
+                                System.out.println("湖北省监测站接入时间: " + getTime + "Status: Success");
+//                                DataCenterUtils.sendMessage("HB_AIR"+ getTime, "站网-湖北省空气质量","这是一条省站推送的湖北省空气质量数据",num);
+                                if(num!=273){
+                                    int gap = 273-num;
+                                    String mes = "接入时间 ："+ getTime+"------湖北省监测站接入部分缺失（站点数据应为273），现在接入为：" + num +"差值为"+ gap;
+                                    // 发送邮件
+//                                SendMail.sendemail(mes);
+//                                    SendException("HB_AIR",getTime,mes);
+                                }
+                            } else {
+                                System.out.println("湖北省监测站，等待中...");
+                            }
+                            Thread.sleep(2 * 60 * 1000);
+                            startloop.add(Calendar.HOUR_OF_DAY,1);
+                        }
                     } catch (Exception e) {
                         log.error(e.getMessage());
                         log.info("湖北省监测站接入时间: " + time + "Status: Fail");
@@ -103,8 +127,7 @@ public class InsertAirService extends Thread implements AirConstant {
                         // 发送邮件
 //                        SendMail.sendemail(mes);
                         SendException("HB_AIR",time,mes);
-                        break;
-                    }
+//                    }
                 }
             }
         }).start();
@@ -263,6 +286,7 @@ public class InsertAirService extends Thread implements AirConstant {
      */
     @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean insertHourDataByHour(String time) throws Exception {
+
         int status = 0 ;
         String param = "UsrName=" + AirConstant.USER_NAME + "&passWord=" + AirConstant.PASSWORD +
                 "&date=" + URLEncoder.encode(time, "utf-8");

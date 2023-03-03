@@ -40,7 +40,7 @@ public class SentinelService {
     }
 
 
-    @Scheduled(cron = "0 20 11 * * ?") //每天上午11:20点接入
+//    @Scheduled(cron = "0 20 11 * * ?") //每天上午11:20点接入
     public void getSentinel() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
@@ -67,7 +67,7 @@ public class SentinelService {
                     } else if (statue == "success") {
                         log.info("------获取影像成功！！！！！！！-----");
                         System.out.println("------ 获取影像成功！！！！！！！-----");
-                        DataCenterUtils.sendMessage("Sentinel-2A" + time, "Sentinel-2A", "GEE获取的Sentinel-2A影像成功");
+                        DataCenterUtils.sendMessage("Sentinel-2A" + time, "Sentinel-2A", "GEE获取的Sentinel-2A影像成功",1);
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());

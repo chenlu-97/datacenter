@@ -38,7 +38,7 @@ public class GetGFService {
 
 
 //    @PostConstruct
-    public int insertGF() throws Exception {
+    public int insertGF(String GF_PATH) throws Exception {
         GF gf = new GF();
         int status = 0;
         try {
@@ -47,11 +47,11 @@ public class GetGFService {
 //            for (int i = 0; i < seasons.size(); i++) {
 //                System.out.println(seasons.get(i));
 //                ArrayList<String> image_name = getFiles(path[h] + seasons.get(i) + '/');
-            ArrayList<String> image_name = getFiles(OfflineConstant.GF_PATH);
+            ArrayList<String> image_name = getFiles(GF_PATH);
             for (int j = 0; j < image_name.size(); j++) {
 //                    System.out.println(image_name.get(j));
 //                    String filepath = path[h] + seasons.get(i) + '/' + image_name.get(j) + '/';
-                String filepath =OfflineConstant.GF_PATH + image_name.get(j) + '/';
+                String filepath =GF_PATH + image_name.get(j) + '/';
 //                    System.out.println(filepath);
                 File[] list = new File(filepath).listFiles();
                 for (File file : list) {

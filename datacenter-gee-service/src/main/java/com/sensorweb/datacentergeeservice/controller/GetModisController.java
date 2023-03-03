@@ -35,8 +35,8 @@ public class GetModisController {
     public Map<String, Object> getModisByPage(@ApiParam(name = "pageNum", value = "当前页码") @Param("pageNum") int pageNum,
                                                 @ApiParam(name = "pageSize", value = "每页的数据条目数") @Param("pageSize") int pageSize) {
         Map<String, Object> res = new HashMap<>();
-        List<Modis> info =  modisService.getModisByPage(pageNum, pageSize);
-        res.put("Info", info);
+//        List<Modis> info =  modisService.getModisByPage(pageNum, pageSize);
+//        res.put("Info", info);
         return res;
 
     }

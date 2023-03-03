@@ -19,7 +19,7 @@ public interface OfflineConstant {
 
 
 //    String GF_PATH = "/Users/chenlu/Desktop/gf/";
-    String GF_PATH = "/data/Ai-Sensing/Data-tmp/1、GaoFen-All/GF_3rd_249/3、RPC-Correction/";
+//    String GF_PATH = "/data/Ai-Sensing/Data-tmp/1、GaoFen-All/GF_3rd_249/3、RPC-Correction/";
 
 
     String WF_PATH = "/data/Ai-Sensing/DataCenter/weatherForecastData_whu1km";

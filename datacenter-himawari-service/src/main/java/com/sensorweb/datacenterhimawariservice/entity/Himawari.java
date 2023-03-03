@@ -16,5 +16,5 @@ public class Himawari {
     private String url;
     private String localPath;
     private String waveBand = "470nm~13300nm";
-    private String bandInfo = "紫外&可见光&近红外&远红外&微波";
+    private String bandInfo = "可见光&近红外&远红外&微波";
 }

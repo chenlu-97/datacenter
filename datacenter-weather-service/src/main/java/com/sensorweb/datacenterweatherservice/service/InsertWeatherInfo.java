@@ -75,17 +75,17 @@ public class InsertWeatherInfo {
                     if (flag) {
                         log.info("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Success");
                         System.out.println("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Success");
-//                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+date, "站网-武汉城市圈气象","这是武汉1+8城市圈气象数据的",getWeatherInfo().size());
+                        DataCenterUtils.sendMessage("WH_1+8_Weather_"+date, "站网-武汉城市圈气象","这是武汉1+8城市圈气象数据的",getWeatherInfo().size());
                     }
                     Thread.sleep(2 * 60 * 1000);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                     log.info("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Fail");
-//                    String mes = "中国气象网接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
+                    String mes = "中国气象网接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
                     // 发送邮件
-//                    SendMail.sendemail(mes);
-//                    SendException("WH_1+8_Weather",date,mes);
+                    SendMail.sendemail(mes);
+                    SendException("WH_1+8_Weather",date,mes);
                 }
             }
         }).start();

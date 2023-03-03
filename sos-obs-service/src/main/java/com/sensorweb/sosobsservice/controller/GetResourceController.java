@@ -105,4 +105,21 @@ public class GetResourceController implements ObsConstant {
         return res;
     }
 
+
+
+    @ApiOperation("分页查询统计报表的数据")
+    @GetMapping(path = "getStatisticsByPage")
+    public Map<String, Object> getStatisticsByPage(@ApiParam(name = "pageNum", value = "当前页码") @Param("pageNum") int pageNum,
+                                                   @ApiParam(name = "pageSize", value = "每页的数据条目数") @Param("pageSize") int pageSize) {
+        Map<String, Object> res = new HashMap<>();
+
+        List<Map> info =  observationMapper.getStatisticsByPage(pageNum, pageSize);
+
+        int count = observationMapper.getStatisticsNum();
+        Object num = new Integer(count);
+        res.put("Info", info);
+        res.put("num",num);
+        return res;
+    }
+
 }

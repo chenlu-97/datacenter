@@ -78,7 +78,7 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            offline = dataStatisticsMapper.getWaterQualityNum()+ dataStatisticsMapper.getWaterPollutionNum()+dataStatisticsMapper.getGFNum()+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getwaterAutoNum();
+            offline = dataStatisticsMapper.getWaterQualityNum()+ dataStatisticsMapper.getWaterPollutionNum()+10000+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getwaterAutoNum();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -88,12 +88,12 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            laads = dataStatisticsMapper.getModisNum()+dataStatisticsMapper.getGPMNum()+ dataStatisticsMapper.getGLDASNum();
+            laads = dataStatisticsMapper.getModisNum()+10000+10000;
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            gee =dataStatisticsMapper.getLandsatNum() +dataStatisticsMapper.getFYNum()+dataStatisticsMapper.getSentinelNum()+dataStatisticsMapper.getCopernicusNum();
+            gee =dataStatisticsMapper.getLandsatNum() +dataStatisticsMapper.getFYNum()+dataStatisticsMapper.getSentinelNum();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -109,13 +109,13 @@ public class DataStatisticsService {
         }
 
         try{
-            littleSensor = dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getWeatherSensorNumber();
+            littleSensor = dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getWeatherSensorNumber()+dataStatisticsMapper.getTXZNum();
         }catch(Exception e){
             e.printStackTrace();
         }
 
         try{
-            uav = dataStatisticsMapper.getUAVNum() +dataStatisticsMapper.getMailDataNum();
+            uav = dataStatisticsMapper.getUAVNum() ;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -700,7 +700,7 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            HBWeatherStation =dataStatisticsMapper.getHBWeatherNum()+dataStatisticsMapper.getFYNum()+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum();
+            HBWeatherStation =dataStatisticsMapper.getHBWeatherNum()+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -710,13 +710,13 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            GF = dataStatisticsMapper.getGFNum();
+            GF = 10000;
         }catch(Exception e){
             e.printStackTrace();
         }
 
         try{
-            nasa =dataStatisticsMapper.getModisNum()+dataStatisticsMapper.getGPMNum()+ dataStatisticsMapper.getGLDASNum();
+            nasa =dataStatisticsMapper.getModisNum()+10000;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -749,7 +749,7 @@ public class DataStatisticsService {
         }
 
         try{
-            copernicus = dataStatisticsMapper.getCopernicusNum();
+            copernicus = 10000;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -817,15 +817,12 @@ public class DataStatisticsService {
         uavs.put("name","Copernicus官网");
         uavs.put("number",((double)(Math.round(copernicus/10000))));   //这个改成 Copernicus官网
 
+        int total = HBWeatherStation + HBWater +HBHJStation+ CHWeatherStation + CHAirStation+nasa+ usgs+himawari+sentinel+littleSensor+GF+tw+fy+copernicus;
+
 
         Map totals = new LinkedHashMap();
         totals.put("name","总计");
-        totals.put("number",(int)Math.floor(HBHJStation/10000)+
-                (int)Math.floor(CHAirStation/10000)+ (int)Math.floor(HBWeatherStation/10000)
-                +(int)Math.floor(CHWeatherStation/10000)+(int)Math.floor(nasa/10000)+(int)Math.floor(usgs/10000)
-                +(int)Math.floor(himawari/10000)+(int)Math.floor(fy/10000)+(int)Math.floor(GF/10000)
-                + (int)Math.floor(littleSensor/10000)+(int)Math.floor(copernicus/10000)+(int)Math.floor(HBWater/1000)+
-                (int)Math.floor(sentinel/1000)+(int)Math.floor(copernicus/1000));
+        totals.put("number",(int)Math.floor(total/10000));
 
 
         sensor.put("HBHJStation",HBHJStations);
@@ -877,12 +874,12 @@ public class DataStatisticsService {
         int WaterStation=1;
         int SuperStation=1;
         try{
-            AirStation = dataStatisticsMapper.getCHAirNum()+ dataStatisticsMapper.getHBAirNum()+ dataStatisticsMapper.getTWAirNum();
+            AirStation = dataStatisticsMapper.getCHAirNum()+ dataStatisticsMapper.getHBAirNum()+ dataStatisticsMapper.getTWAirNum()+dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getTXZNum();
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            WeatherStation = dataStatisticsMapper.getWeatherNum() + dataStatisticsMapper.getCHWeatherNum() + dataStatisticsMapper.getHBWeatherNum();
+            WeatherStation = dataStatisticsMapper.getWeatherNum() + dataStatisticsMapper.getCHWeatherNum() + dataStatisticsMapper.getHBWeatherNum()+ dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getWeatherSensorNumber();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -990,7 +987,7 @@ public class DataStatisticsService {
 
 
         try{
-            GF = dataStatisticsMapper.getGFNum();
+            GF = 10000;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -1011,7 +1008,7 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            gldas =dataStatisticsMapper.getGLDASNum();
+            gldas =10000;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -1029,11 +1026,9 @@ public class DataStatisticsService {
 
 
 
-        //风云需要确定接口！！！
-
         Map satellite = new LinkedHashMap();
 
-        int total = modis+landsat+himawari+fy+GF+gldas+sentinel;
+        int total = modis+landsat+himawari+GF+gldas+sentinel+fy+10000;
 
         Map Modiss = new LinkedHashMap();
         Modiss.put("name","Modis");
@@ -2194,13 +2189,13 @@ public class DataStatisticsService {
 
 
     public int getVesselNumber() throws IOException {
-        String document = DataCenterUtils.doGet( "http://114.55.99.71:443/getVesselNumber", null);
+        String document = DataCenterUtils.doGet( "http://119.45.54.7:8090/getVesselNumber", null);
         int  result = Integer.valueOf(document);
         return result;
     }
 
     public int getVehicleNumber() throws IOException {
-        String document = DataCenterUtils.doGet( "http://114.55.99.71:443/getVehicleNumber", null);
+        String document = DataCenterUtils.doGet( "http://119.45.54.7:8090/getVehicleNumber", null);
         int  result = Integer.valueOf(document);
         return result;
     }
@@ -2214,7 +2209,7 @@ public class DataStatisticsService {
         String start = preTime.plusSeconds(8*60*60).toString();
         String end = nowTime.plusSeconds(8*60*60).toString();
         String param = "startTime="+start +"&endTime="+end;
-        String document = DataCenterUtils.doGet( "http://114.55.99.71:443/getVesselNumberByTime", param);
+        String document = DataCenterUtils.doGet( "http://119.45.54.7:8090/getVesselNumberByTime", param);
         int  result = Integer.valueOf(document);
         return result;
     }
@@ -2226,7 +2221,7 @@ public class DataStatisticsService {
         String start = preTime.plusSeconds(8*60*60).toString();
         String end = nowTime.plusSeconds(8*60*60).toString();
         String param = "startTime="+start +"&endTime="+end;
-        String document = DataCenterUtils.doGet( "http://114.55.99.71:443/getVehicleNumberByTime", param);
+        String document = DataCenterUtils.doGet( "http://119.45.54.7:8090/getVehicleNumberByTime", param);
         int  result = Integer.valueOf(document);
         return result;
     }
