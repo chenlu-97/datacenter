@@ -1,6 +1,12 @@
 package com.sensorweb.datacenterweatherservice.util;
 
 public interface WeatherConstant {
+
+
+    /**
+     * 武汉1+8城市群气象api
+     */
+
     String CHINA_WEATHER_URL = "http://api.weatherdt.com/common/";
 
 //    String CHINA_WEATHER_KEY = "cf477689ee37f14790a4d6359bfa5915";
@@ -11,7 +17,9 @@ public interface WeatherConstant {
     String BAIDU_AK = "DUljkTDcLCQ00d6ZofaN8FgTnRf4YWAu";
 
 
-
+    /**
+     * 天兴洲站点api
+     */
 
     String TianXingZhou_URL = "http://iot.ainongye.cn/json";
 
@@ -24,6 +32,7 @@ public interface WeatherConstant {
         String user_id = "657630347734WX3gV";
         String pwd = "r1Lh6HR";
         String element ="Station_Id_C,Year,Mon,Day,Hour,PRS,PRS_Sea,PRS_Max,PRS_Min,TEM,TEM_Max,TEM_Min,RHU,RHU_Min,VAP,PRE_1h,WIN_D_INST_Max,WIN_S_Max,WIN_D_S_Max,WIN_S_Avg_2mi,WIN_D_Avg_2mi,WIN_S_Inst_Max,windpower";
+
 
 
 

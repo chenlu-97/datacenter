@@ -23,9 +23,9 @@ public class downloadlandsat5 implements Runnable{
 
         try {
             //起始时间
-            String str="20230201";
+            String str="20230301";
             //结束时间
-            String str1="20230217";
+            String str1="20230321";
             System.out.println("-----"+str+"----------"+str1+"--------------Landsat8 L1/L2影像");
             LandsatService landsatService = (LandsatService) ApplicationContextUtil.getBean("landsatService");
             SimpleDateFormat format= new  SimpleDateFormat("yyyyMMdd");

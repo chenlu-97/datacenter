@@ -868,9 +868,25 @@
                             where d.id in (
                                 select max(dd.id)
                                 from data_download_statistics dd
+                                where 1=1
+                                <if test="start != null">
+                                    AND dd.start_time is not null AND dd.start_time <![CDATA[>=]]> #{start}
+                                </if>
+                                <if test="end != null">
+                                    AND dd.end_time is not null AND dd.end_time <![CDATA[<=]]> #{end}
+                                </if>
                                 group by dd.did
-                            )) b on a.id = b.did order by a.id asc
-        LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
+                            )
+                     ) b on a.id = b.did
+                        where 1=1
+                        <if test="dataType != null">
+                            AND a.data_type LIKE #{dataType}
+                        </if>
+                        <if test="spa != null">
+                            AND a.area LIKE #{spa}
+                        </if>
+                    order by a.id asc
+                 LIMIT #{pageSize} OFFSET (#{pageNum}-1)*(#{pageSize})
     </select>
 
     <select id="getStatisticsNum" resultType="java.lang.Integer">
@@ -881,8 +897,24 @@
                             where d.id in (
                                 select max(dd.id)
                                 from data_download_statistics dd
+                                where 1=1
+                                <if test="start != null">
+                                    AND dd.start_time is not null AND dd.start_time <![CDATA[>=]]> #{start}
+                                </if>
+                                <if test="end != null">
+                                    AND dd.end_time is not null AND dd.end_time <![CDATA[<=]]> #{end}
+                                </if>
                                 group by dd.did
-                            )) b on a.id = b.did
+                               )
+                            ) b on a.id = b.did
+        where 1=1
+        <if test="dataType != null">
+            AND a.data_type LIKE #{dataType}
+        </if>
+        <if test="spa != null">
+            AND a.area LIKE #{spa}
+        </if>
+        order by a.id asc
     </select>
 
 

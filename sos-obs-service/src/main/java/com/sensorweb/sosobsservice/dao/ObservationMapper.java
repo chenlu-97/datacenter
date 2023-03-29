@@ -56,7 +56,7 @@ public interface ObservationMapper {
 
 
 
-    List<Map> getStatisticsByPage(@Param("pageNum")int pageNum, @Param("pageSize")int pageSize);
+    List<Map> getStatisticsByPage(@Param("pageNum")int pageNum, @Param("pageSize")int pageSize, @Param("dataType")String dataType,@Param("start") Instant start, @Param("end") Instant end,@Param("spa") String spa);
 
     int getStatisticsNum();
 }

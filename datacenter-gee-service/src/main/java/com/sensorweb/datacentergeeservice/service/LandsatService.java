@@ -239,9 +239,9 @@ public class LandsatService implements GoogleServiceConstant{
         String res = null;
         boolean finalres = false;
         for(int path = 117;path<=134;path++){
-//        List<Integer> rows = landsatMapper.getRowByPath(path);
-//        for(int row :rows){
-        for(int row = 35;row<=46;row++){
+        List<Integer> rows = landsatMapper.getRowByPath(path);
+        for(int row :rows){
+//        for(int row = 35;row<=46;row++){
                 Instant startTime = string2Instant(time);
                 Instant endTime = string2Instant(time).plusSeconds(24*60*60);
                 List<Landsat> landsat_exit = landsatMapper.getLandsat2(type,row,path,startTime,endTime);
@@ -289,6 +289,61 @@ public class LandsatService implements GoogleServiceConstant{
         }
     }
 
+    public String downloadLandsat_old(String time,String baseUrl,String type) throws IOException {
+        String res = null;
+        boolean finalres = false;
+        for(int path = 117;path<=134;path++){
+            List<Integer> rows = landsatMapper.getRowByPath(path);
+            for(int row :rows){
+//        for(int row = 35;row<=46;row++){
+                Instant startTime = string2Instant(time);
+                Instant endTime = string2Instant(time).plusSeconds(24*60*60);
+                List<Landsat> landsat_exit = landsatMapper.getLandsat2(type,row,path,startTime,endTime);
+                if(landsat_exit.size()>0){
+//                    System.out.println("已经存在该影像！！！");
+                }else{
+//                    System.out.println("没有该影像，需要下载，下载中！！！");
+                    String day_num = YearMouthToday(time);
+                    String year = time.substring(0,4);
+                    String mounth = time.substring(4,6);
+                    Format f1=new DecimalFormat("000");
+                    String filename = "LC8"+path+f1.format(row)+year+day_num+"LGN00";
+                    String url = baseUrl+filename;
+//                    System.out.println("url = " + url);
+                    res = downloadFromUrl(url, filename+".tar", savePath+  year +File.separator + mounth);
+                    if (res == "cookie过期"){
+//                   getCookie();
+                        res = downloadFromUrl(url, filename+".tar", savePath+ year +File.separator + mounth);
+                        if(res == "cookie过期"){
+                            return "cookie error";
+                        }else if(res.equals("no_data")){
+
+                        }else if(res.equals("error")){
+                            return "fail";
+                        }
+                        else{
+                            System.out.println("下载成功 : " +url+ " "+res);
+                            finalres =  saveToDB_old(res);
+                        }
+                    }else if(res.equals("no_data")){
+//                     System.out.println(url+ " "+res);
+                    }else if(res.equals("error")){
+                        return "fail";
+                    }else{
+                        System.out.println("下载成功 : " +url+ " "+res);
+                        finalres = saveToDB_old(res);
+                    }
+                }
+            }
+        }
+        if(finalres){
+            return "success";
+        }else{
+            return "fail";
+        }
+    }
+
+
 
     /**
      * 对文件夹解压、更名、获取xml信息、最终报存到数据库
@@ -308,8 +363,7 @@ public class LandsatService implements GoogleServiceConstant{
                 deleteFileOrDirectory(filepath);//删除压缩包
                 newfilepath = renamefile(unzippath);//文件夹重命名
                 String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
-//                String doc = readJsonFile(newfilepath+File.separator+newfilename+"_stac.json");//读取json文件获取信息
-//                landsat =  getLandsatInfo(doc,newfilepath);// 打包文件信息，变为landsat对象
+
                 landsat = printXMLNodes(newfilepath+File.separator+newfilename+"_MTL.xml");
 
                 flag =  landsatMapper.insertLandsat(landsat);//插入表
@@ -330,6 +384,52 @@ public class LandsatService implements GoogleServiceConstant{
                 submitRawImage(newfilepath,timeNow);//下载后提交初始文件
 //                changeAuthority(newfilepath);//更改文件权限
             }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return  true;
+        }else{
+            return  false;
+        }
+    }
+
+
+    public boolean saveToDB_old(String filepath) throws IOException {
+        String unzippath = filepath.substring(0,filepath.indexOf(".tar"));
+        Landsat landsat = new Landsat();
+        String newfilepath = null;
+        int flag = 0 ;
+        //解压、更名、获取信息
+        try {
+            if(readTarFile(filepath)){ //解压前先判断是不是T1数据，如果是执行下面步骤，不是则删除下载的压缩包
+                TarArchiveInputStream tais = new TarArchiveInputStream(new FileInputStream(new File(filepath)));
+                deTarFile(unzippath, tais);//解压
+                tais.close();
+                deleteFileOrDirectory(filepath);//删除压缩包
+                newfilepath = renamefile(unzippath);//文件夹重命名
+                String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
+
+                String doc = readJsonFile(newfilepath+File.separator+newfilename+"_stac.json");//读取json文件获取信息
+                landsat =  getLandsatInfo(doc,newfilepath);// 打包文件信息，变为landsat对象
+
+                flag =  landsatMapper.insertLandsat(landsat);//插入表
+            }else{
+//                deleteFileOrDirectory(filepath);
+//                System.out.println("下载后的路径是filepath 解压不成功！！！ " + filepath);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if(flag>0){
+            try {
+                if(newfilepath !=null){
+//                generateThumb(newfilepath);//生成缩略图
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Calendar calendarNow = Calendar.getInstance();
+                    String timeNow = format.format(calendarNow.getTime());
+                    submitRawImage(newfilepath,timeNow);//下载后提交初始文件
+//                changeAuthority(newfilepath);//更改文件权限
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -429,29 +529,29 @@ public class LandsatService implements GoogleServiceConstant{
         }
     }
 
-//    /**
-//     * 更改文件名称
-//     */
-//    public static String renamefile(String destPath) {
-//        File f = new File(destPath);
-//        File list[] = f.listFiles();
-//        String filename = null;
-//        for (int i = 0; i < list.length; i++) {
-//            if (list[i].isFile()) {
-//                String temp = list[i].getName();
-//                if(temp.substring(temp.lastIndexOf("_")).equals("_stac.json")){
-//                  filename = temp.substring(0,temp.indexOf("_stac.json"));
-//                    //想命名的原文件夹的路径
-//                    File file1 = new File(destPath);
-//                    //将原文件夹更改为A，其中路径是必要的
-//                    String newFilePath = destPath.substring(0,destPath.lastIndexOf("LC"))+filename;
-//                    file1.renameTo(new File(newFilePath));
-//                    return newFilePath;
-//                }
-//            }
-//        }
-//        return null;
-//    }
+    /**
+     * 更改文件名称
+     */
+    public static String renamefile_old(String destPath) {
+        File f = new File(destPath);
+        File list[] = f.listFiles();
+        String filename = null;
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].isFile()) {
+                String temp = list[i].getName();
+                if(temp.substring(temp.lastIndexOf("_")).equals("_stac.json")){
+                  filename = temp.substring(0,temp.indexOf("_stac.json"));
+                    //想命名的原文件夹的路径
+                    File file1 = new File(destPath);
+                    //将原文件夹更改为A，其中路径是必要的
+                    String newFilePath = destPath.substring(0,destPath.lastIndexOf("LC"))+filename;
+                    file1.renameTo(new File(newFilePath));
+                    return newFilePath;
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * 更改文件名称    _stac.json   _MTL.xml
@@ -593,6 +693,8 @@ public class LandsatService implements GoogleServiceConstant{
         res.setFilePath(path);
         return res;
     }
+
+
 
     public Instant str2Instant(String time) {
         time = time.substring(0, time.indexOf(".")).replace("T"," ");

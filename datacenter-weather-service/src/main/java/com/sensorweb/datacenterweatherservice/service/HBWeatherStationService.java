@@ -46,7 +46,7 @@ public class HBWeatherStationService {
     /**
      * 每小时接入一次数据
      */
-//    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
+    @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的25分开始接入
     public void insertDataByHour() {
 //        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHH0000");
