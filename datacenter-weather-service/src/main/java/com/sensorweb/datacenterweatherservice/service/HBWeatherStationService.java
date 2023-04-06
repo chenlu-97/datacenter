@@ -137,6 +137,8 @@ public class HBWeatherStationService {
             hbWeatherStation.setGst(Float.parseFloat(object.getString("GST")));
             hbWeatherStation.setGst_10cm(Float.parseFloat(object.getString("GST_10cm")));
             hbWeatherStation.setVis(Float.parseFloat(object.getString("VIS")));
+            hbWeatherStation.setWin_d(Float.parseFloat(object.getString("WIN_D_Avg_10mi")));
+            hbWeatherStation.setWin_s(Float.parseFloat(object.getString("WIN_S_Avg_10mi")));
             hbWeatherStation.setQueryTime(queryTime);
             statue = hbWeatherStationMapper.insertData(hbWeatherStation);
         }

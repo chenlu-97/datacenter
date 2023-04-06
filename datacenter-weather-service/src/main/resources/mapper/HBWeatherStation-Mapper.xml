@@ -4,16 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sensorweb.datacenterweatherservice.dao.HBWeatherStationMapper">
     <sql id="insertFields">
-        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time,ground_temperature_10cm,horizontal_visibility
+        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time,ground_temperature_10cm,horizontal_visibility,win_d_avg_10m,win_s_avg_10m
     </sql>
 
     <sql id="selectFields">
-        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time,ground_temperature_10cm,horizontal_visibility
+        station_name,lat,lon,pressure,temperature,relative_humidity,pre_1h,ground_temperature,response_time,ground_temperature_10cm,horizontal_visibility,win_d_avg_10m,win_s_avg_10m
     </sql>
 
     <insert id="insertData" parameterType="HBWeatherStation" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO hb_weather_station_hourly (<include refid="insertFields"></include>)
-        VALUES (#{stationId},#{lat}, #{lon},#{prs},#{tem},#{rhu},#{pre_1h},#{gst},#{queryTime},#{gst_10cm},#{vis})
+        VALUES (#{stationId},#{lat}, #{lon},#{prs},#{tem},#{rhu},#{pre_1h},#{gst},#{queryTime},#{gst_10cm},#{vis},#{win_d},#{win_s})
     </insert>
 
     <resultMap id="hbWeatherStation" type="HBWeatherStation">
@@ -28,6 +28,8 @@
         <result column="response_time" property="queryTime"/>
         <result column="ground_temperature_10cm" property="gst_10cm"/>
         <result column="horizontal_visibility" property="vis"/>
+        <result column="win_d_avg_10m" property="win_d"/>
+        <result column="win_s_avg_10m" property="win_s"/>
     </resultMap>
 
     <select id="selectByPage" resultMap="hbWeatherStation">

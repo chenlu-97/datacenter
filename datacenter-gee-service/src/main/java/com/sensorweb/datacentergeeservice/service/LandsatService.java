@@ -364,7 +364,7 @@ public class LandsatService implements GoogleServiceConstant{
                 newfilepath = renamefile(unzippath);//文件夹重命名
                 String newfilename = newfilepath.substring(newfilepath.lastIndexOf("LC"));
 
-                landsat = printXMLNodes(newfilepath+File.separator+newfilename+"_MTL.xml");
+                landsat = printXMLNodes(newfilepath+File.separator+newfilename+"_MTL.xml", newfilepath);
 
                 flag =  landsatMapper.insertLandsat(landsat);//插入表
             }else{
@@ -654,14 +654,14 @@ public class LandsatService implements GoogleServiceConstant{
     /**
      * 读取并解析xml字符串信息
      */
-    public Landsat printXMLNodes(String path) throws Exception {
+    public Landsat printXMLNodes(String XMLpath,String filepath) throws Exception {
         Landsat res = new Landsat();
-        File file = new File(path);
+        File file = new File(XMLpath);
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(file);
         doc.getDocumentElement().normalize();
-
         res.setImageID(doc.getElementsByTagName("LANDSAT_PRODUCT_ID").item(0).getTextContent());
         res.setSensorID("OLI_TIRS");
         res.setSpacecraftID(doc.getElementsByTagName("SPACECRAFT_ID").item(0).getTextContent());
@@ -690,7 +690,7 @@ public class LandsatService implements GoogleServiceConstant{
                 + min_lon + ' ' + min_lat + ',' + min_lon1+ ' ' + min_lat1 + ',' + max_lon + ' ' + max_lat;
         String wkt = "POLYGON((" + bbox_tmp  + "))";
         res.setCoordinates(wkt);
-        res.setFilePath(path);
+        res.setFilePath(filepath);
         return res;
     }
 

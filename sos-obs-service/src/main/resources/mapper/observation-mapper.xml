@@ -890,7 +890,7 @@
     </select>
 
     <select id="getStatisticsNum" resultType="java.lang.Integer">
-        select count(*)
+        select count(1)
         from data_download_type a
                  left join (select *
                             from data_download_statistics d
@@ -914,7 +914,6 @@
         <if test="spa != null">
             AND a.area LIKE #{spa}
         </if>
-        order by a.id asc
     </select>
 
 
