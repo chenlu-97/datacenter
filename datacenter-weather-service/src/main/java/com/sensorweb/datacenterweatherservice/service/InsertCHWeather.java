@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sensorweb.datacenterutil.utils.DataCenterUtils;
+import com.sensorweb.datacenterutil.utils.SendMail;
 import com.sensorweb.datacenterweatherservice.dao.ChinaWeatherMapper;
 import com.sensorweb.datacenterweatherservice.dao.WeatherMapper;
 import com.sensorweb.datacenterweatherservice.dao.WeatherStationMapper;
@@ -79,7 +80,7 @@ public class InsertCHWeather {
                     log.info("接入中国地面气象站逐小时数据时间: " + date + "Status: Fail");
                     String mes = "接入中国地面气象站逐小时数据接入失败！！----失败时间 ："+ date;
                     // 发送邮件
-//                    SendMail.sendemail(mes);
+                    SendMail.sendemail(mes);
                     SendException("CH_WEATHER",date,mes);
                 }
             }

@@ -86,9 +86,9 @@ public class InsertTWEPA implements AirConstant {
                         log.info("台湾EPA接入时间: " + date + "Status: Success");
                         DataCenterUtils.sendMessage("TW_AIR"+ date, "站网-台湾空气质量","这是一条获取的台湾省空气质量数据",num);
                         System.out.println("台湾EPA接入时间: " + date + "Status: Success");
-                        if(num!=85){
-                            int gap = 85-num;
-                            String mes = "接入时间 ："+ date+ "-----台湾EPA接入部分缺失（站点数据应为85个），现在接入为：" + num +"差值为"+ gap;
+                        if(num!=80){
+                            int gap = 80-num;
+                            String mes = "接入时间 ："+ date+ "-----台湾EPA接入部分缺失（站点数据应为80个），现在接入为：" + num +"差值为"+ gap;
                             // 发送邮件
 //                            SendMail.sendemail(mes);
                             SendException("TW_AIR",date,mes);
@@ -160,16 +160,13 @@ public class InsertTWEPA implements AirConstant {
     }
 
     public Instant str2Instant(String time) {
-        String pattern = "yyyy/MM/dd HH:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm";
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
         return localDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
     }
 
-    /**
-     * 解析JSON字符串信息
-     */
     public List<TWEPA> getEPAInfo(String document) {
         List<TWEPA> res = new ArrayList<>();
         if (!StringUtils.isBlank(document)) {
@@ -179,14 +176,14 @@ public class InsertTWEPA implements AirConstant {
                 for (int i=0; i<feeds.size(); i++) {
                     TWEPA twepa = new TWEPA();
                     JSONObject feed = feeds.getJSONObject(i);
-                    twepa.setTime(str2Instant(feed.getString("PublishTime")));
+                    twepa.setTime(str2Instant(feed.getString("datacreationdate")));
                     twepa.setAqi(feed.getString("AQI"));
                     twepa.setCo(feed.getString("CO"));
                     twepa.setCo8hr(feed.getString("CO_8hr"));
                     twepa.setCountry(feed.getString("Country"));
-                    twepa.setImportDate(str2Instant(feed.getString("PublishTime")));
-                    twepa.setLon(Double.parseDouble(feed.getString("Longitude")));
-                    twepa.setLat(Double.parseDouble(feed.getString("Latitude")));
+                    twepa.setImportDate(str2Instant(feed.getString("datacreationdate")));
+                    twepa.setLon(Double.parseDouble(feed.getString("longitude")));
+                    twepa.setLat(Double.parseDouble(feed.getString("latitude")));
                     twepa.setNo(feed.getString("NO"));
                     twepa.setNo2(feed.getString("NO2"));
                     twepa.setNox(feed.getString("NOx"));
@@ -197,7 +194,7 @@ public class InsertTWEPA implements AirConstant {
                     twepa.setPm25(feed.getString("PM2_5"));
                     twepa.setPm25Avg(feed.getString("PM2_5_AVG"));
                     twepa.setPollutant(feed.getString("Pollutant"));
-                    twepa.setPublishTime(str2Instant(feed.getString("PublishTime")));
+                    twepa.setPublishTime(str2Instant(feed.getString("datacreationdate")));
                     twepa.setSo2(feed.getString("SO2"));
                     twepa.setSo2Avg(feed.getString("SO2_AVG"));
                     twepa.setSiteEngName(feed.getString("SiteEngName"));
@@ -271,18 +268,9 @@ public class InsertTWEPA implements AirConstant {
                 airStationModel.setStationId(twepa.getSiteId());
                 airStationModel.setStationName(twepa.getSiteName());
                 airStationModel.setTownship(twepa.getCountry());
-                JSONObject jsonObject = null;
-                if (airStationModel.getStationName()!=null) {
-                    jsonObject = getGeoAddress(airStationModel.getStationName());
-                }
-                if (jsonObject!=null) {
-                    Object result = jsonObject.get("result");
-                    if (result!=null) {
-                        Object location = ((JSONObject) result).get("location");
-                        airStationModel.setLon(((JSONObject) location).getFloatValue("lng"));
-                        airStationModel.setLat(((JSONObject) location).getFloatValue("lat"));
-                    }
-                }
+                airStationModel.setLon(Float.valueOf((float) twepa.getLon()));
+                airStationModel.setLat(Float.valueOf((float) twepa.getLat()));
+                airStationModel.setGeom("POINT("+Float.valueOf((float) twepa.getLon())+" "+Float.valueOf((float) twepa.getLat())+")");
                 airStationModel.setStationType("TW_EPA_AIR");
                 res.add(airStationModel);
             }

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,7 +69,8 @@ public class InsertTWEPA2 implements AirConstant {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 30 0/1 * * ?") //每个小时的30分开始接入
+//    @Scheduled(cron = "0 30 0/1 * * ?") //每个小时的30分开始接入
+//    @PostConstruct
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
@@ -77,20 +79,21 @@ public class InsertTWEPA2 implements AirConstant {
             @Override
             public void run() {
                 boolean flag = false;
-                try {
+//                try {
                     String path = downloadFile();
                     String document = getDocumentByGZip(path);
                     flag = insertTwEPAInfoBatch(getEPAInfo(document));
-                    if (flag) {
-                        int num = twepaMapper.selectMaxTimeData().size();
-                        log.info("台湾EPA接入时间: " + date + "Status: Success");
-
-                        System.out.println("台湾EPA接入时间: " + date + "Status: Success");
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    log.info("台湾EPA接入时间: " +date + "Status: Fail");
-                }
+                    System.out.println("flag = " + flag);
+//                    if (flag) {
+//                        int num = twepaMapper.selectMaxTimeData().size();
+//                        log.info("台湾EPA接入时间: " + date + "Status: Success");
+//
+//                        System.out.println("台湾EPA接入时间: " + date + "Status: Success");
+//                    }
+//                } catch (Exception e) {
+//                    log.error(e.getMessage());
+//                    log.info("台湾EPA接入时间: " +date + "Status: Fail");
+//                }
             }
         }).start();
     }
@@ -107,7 +110,7 @@ public class InsertTWEPA2 implements AirConstant {
     }
 
     public Instant str2Instant(String time) {
-        String pattern = "yyyy/MM/dd HH:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm";
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         dateTimeFormatter.withZone(ZoneId.of("Asia/Shanghai"));
         LocalDateTime localDateTime = LocalDateTime.parse(time, dateTimeFormatter);
@@ -126,14 +129,14 @@ public class InsertTWEPA2 implements AirConstant {
                 for (int i=0; i<feeds.size(); i++) {
                     TWEPA twepa = new TWEPA();
                     JSONObject feed = feeds.getJSONObject(i);
-                    twepa.setTime(str2Instant(feed.getString("PublishTime")));
+                    twepa.setTime(str2Instant(feed.getString("datacreationdate")));
                     twepa.setAqi(feed.getString("AQI"));
                     twepa.setCo(feed.getString("CO"));
                     twepa.setCo8hr(feed.getString("CO_8hr"));
                     twepa.setCountry(feed.getString("Country"));
-                    twepa.setImportDate(str2Instant(feed.getString("PublishTime")));
-                    twepa.setLon(Double.parseDouble(feed.getString("Longitude")));
-                    twepa.setLat(Double.parseDouble(feed.getString("Latitude")));
+                    twepa.setImportDate(str2Instant(feed.getString("datacreationdate")));
+                    twepa.setLon(Double.parseDouble(feed.getString("longitude")));
+                    twepa.setLat(Double.parseDouble(feed.getString("latitude")));
                     twepa.setNo(feed.getString("NO"));
                     twepa.setNo2(feed.getString("NO2"));
                     twepa.setNox(feed.getString("NOx"));
@@ -144,7 +147,7 @@ public class InsertTWEPA2 implements AirConstant {
                     twepa.setPm25(feed.getString("PM2_5"));
                     twepa.setPm25Avg(feed.getString("PM2_5_AVG"));
                     twepa.setPollutant(feed.getString("Pollutant"));
-                    twepa.setPublishTime(str2Instant(feed.getString("PublishTime")));
+                    twepa.setPublishTime(str2Instant(feed.getString("datacreationdate")));
                     twepa.setSo2(feed.getString("SO2"));
                     twepa.setSo2Avg(feed.getString("SO2_AVG"));
                     twepa.setSiteEngName(feed.getString("SiteEngName"));

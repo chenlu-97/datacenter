@@ -11,16 +11,16 @@
         "StationID","StationName", "QueryTime", "Precipitation", "Update_time", "Pressure", "Wind_p", "Wind_d", "Weather_p","Humidity","Temperature","Lng","Lat","WP", "QS"
     </sql>
 
+    <insert id="insertData" parameterType="ChinaWeather">
+        INSERT INTO "wuhanCC_weather_hourly" (<include refid="insertFields"></include>)
+        VALUES (#{stationId},#{stationName}, #{queryTime}, #{precipitation}, #{updateTime}, #{pressure}, #{windD}, #{windP}, #{weatherP},#{humidity}, #{temperature}, #{lng},#{lat},#{wp}, #{qs})
+        ON CONFLICT ("QS") DO NOTHING
+    </insert>
+
 <!--    <insert id="insertData" parameterType="ChinaWeather">-->
 <!--        INSERT INTO "wuhanCC_weather_hourly" (<include refid="insertFields"></include>)-->
 <!--        VALUES (#{stationId},#{stationName}, #{queryTime}, #{precipitation}, #{updateTime}, #{pressure}, #{windD}, #{windP}, #{weatherP},#{humidity}, #{temperature}, #{lng},#{lat},#{wp}, #{qs})-->
-<!--        ON CONFLICT ("QS") DO NOTHING-->
 <!--    </insert>-->
-
-    <insert id="insertData" parameterType="ChinaWeather">
-        INSERT INTO wuhanCC_weather_hourly ( StationID,StationName, QueryTime, Precipitation, Update_time, Pressure, Wind_p, Wind_d, Weather_p,Humidity,Temperature,Lng,Lat,WP, QS)
-        VALUES (#{stationId},#{stationName}, #{queryTime}, #{precipitation}, #{updateTime}, #{pressure}, #{windD}, #{windP}, #{weatherP},#{humidity}, #{temperature}, #{lng},#{lat},#{wp}, #{qs})
-    </insert>
 
     <insert id="insertDataBatch" parameterType="java.util.List">
         INSERT INTO "wuhanCC_weather_hourly" (<include refid="insertFields"></include>)
