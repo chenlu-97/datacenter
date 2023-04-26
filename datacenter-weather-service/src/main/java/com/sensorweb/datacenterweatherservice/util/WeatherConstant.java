@@ -57,6 +57,8 @@ public interface WeatherConstant {
      */
     String HBWEATHER_STATION_INTERFACEID = "getSurfSixEle";
 
+    String HBWEATHER_STATION_INTERFACEID2 = "gettmp";
+
     /**
      * 湖北气象站点 times
      */

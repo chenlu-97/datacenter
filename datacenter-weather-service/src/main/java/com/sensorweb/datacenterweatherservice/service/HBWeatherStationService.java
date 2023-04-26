@@ -62,7 +62,8 @@ public class HBWeatherStationService {
                 boolean flag = false;
                 try {
                     String document = getApiDocument(dateTime);
-                    flag= getIOTInfo(document);
+                    String document2 = getApiDocument2(dateTime);
+                    flag= getIOTInfo(document,document2);
                     if (flag) {
                         int num = hbWeatherStationMapper.selectMaxTimeData().size();
                         log.info("湖北气象接入时间: " + date + "         Status: Success");
@@ -91,6 +92,12 @@ public class HBWeatherStationService {
         return document;
     }
 
+    public String getApiDocument2(String time) throws IOException {
+        String param = "userId=" + WeatherConstant.HBWEATHER_STATION_ID +"&pwd=" + WeatherConstant.HBWEATHER_STATION_PASSWORD + "&interfaceId=" + WeatherConstant.HBWEATHER_STATION_INTERFACEID2 + "&times=" + time + "&dataCode=" + WeatherConstant.HBWEATHER_STATION_DATACODE + "&dataFormat=" + WeatherConstant.HBWEATHER_STATION_DATAFORMAT;
+        String document = DataCenterUtils.doGet(WeatherConstant.GET_HBWEATHER_STATION_URL, param);
+        return document;
+    }
+
     /**
      * 字符串转Instant  yyyy-MM-dd HH:mm:ss
      * @return
@@ -111,14 +118,17 @@ public class HBWeatherStationService {
      * 通过api请求数据入库
      */
 
-    public boolean getIOTInfo(String document) throws IOException {
+    public boolean getIOTInfo(String document,String document2) throws IOException {
         int statue = 0;
         HBWeatherStation hbWeatherStation = new HBWeatherStation();
         JSONObject jsonObject = JSON.parseObject(document);
+        JSONObject jsonObject2 = JSON.parseObject(document2);
         JSONArray message = jsonObject.getJSONArray("DS");
+        JSONArray message2 = jsonObject2.getJSONArray("DS");
         Instant queryTime = str2Instant(jsonObject.getString("responseTime")).plusSeconds(8*60*60).minusSeconds(20*60);
         for (int i = 0; i < message.size(); i++) {
             JSONObject object = message.getJSONObject(i);
+            JSONObject object2 = message2.getJSONObject(i);
             hbWeatherStation.setStationId(object.getString("Station_Name"));
             hbWeatherStation.setLat(Float.parseFloat(object.getString("Lat")));
             hbWeatherStation.setLon(Float.parseFloat(object.getString("Lon")));
@@ -129,8 +139,8 @@ public class HBWeatherStationService {
             hbWeatherStation.setGst(Float.parseFloat(object.getString("GST")));
             hbWeatherStation.setGst_10cm(Float.parseFloat(object.getString("GST_10cm")));
             hbWeatherStation.setVis(Float.parseFloat(object.getString("VIS")));
-            hbWeatherStation.setWin_d(Float.parseFloat(object.getString("WIN_D_Avg_10mi")));
-            hbWeatherStation.setWin_s(Float.parseFloat(object.getString("WIN_S_Avg_10mi")));
+            hbWeatherStation.setWin_d(Float.parseFloat(object2.getString("WIN_D_Avg_10mi")));
+            hbWeatherStation.setWin_s(Float.parseFloat(object2.getString("WIN_S_Avg_10mi")));
             hbWeatherStation.setQueryTime(queryTime);
             statue = hbWeatherStationMapper.insertData(hbWeatherStation);
         }

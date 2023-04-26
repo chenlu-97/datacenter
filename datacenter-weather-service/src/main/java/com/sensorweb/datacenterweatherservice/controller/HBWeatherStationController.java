@@ -29,7 +29,8 @@ public class HBWeatherStationController {
 
         try {
             String document = hbWeatherStationService.getApiDocument(time);
-            boolean res = hbWeatherStationService.getIOTInfo(document);
+            String document2 =hbWeatherStationService.getApiDocument2(time);
+            boolean res = hbWeatherStationService.getIOTInfo(document,document2);
             System.out.println(res);
         } catch (IOException e) {
             e.printStackTrace();
