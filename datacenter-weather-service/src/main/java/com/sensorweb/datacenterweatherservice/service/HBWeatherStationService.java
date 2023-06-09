@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.List;
 
@@ -46,38 +47,48 @@ public class HBWeatherStationService {
     /**
      * 每小时接入一次数据
      */
-    @Scheduled(cron = "0 35 0/1 * * ?") //每个小时的25分开始接入
+    @Scheduled(cron = "0 35 0/1 * * ?") //每个小时的35分开始接入
     public void insertDataByHour() {
 //        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHH0000");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, -8);//由于接入时间是utc时间和正常的系统时间差8小时，这里需要减去8小时
+//        calendar.add(Calendar.HOUR_OF_DAY, -8);//由于接入时间是utc时间和正常的系统时间差8小时，这里需要减去8小时
         String dateTime = format.format(calendar.getTime());
         LocalDateTime dateTime1 = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-        String date = dateTime1.toString().substring(0,dateTime1.toString().indexOf(".")).replace("T"," ");
+
+        LocalDateTime dateTime2 = LocalDateTime.now();
+        DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+        String strDate3 = dtf3.format(dateTime2);
+        dateTime2 = LocalDateTime.parse(strDate3, dtf3);
+
+        LocalDateTime finalDateTime = dateTime2;
+        LocalDateTime finalDateTime1 = dateTime2;
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
             public void run() {
                 boolean flag = false;
-                try {
-                    String document = getApiDocument(dateTime);
-                    String document2 = getApiDocument2(dateTime);
-                    flag= getIOTInfo(document,document2);
-                    if (flag) {
-                        int num = hbWeatherStationMapper.selectMaxTimeData().size();
-                        log.info("湖北气象接入时间: " + date + "         Status: Success");
-                        System.out.println("湖北气象接入时间: " + date+ "         Status: Success");
-                        DataCenterUtils.sendMessage("HB_Weather_"+date, "站网-湖北省气象","这是一条湖北省气象数据的",num);
+                Instant timeNew =  hbWeatherStationMapper.selectMaxTimeData().get(0).getQueryTime();
+                Instant timeNow = finalDateTime.atZone(ZoneId.of("Asia/Shanghai")).toInstant();
+                while (timeNew.isBefore(timeNow)) {
+                    try {
+                        timeNew = timeNew.plus(1, ChronoUnit.HOURS);
+                        String time = timeNew.toString().replace("T", "").replace("Z", "").replace("-", "").replace(":", "");
+                        String document = getApiDocument(time);
+                        String document2 = getApiDocument2(time);
+                        flag = getIOTInfo(document, document2);
+                        if (flag) {
+                            int num = hbWeatherStationMapper.selectMaxTimeData().size();
+                            log.info("湖北气象接入时间: " + time + "         Status: Success");
+                            System.out.println("湖北气象接入时间: " + time + "         Status: Success");
+                            DataCenterUtils.sendMessage("HB_Weather_" + time, "站网-湖北省气象", "这是一条湖北省气象数据的", num);
+                        }
+                    }catch (Exception e) {
+                        log.error(e.getMessage());
+                        e.printStackTrace();
+                        log.info("湖北气象站接入时间: " + timeNew + "Status: Fail");
                     }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
-                    log.info("湖北气象站接入时间: " + date + "Status: Fail");
-                    String mes = "湖北气象接入失败！！----失败时间 ："+ date;
-                    // 发送邮件
-                    SendMail.sendemail(mes);
-                    SendException("HB_Weather",date,mes);
+                    Thread.sleep(60*10); //防止访问过快，休息10秒
                 }
             }
         }).start();

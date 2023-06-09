@@ -53,7 +53,7 @@ public class InsertCHWeather {
     @Scheduled(cron = "0 25 0/1 * * ?") //每个小时的20分开始接入
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
-        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
+        String date = dateTime.toString();
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -79,9 +79,9 @@ public class InsertCHWeather {
                     e.printStackTrace();
                     log.info("接入中国地面气象站逐小时数据时间: " + date + "Status: Fail");
                     String mes = "接入中国地面气象站逐小时数据接入失败！！----失败时间 ："+ date;
-                    // 发送邮件
-                    SendMail.sendemail(mes);
-                    SendException("CH_WEATHER",date,mes);
+//                    // 发送邮件
+//                    SendMail.sendemail(mes);
+//                    SendException("CH_WEATHER",date,mes);
                 }
             }
         }).start();

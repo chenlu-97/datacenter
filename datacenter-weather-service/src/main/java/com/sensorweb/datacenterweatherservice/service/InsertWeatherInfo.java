@@ -64,7 +64,7 @@ public class InsertWeatherInfo {
     public void insertDataByHour() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         System.out.println("dateTime = " + dateTime);
-        String date = dateTime.toString().substring(0,dateTime.toString().indexOf(".")).replace("T"," ");
+        String date = dateTime.toString();
         new Thread(new Runnable() {
             @SneakyThrows
             @Override
@@ -83,9 +83,9 @@ public class InsertWeatherInfo {
                     e.printStackTrace();
                     log.info("中国气象网接入武汉1+8城市圈时间: " + date + "Status: Fail");
                     String mes = "中国气象网接入武汉1+8城市圈数据接入失败！！----失败时间 ："+ date;
-                    // 发送邮件
-                    SendMail.sendemail(mes);
-                    SendException("WH_1+8_Weather",date,mes);
+//                    // 发送邮件
+//                    SendMail.sendemail(mes);
+//                    SendException("WH_1+8_Weather",date,mes);
                 }
             }
         }).start();

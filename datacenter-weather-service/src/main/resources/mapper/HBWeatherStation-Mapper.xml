@@ -43,7 +43,7 @@
         SELECT count(*)
         FROM hb_weather_station_hourly
     </select>
-    <select id="selectMaxTimeData" resultType="com.sensorweb.datacenterweatherservice.entity.HBWeatherStation">
+    <select id="selectMaxTimeData" resultMap="hbWeatherStation">
         select <include refid="selectFields"></include>
         from hb_weather_station_hourly where response_time = (select max(response_time) from hb_weather_station_hourly);
     </select>
