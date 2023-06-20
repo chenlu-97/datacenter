@@ -73,7 +73,11 @@ public class HBWeatherStationService {
                 while (timeNew.isBefore(timeNow)) {
                     try {
                         timeNew = timeNew.plus(1, ChronoUnit.HOURS);
-                        String time = timeNew.toString().replace("T", "").replace("Z", "").replace("-", "").replace(":", "");
+                        String time = timeNew.toString();
+                        time = time.replace("T", "").replace(" ", "").replace("Z", "").replace("-", "");
+                        int firstIndex = time.indexOf(":");
+                        time = time.substring(0, firstIndex)+"0000";
+                        System.out.println("time = " + time);
                         String document = getApiDocument(time);
                         String document2 = getApiDocument2(time);
                         flag = getIOTInfo(document, document2);
@@ -88,7 +92,7 @@ public class HBWeatherStationService {
                         e.printStackTrace();
                         log.info("湖北气象站接入时间: " + timeNew + "Status: Fail");
                     }
-                    Thread.sleep(60*10); //防止访问过快，休息10秒
+                    Thread.sleep(60*60*2); //防止访问过快，休息60秒
                 }
             }
         }).start();
