@@ -162,46 +162,48 @@ public class DataStatisticsService {
         String tmp = nowTime.plusSeconds(8*60*60).toString().substring(0,nowTime.toString().indexOf('T'))+" 00:00:00";
         Instant preTime = DataCenterUtils.string2Instant(tmp);
 
+        try{
+            Station = dataStatisticsMapper.getCHAirNumByTime(preTime,nowTime) + dataStatisticsMapper.getWeatherNumByTime(preTime,nowTime)
+            +dataStatisticsMapper.getCHWeatherNumByTime(preTime,nowTime)+dataStatisticsMapper.getHBAirNumByTime(preTime,nowTime)
+            +dataStatisticsMapper.getHBWeatherNumByTime(preTime,nowTime)+dataStatisticsMapper.getSuperAirNumByTime(preTime,nowTime)+
+            dataStatisticsMapper.getWaterNumByTime(preTime,nowTime)+dataStatisticsMapper.getTWAirNumByTime(preTime,nowTime);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            satellite = dataStatisticsMapper.getHimawariNumByTime(preTime,nowTime) + dataStatisticsMapper.getModisNumByTime(preTime,nowTime)+
+                    dataStatisticsMapper.getLandsatNumByTime(preTime,nowTime)+dataStatisticsMapper.getGLDASNumByTime(preTime,nowTime)+
+                    dataStatisticsMapper.getGPMNumByTime(preTime,nowTime)
+                    +dataStatisticsMapper.getFYNumByTime(preTime,nowTime)
+                    +dataStatisticsMapper.getSentineByTime(preTime,nowTime)+dataStatisticsMapper.getCopernicus(preTime,nowTime);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            uva = dataStatisticsMapper.getUAVNumByTime(preTime,nowTime);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            mobile =  getVehicleNumberByTime(preTime,nowTime)+getVesselNumberByTime(preTime,nowTime);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try{
+            other = dataStatisticsMapper.getNumberByTime(preTime,nowTime) +dataStatisticsMapper.getWeatherSensorByTime(preTime,nowTime);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
 //        try{
-//            Station = dataStatisticsMapper.getCHAirNumByTime(preTime,nowTime) + dataStatisticsMapper.getWeatherNumByTime(preTime,nowTime)
-//            +dataStatisticsMapper.getCHWeatherNumByTime(preTime,nowTime)+dataStatisticsMapper.getHBAirNumByTime(preTime,nowTime)
-//            +dataStatisticsMapper.getHBWeatherNumByTime(preTime,nowTime)+dataStatisticsMapper.getSuperAirNumByTime(preTime,nowTime)+
-//            dataStatisticsMapper.getWaterNumByTime(preTime,nowTime)+dataStatisticsMapper.getTWAirNumByTime(preTime,nowTime);
-//
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//        try{
-//            satellite = dataStatisticsMapper.getHimawariNumByTime(preTime,nowTime) + dataStatisticsMapper.getModisNumByTime(preTime,nowTime)+
-//                    dataStatisticsMapper.getLandsatNumByTime(preTime,nowTime)+dataStatisticsMapper.getGLDASNumByTime(preTime,nowTime)+
-//                    dataStatisticsMapper.getGPMNumByTime(preTime,nowTime)
-//                    +dataStatisticsMapper.getFYNumByTime(preTime,nowTime)
-//                    +dataStatisticsMapper.getSentineByTime(preTime,nowTime)+dataStatisticsMapper.getCopernicus(preTime,nowTime);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//        try{
-//            uva = dataStatisticsMapper.getUAVNumByTime(preTime,nowTime);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//        try{
-//            mobile =  getVehicleNumberByTime(preTime,nowTime)+getVesselNumberByTime(preTime,nowTime);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//
-//        try{
-//            other = dataStatisticsMapper.getNumberByTime(preTime,nowTime) +dataStatisticsMapper.getWeatherSensorByTime(preTime,nowTime);
+//            num = dataStatisticsMapper.getTodayNumber(preTime);
 //        }catch(Exception e){
 //            e.printStackTrace();
 //        }
 
-        try{
-            num = dataStatisticsMapper.getTodayNumber(preTime);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        num = Station+satellite+mobile+uva+other;
 
         int res = 0;
 
@@ -601,7 +603,6 @@ public class DataStatisticsService {
         }
 
 
-
         Map result = new LinkedHashMap();
         Map stations = new LinkedHashMap();
         stations.put("name","地面站网");
@@ -658,6 +659,7 @@ public class DataStatisticsService {
         }
         return i>0;
     }
+
 
     @XxlJob("DC_Overview_SensorPlatform")
     public boolean SensorPlatform() {
@@ -867,6 +869,7 @@ public class DataStatisticsService {
         }
         return i>0;
     }
+
 
     @XxlJob("DC_BasicData_GroundStation")
     public boolean GroundStation() {
@@ -1590,8 +1593,7 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWeatherSensorByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getNumberByTime(start_mounth,stop_mounth);
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+1000;
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -1676,8 +1678,7 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWeatherSensorByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getNumberByTime(start_mounth,stop_mounth);
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+ 1000;
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -1757,8 +1758,7 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start,end) + dataStatisticsMapper.getWeatherNumByTime(start,end)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start,end)+dataStatisticsMapper.getHBAirNumByTime(start,end)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start,end)+dataStatisticsMapper.getSuperAirNumByTime(start,end)+
-                        dataStatisticsMapper.getWaterNumByTime(start,end)+dataStatisticsMapper.getTWAirNumByTime(start,end)+
-                        dataStatisticsMapper.getWeatherSensorByTime(start,end)+dataStatisticsMapper.getNumberByTime(start,end);
+                        dataStatisticsMapper.getWaterNumByTime(start,end)+dataStatisticsMapper.getTWAirNumByTime(start,end)+1000;
 
             }catch(Exception e){
                 e.printStackTrace();
