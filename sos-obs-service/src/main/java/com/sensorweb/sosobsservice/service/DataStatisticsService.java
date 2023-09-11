@@ -63,38 +63,68 @@ public class DataStatisticsService {
 
     @XxlJob("DC_Overview_DataNumber")
     public boolean DataNumber() {
-        int AirStation=1;
-        int WeatherStation=1;
-        int offline = 1;
-        int laads  = 1;
-        int gee = 1;
-        int himawari = 1;
-        int mobile = 1;
+        int HBWeatherStation=1;
+        int HBWater =1;
+        int HBHJStation=1;
+        int CHWeatherStation=1;
+        int CHAirStation=1;
+        int nasa = 1;
+        int usgs  = 1;
+        int himawari = 1 ;
+        int sentinel = 1;
         int littleSensor = 1;
-        int uav = 1;
-        try{
-            AirStation = dataStatisticsMapper.getCHAirNum()+ dataStatisticsMapper.getHBAirNum()+ dataStatisticsMapper.getTWAirNum()+dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getTXZNum()+ dataStatisticsMapper.getSuperAirNum()+dataStatisticsMapper.getWaterNum();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        try{
-            offline = dataStatisticsMapper.getWaterQualityNum()+ dataStatisticsMapper.getWaterPollutionNum()+10000+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getwaterAutoNum();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        try{
-            WeatherStation = dataStatisticsMapper.getWeatherNum() + dataStatisticsMapper.getCHWeatherNum() + dataStatisticsMapper.getHBWeatherNum()+ dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getWeatherSensorNumber();
+        int GF = 1;
+        int tw = 1;
+        int fy = 1;
+        int copernicus = 1;
 
+
+        try{
+            HBHJStation = dataStatisticsMapper.getHBAirNum() + dataStatisticsMapper.getSuperAirNum()+dataStatisticsMapper.getWaterNum()+getVehicleNumber();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try{
+            HBWater = dataStatisticsMapper.getWaterQualityNum()+ dataStatisticsMapper.getWaterPollutionNum()+getVesselNumber() + dataStatisticsMapper.getwaterAutoNum();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try{
+            tw = dataStatisticsMapper.getTWAirNum();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try{
+            CHAirStation =dataStatisticsMapper.getCHAirNum();
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            laads = dataStatisticsMapper.getModisNum()+10000+10000;
+            HBWeatherStation =dataStatisticsMapper.getHBWeatherNum()+dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum();
         }catch(Exception e){
             e.printStackTrace();
         }
         try{
-            gee =dataStatisticsMapper.getLandsatNum() +dataStatisticsMapper.getFYNum()+dataStatisticsMapper.getSentinelNum();
+            CHWeatherStation =dataStatisticsMapper.getCHWeatherNum()+dataStatisticsMapper.getWeatherNum();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            GF = 10000;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        try{
+            nasa =dataStatisticsMapper.getModisNum()+10000;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        try{
+            usgs =dataStatisticsMapper.getLandsatNum() ;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -104,29 +134,35 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            mobile =  getVehicleNumber()+getVesselNumber();
+            sentinel =  dataStatisticsMapper.getSentinelNum();
         }catch(Exception e){
             e.printStackTrace();
         }
 
         try{
-            littleSensor = dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getWeatherSensorNumber()+dataStatisticsMapper.getTXZNum();
+            littleSensor = dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getWeatherSensorNumber()+dataStatisticsMapper.getTXZNum()+dataStatisticsMapper.getUAVNum() ;
         }catch(Exception e){
             e.printStackTrace();
         }
 
         try{
-            uav = dataStatisticsMapper.getUAVNum() ;
+            fy = dataStatisticsMapper.getFYNum();
         }catch(Exception e){
             e.printStackTrace();
         }
 
-        int num = AirStation+WeatherStation+offline+himawari+laads+gee+mobile +littleSensor+ uav;
+        try{
+            copernicus = 10000;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        int total = HBWeatherStation + HBWater +HBHJStation+ CHWeatherStation + CHAirStation+nasa+ usgs+himawari+sentinel+littleSensor+GF+tw+fy+copernicus;
 
         dataStatistics statistics = new dataStatistics();
         int res = 0;
 
-        res = ((int)Math.floor(num/10000));
+        res = ((int)Math.floor(total/10000));
 
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Shanghai"));
@@ -2189,11 +2225,6 @@ public class DataStatisticsService {
         }
         return i>0;
     }
-
-
-
-
-
 
 
 
