@@ -338,9 +338,7 @@
 
 
     <select id="getTodayNumber" resultType="java.lang.Integer" parameterType="java.time.Instant">
-      select sum(total) as total
-      from push_data
-      where create_time <![CDATA[>=]]> #{time}
+      SELECT SUM(total) FROM(select DISTINCT on(id) total from push_data where create_time <![CDATA[>=]]> #{time}) as total
     </select>
 
 </mapper>
