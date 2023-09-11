@@ -73,7 +73,7 @@ public class DataStatisticsService {
         int littleSensor = 1;
         int uav = 1;
         try{
-            AirStation = dataStatisticsMapper.getHBAirNum() + dataStatisticsMapper.getSuperAirNum()+dataStatisticsMapper.getCHAirNum()+dataStatisticsMapper.getTWAirNum()+ dataStatisticsMapper.getWaterNum();
+            AirStation = dataStatisticsMapper.getCHAirNum()+ dataStatisticsMapper.getHBAirNum()+ dataStatisticsMapper.getTWAirNum()+dataStatisticsMapper.getLittleSensorNumber()+dataStatisticsMapper.getTXZNum()+ dataStatisticsMapper.getSuperAirNum()+dataStatisticsMapper.getWaterNum();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -83,7 +83,8 @@ public class DataStatisticsService {
             e.printStackTrace();
         }
         try{
-            WeatherStation = dataStatisticsMapper.getWeatherNum() + dataStatisticsMapper.getCHWeatherNum() + dataStatisticsMapper.getHBWeatherNum();
+            WeatherStation = dataStatisticsMapper.getWeatherNum() + dataStatisticsMapper.getCHWeatherNum() + dataStatisticsMapper.getHBWeatherNum()+ dataStatisticsMapper.getyaEBNum()+dataStatisticsMapper.getyaMRNum()+dataStatisticsMapper.getWeatherSensorNumber();
+
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -1589,7 +1590,8 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth);
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getWeatherSensorByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getNumberByTime(start_mounth,stop_mounth);
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -1674,7 +1676,8 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start_mounth,stop_mounth) + dataStatisticsMapper.getWeatherNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getHBAirNumByTime(start_mounth,stop_mounth)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getSuperAirNumByTime(start_mounth,stop_mounth)+
-                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth);
+                        dataStatisticsMapper.getWaterNumByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getTWAirNumByTime(start_mounth,stop_mounth)+
+                        dataStatisticsMapper.getWeatherSensorByTime(start_mounth,stop_mounth)+dataStatisticsMapper.getNumberByTime(start_mounth,stop_mounth);
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -1754,7 +1757,8 @@ public class DataStatisticsService {
                 Station = dataStatisticsMapper.getCHAirNumByTime(start,end) + dataStatisticsMapper.getWeatherNumByTime(start,end)
                         +dataStatisticsMapper.getCHWeatherNumByTime(start,end)+dataStatisticsMapper.getHBAirNumByTime(start,end)
                         +dataStatisticsMapper.getHBWeatherNumByTime(start,end)+dataStatisticsMapper.getSuperAirNumByTime(start,end)+
-                        dataStatisticsMapper.getWaterNumByTime(start,end)+dataStatisticsMapper.getTWAirNumByTime(start,end);
+                        dataStatisticsMapper.getWaterNumByTime(start,end)+dataStatisticsMapper.getTWAirNumByTime(start,end)+
+                        dataStatisticsMapper.getWeatherSensorByTime(start,end)+dataStatisticsMapper.getNumberByTime(start,end);
 
             }catch(Exception e){
                 e.printStackTrace();
@@ -2185,6 +2189,11 @@ public class DataStatisticsService {
         }
         return i>0;
     }
+
+
+
+
+
 
 
 
